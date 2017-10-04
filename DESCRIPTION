@@ -1,9 +1,14 @@
 Package: purexposure
-Title: What the Package Does (one line, title case)
+Title: Pull and Calculate Exposure to CA Pesticide Use Registry Records
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Rachel", "Severson", email = "rachel.severson@colostate.edu", 
+                  role = c("aut", "cre"))
+Description: Pulls and cleans data from California's Pesticide Use Registry 
+    (PUR) to visualize and calculate exposure to active ingredients present 
+    in applied pesticides.
 Depends: R (>= 3.4.1)
-License: What license is it under?
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    dplyr (>= 0.7.3)
