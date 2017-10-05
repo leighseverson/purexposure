@@ -126,10 +126,22 @@ chemical_codes <- function(year, chemicals = "all") {
 #'   Alameda county, enter either "alameda" or "01" for the \code{county}
 #'   argument.
 #' @param year A four-digit numeric year in the range of 1990 to 2015 or a
-#' vector of years. Indicates the years for which you would like to pull PUR
-#' datasets.
+#'   vector of years. Indicates the years for which you would like to pull PUR
+#'   datasets.
+#' @param verbose TRUE / FALSE indicating whether you would like a single message
+#'   printed indicating which counties and years you are pulling data for. The
+#'   default value is TRUE.
+#' @param download_progress TRUE / FALSE indicating whether you would like a
+#'   message and progress bar printed for each year of PUR data that is downloaded.
+#'   The default value is FALSE.
 #'
 #' @return A data frame with 33 columns.
+#'
+#' @section Note: For more documentation of raw PUR data, see the Pesticide Use
+#'   Report Data User Guide & Documentation document published by the California
+#'   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
+#'   "pur[year].zip" file between 1990 and 2015 found here:
+#'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
 #'
 #' @examples
 #' \dontrun{
@@ -137,150 +149,184 @@ chemical_codes <- function(year, chemicals = "all") {
 #' }
 #' @importFrom dplyr %>%
 #' @export
-raw_pur <- function(counties, years) {
+raw_pur <- function(counties, years, verbose = TRUE, download_progress = FALSE) {
 
   code_df <- purexposure::county_codes
 
-  for (i in 1:length(counties)) {
+  if (!all(is.character(counties))) {
+    stop("County names and/or codes should be character strings.")
+  }
+  if (!all(is.numeric(years))) {
+    stop("Years should be four-digit numeric values.")
+  }
+  if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > 2015)) {
+    stop("Years should be between 1990 and 2015.")
+  }
 
-    test <- suppressWarnings(as.numeric(counties[i]))
-    if (is.na(test)) {
-      county_nm <- toupper(counties[i])
+  test <- suppressWarnings(as.numeric(counties))
+  order <- data.frame(counties = counties, order = 1:length(counties))
 
-      county_name <- grep(county_nm, code_df$county_name, value = TRUE)
+  names <- counties[grep(TRUE, is.na(test))]
+  if (length(names) != 0) {
+    for (k in 1:length(names)) {
 
-      if (length(county_name) != 1) {
-        stop(paste0(counties[i], " doesn't match any California counties. Check out the
-            county_codes data set included with this package for names and
-            corresponding codes."))
+      county_nm <- toupper(names[k])
+      county_test <- grep(county_nm, code_df$county_name, value = TRUE)
+
+      if (length(county_test) != 1) {
+        stop(paste0("\"", names[k], "\"", " doesn't match any California counties. ",
+                    "Check out the county_codes data set included with this package for ",
+                    "county names and corresponding codes."))
       }
 
-      code <- dplyr::filter(code_df, county_name == county_name)$county_code
+      s <- strsplit(names[k], " ")[[1]]
+      county_name <- paste(toupper(substring(s, 1,1)), substring(s, 2),
+                           sep = "", collapse = " ")
+      order_df <- data.frame(counties = names[k], name_clean = county_name)
+      if (k == 1) {
+        county_name_out <- county_name
+        order_df_out <- order_df
+      } else {
+        county_name_out <- c(county_name_out, county_name)
+        order_df_out <- rbind(order_df_out, order_df)
+      }
+    }
+  }
 
-    } else {
+  codes <- counties[grep(FALSE, is.na(test))]
+  if (length(codes) != 0) {
+    for (l in 1:length(codes)) {
 
-      county_cd <- counties[i]
+      county_cd <- codes[l]
 
       county_code <- grep(county_cd, code_df$county_code, value = TRUE)
 
       if (length(county_code) != 1) {
-        stop(paste0(counties[i], " doesn't match any California counties. Check out the
-            county_codes data set included with this package for names and
-                  corresponding codes."))
+        stop(paste0("\"", codes[l], "\"", " doesn't match any California counties. ",
+                    "Check out the county_codes data set included with this package for ",
+                    "county names and corresponding codes."))
       }
 
-      code <- county_code
+      county_name2 <- dplyr::filter(code_df, county_code == codes[l])$county_name
+      county_name2 <- tolower(county_name2)
+      s2 <- strsplit(county_name2, " ")[[1]]
+      county_name2 <- paste(toupper(substring(s2, 1,1)), substring(s2, 2),
+                            sep = "", collapse = " ")
+      order_df2 <- data.frame(counties = codes[l], name_clean = county_name2)
+      if (l == 1) {
+        county_name_out2 <- county_name2
+        order_df_out2 <- order_df2
+      } else {
+        county_name_out2 <- c(county_name_out2, county_name2)
+        order_df_out2 <- rbind(order_df_out2, order_df2)
+      }
+    }
+  }
 
+  if (length(names) != 0 & length(codes) != 0) {
+    order_df <- rbind(order_df_out, order_df_out2)
+  } else if (length(names) != 0 & length(codes) == 0) {
+    order_df <- order_df_out
+  } else if (length(names) == 0 & length(codes) != 0) {
+    order_df <- order_df_out2
+  }
+
+  order_df_full <- suppressWarnings(dplyr::full_join(order_df, order,
+                                                     by = "counties") %>%
+                                      dplyr::arrange(order))
+
+  names_clean <- as.character(order_df_full$name_clean)
+
+  if (verbose) {
+
+    ## counties section
+    if (length(names_clean) == 1) {
+      county_message <- paste0(names_clean, " county")
+    } else if (length(names_clean) == 2) {
+      county_message <- paste0(names_clean[1], " and ", names_clean[2], " counties")
+    } else if (length(names_clean) > 2) {
+      counties_vec <- names_clean[1:length(names_clean)-1]
+      counties_vec <- paste(counties_vec, collapse = ", ")
+      county_message <- paste0(counties_vec, ", and ", names_clean[length(names_clean)],
+                               " counties")
     }
 
-    if (!is.na(test)) {
-      county_name <- dplyr::filter(code_df, county_code == code)$county_name
-      county_name <- tolower(county_name)
+    ## years section
+    if (length(years) == 1) {
+      year_message <- paste0(years, ".")
+    } else if (length(years) == 2) {
+      year_message <- paste0(years[1], " and ", years[2], ".")
+    } else if (length(years) > 1) {
+      years_list <- split(years, cumsum(c(1, diff(years) != 1)))
+      if (length(years_list) == 1) {
+        year_message <- paste0(years[1], " through ", years[length(years)], ".")
+      } else {
+        years_vec <- years[1:length(years)-1]
+        years_vec <- paste(years_vec, collapse = ", ")
+        year_message <- paste0(years_vec, ", and ", years[length(years)], ".")
+      }
+    }
+
+    message(paste0("Pulling PUR data for ", county_message, " for ", year_message))
+
+  }
+
+  for (i in 1:length(years)) {
+
+    url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                  years[i], ".zip")
+    file <- paste0("pur", years[i], ".zip")
+
+    current_dir <- getwd()
+    dir <- tempdir()
+    setwd(dir)
+
+    if (download_progress) {
+      quiet <- FALSE
     } else {
-      county_name <- tolower(county_name)
+      quiet <- TRUE
     }
 
-    s <- strsplit(county_name, " ")[[1]]
-    county_name <- paste(toupper(substring(s, 1,1)), substring(s, 2),
-                         sep = "", collapse = " ")
+    download.file(url, destfile = file, mode = "wb", quiet = quiet)
+    unzip(file, exdir = dir)
 
-    message("Pulling Pesticide Use Report data for ") ## message, add verbose arg
+    sm_year <- substr(years[i], 3, 4)
 
-    for (j in 1:length(years)) {
+    for (j in 1:length(counties)) {
 
-      url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
-                    years[j], ".zip")
-      file <- paste0("pur", years[j], ".zip")
+      test2 <- suppressWarnings(as.numeric(counties[j]))
+      if (is.na(test2)) {
+        county_nm <- toupper(counties[j])
+        county_nm <- grep(county_nm, code_df$county_name, value = TRUE)
+        code <- dplyr::filter(code_df, county_name == county_nm)$county_code
+      } else {
+        county_cd <- counties[i]
+        county_code <- grep(county_cd, code_df$county_code, value = TRUE)
+        code <- county_code
+      }
 
-      current_dir <- getwd()
-      dir <- tempdir()
-      setwd(dir)
-
-      download.file(url, destfile = file, mode = "wb", quiet = quiet)
-      unzip(file, exdir = dir)
-
-      sm_year <- substr(years[j], 3, 4)
       raw_data <- suppressWarnings(suppressMessages(
-        readr::read_csv(paste0("udc", sm_year, "_", county_code, ".txt"))))
-
-      setwd(current_dir)
+        readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))))
 
       if (j == 1) {
-        years_out <- raw_data
+        year_out <- raw_data
       } else {
-        years_out <- rbind(raw_data, years_out)
+        year_out <- rbind(year_out, raw_data)
       }
 
     }
 
+    setwd(current_dir)
+
     if (i == 1) {
-      raw_out <- years_out
+      raw_out <- year_out
     } else {
-      raw_out <- rbind(raw_out, years_out)
+      raw_out <- rbind(raw_out, year_out)
     }
 
   }
 
   return(raw_out)
-
-}
-
-
-
-
-raw_pur <- function(county, year) {
-
-  code_df <- purexposure::county_codes
-
-  test <- suppressWarnings(as.numeric(county))
-  if (is.na(test)) {
-    county_nm <- toupper(county)
-
-    # make sure county is an exact match
-    county_name <- grep(county_nm, code_df$couty_name, value = TRUE)
-
-    if (length(county_name) != 1) {
-      stop(paste0(county, " doesn't match any California counties. Check out the
-            county_codes data set included with this package for names and
-            corresponding codes."))
-    }
-
-    code <- dplyr::filter(code_df, county_name == county_name)$county_cd
-
-  } else {
-    county_cd <- county
-
-    county_code <- grep(county_cd, code_df$county_code, value = TRUE)
-
-    if (length(county_code) != 1) {
-      stop(paste0(county, " doesn't match any California counties. Check out the
-            county_codes data set included with this package for names and
-                  corresponding codes."))
-    }
-
-    code <- county_code
-
-  }
-
-  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
-                year, ".zip")
-  file <- paste0("pur", year, ".zip")
-
-  current_dir <- getwd()
-  dir <- tempdir()
-  setwd(dir)
-
-  download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  unzip(file, exdir = dir)
-
-  sm_year <- substr(year, 3, 4)
-  raw_data <- suppressWarnings(suppressMessages(
-    readr::read_csv(paste0("udc", sm_year, "_", county_code, ".txt"))))
-
-
-  setwd(current_dir)
-
-  return(raw_data)
 
 }
 
