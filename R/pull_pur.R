@@ -199,8 +199,6 @@ pull_pur_file <- function(year, counties, download_progress = FALSE) {
 
   sm_year <- substr(year, 3, 4)
 
-  code <- find_county_code(county)
-
   codes <- purrr::map(counties, find_county_code) %>% unlist()
 
   read_in_counties <- function(code) {
@@ -217,6 +215,21 @@ pull_pur_file <- function(year, counties, download_progress = FALSE) {
   setwd(current_dir)
   return(counties_in_year)
 
+}
+
+#' Extract a character vector from a tibble with one column.
+#'
+#' @param df A tibble with one column.
+#'
+#' @return A character vector
+#'
+#' @example
+#' \dontrun{
+#' tibble_to_vector(tibble::tibble(x = 1:3))
+#' }
+tibble_to_vector <- function(tib) {
+  vec <- tib %>% dplyr::pull(1) %>% as.character()
+  return(vec)
 }
 
 #' Pull raw PUR data by counties and years
@@ -398,19 +411,16 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 
   ## pull data
 
-  cty_tibble_to_vector <- function(df) {
-    vec <- as.character(df$county)
-    return(vec)
-  }
-
   years_counties <- expand.grid(year = years, county = counties) %>%
     dplyr::group_by(year) %>%
     tidyr::nest() %>%
-    dplyr::mutate(counties = purrr::map(data, cty_tibble_to_vector)) %>%
+    dplyr::mutate(counties = purrr::map(data, tibble_to_vector)) %>%
     dplyr::select(-data)
 
-  raw_df <- purrr::map2_dfr(years_counties$year, years_counties$counties,
-                             pull_pur_file)
+  raw_df <- purrr::map2_dfr(years_counties$year,
+                            years_counties$counties,
+                            pull_pur_file,
+                            download_progress = download_progress)
 
   return(raw_df)
 
@@ -495,7 +505,12 @@ pur_data <- function(years, counties, chemicals, sum_application = TRUE,
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                          download_progress = download_progress)
 
-  years_chemicals <- expand.grid(year = years, chemicals = chemicals)
+  years_chemicals <- expand.grid(year = years, chemicals = chemicals) %>%
+    dplyr::group_by(year) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(chemicals = )
+
+
   years_chemicals <- dplyr::mutate(years_chemicals,
                                    chemicals = as.character(chemicals))
   chem_df <- purrr::map2_dfr(years_chemicals$year, years_chemicals$chemical,
