@@ -5,9 +5,9 @@
 #' "county.txt" was pulled from the .zip file "pur2000.zip" found here:
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 #'
-#' @format A data frame with 59 rows and 2 columns:
+#' @format A data frame with 59 rows and two columns:
 #' \describe{
-#'   \item{county_name}{A character vector giving California county names}}
+#'   \item{county_name}{A character vector giving California county names.}
 #'   \item{county_code}{A character vector giving county codes (ranging from "01"
 #'   through "58", with "-1" indicating "unknown") corresponding to each
 #'   California county. Note: these codes are unique to California PUR datasets;
@@ -16,3 +16,29 @@
 #'
 #' @source
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+"county_codes"
+
+#' California Pesticide Use Report chemical codes.
+#'
+#' A list of data frames (one for each year from 1990 through 2015) containing
+#' California Department of Pesticide Regulation chemical codes and names used
+#' to identify active ingredients in Pesticide Use Report data. "chemical.txt"
+#' files for each year were pulled from the .zip files "pur1990.zip" through
+#' "pur2015.zip" found here:
+#' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+#'
+#' @format A list of 26 elements. Each element is a data frame with a variable
+#' number of rows ranging from 3,579 to 3,934 and  three columns:
+#' \describe{
+#'   \item{chem_code}{An integer giving the chemical code. This uniquely
+#'   identifies a chemical within a year.}
+#'   \item{chemalpa_cd}{An integer used to sort the chemical names in each data
+#'   frame alphabetically.}
+#'   \item{chemname}{A character vector giving common chemical name for each
+#'   active ingredient. These are usually listed on the pesticide product
+#'   label.}
+#' }
+#'
+#' @source
+#' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+"chemical_list"
