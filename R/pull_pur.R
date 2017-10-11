@@ -407,7 +407,7 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 #'   given in \code{unit}. The default value is TRUE.
 #' @param unit A character string giving either "section" or "township".
 #'   Specifies whether applications of each active ingredient should be summed
-#'   by California section (the default) or by township if \code{sum} is
+#'   by California section (the default) or by township if \code{sum_application} is
 #'   \code{TRUE}.
 #' @param include_ag TRUE / FALSE indicating if you would like to retain
 #'   aerial/ground application data when summing application across sections or
@@ -429,7 +429,7 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 #'     of application. PLS sections are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
 #'     (N or S), range (01-47), range direction (E or W) and section number
-#'     (01-36). (This column is not included if \code{sum} = TRUE).
+#'     (01-36). (This column is not included if \code{sum_application} = TRUE).
 #'     \item \code{township} A string 7 characters long indicating the township
 #'     of application. PLS townships are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
@@ -441,7 +441,7 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 #'     \item \code{date} the date of application (yyyy-mm-dd).
 #'     \item \code{aerial_ground} A character giving the application method.
 #'     "A" = aerial, "G" = ground, and "O" = other. (This column is not included if
-#'     you \code{sum} = TRUE and \code{include_ag} = FALSE.)
+#'     you \code{sum_application} = TRUE and \code{include_ag} = FALSE.)
 #'     \item \code{use_no} A character ID ID identifing unique application of an
 #'     active ingredient across years. This value is a combination of the raw PUR
 #'     \code{use_no} and the year of application.
@@ -450,7 +450,7 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 #'     entered in error. The algorithm for identifying and replacing outliers
 #'     was developed based on methods used by Gunier et al. (2001). Please see
 #'     the package vignette for more detail regarding these methods. (This column
-#'     is not included if \code{sum} = TRUE).
+#'     is not included if \code{sum_application} = TRUE).
 #'   }
 #'
 #' @section Note: For documentation of raw PUR data, see the Pesticide Use
