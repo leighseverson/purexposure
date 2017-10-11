@@ -1,6 +1,6 @@
 #' Pull cleaned PUR data by counties, years, and active ingredients
 #'
-#' \code{pur_data} returns a data frame of cleaned Pesticide Use Report data
+#' \code{clean_pur_data} returns a data frame of cleaned Pesticide Use Report data
 #' filtered by counties, years, and active ingredients. Active ingredients
 #' or chemical classes present in applied pesticides can be summed by either
 #' Public Land Survey (PLS) section or township.
@@ -106,33 +106,37 @@
 #'
 #' @examples
 #' \dontrun{
-#' df <- pur_data(download_progress = TRUE)
-#' df2 <- pur_data(years = 2000:2010, counties = c("01", "nevada", "riverside"),
-#'                 chemicals = "methylene")
+#' df <- clean_pur_data(download_progress = TRUE)
+#' df2 <- clean_pur_data(years = 2000:2010,
+#'                       counties = c("01", "nevada", "riverside"),
+#'                       chemicals = "methylene")
 #'
 #' # Sum application by active ingredients
-#' df3 <- pur_data(years = 2000:2010, counties = c("01", "nevada", "riverside"),
-#'                 chemicals = "methylene",
-#'                 unit = "township", sum_application = TRUE)
+#' df3 <- clean_pur_data(years = 2000:2010,
+#'                       counties = c("01", "nevada", "riverside"),
+#'                       chemicals = "methylene",
+#'                       unit = "township", sum_application = TRUE)
 #'
 #' # Or by chemical classes
 #' chemical_class_df <- rbind(chemical_codes(2000, "methylene"),
 #'                            chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
 #'
-#' df4 <- pur_data(1995, counties = "fresno", chemicals = chemical_class$chemname,
-#'                 sum_application = TRUE, sum_by = "chemical_class",
-#'                 unit = "township",
-#'                 chemical_class = chemical_class_df)
+#' df4 <- clean_pur_data(years = 1995,
+#'                       counties = "fresno",
+#'                       chemicals = chemical_class$chemname,
+#'                       sum_application = TRUE,
+#'                       sum_by = "chemical_class",
+#'                       unit = "township",
+#'                       chemical_class = chemical_class_df)
 #' }
 #' @importFrom dplyr %>%
 #' @export
-pur_data <- function(years = "all", counties = "all", chemicals = "all",
-                     sum_application = FALSE,
-                     unit = "section", sum_by = "active_ingredient",
-                     chemical_class = NULL,
-                     include_ag = TRUE, verbose = TRUE,
-                     download_progress = FALSE) {
+clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
+                           sum_application = FALSE, unit = "section",
+                           sum_by = "active_ingredient", chemical_class = NULL,
+                           include_ag = TRUE, verbose = TRUE,
+                           download_progress = FALSE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                          download_progress = download_progress)

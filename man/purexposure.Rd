@@ -7,6 +7,6 @@
 \title{purexposure: A package for working with CA Pesticide Use Registry data.}
 \description{
 The purexposure package provides functions to pull data from California's
-Pesticide Use Registry (PUR), as well as to, visualize and calculate
-exposure to active ingredients present in applied pesticides.
+Pesticide Use Registry (PUR), as well as to calculate exposure to and
+visualize active ingredients present in applied pesticides.
 }
