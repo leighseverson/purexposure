@@ -1,10 +1,9 @@
 # save chemical code lookup tables for each year
 library(readr)
 library(usethis)
+library(purrr)
 
-chemical_list <- list()
-
-for (year in as.character(1990:2015)) {
+pull_chemical_list <- function(year) {
 
   url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
                 year, ".zip")
@@ -13,15 +12,17 @@ for (year in as.character(1990:2015)) {
   current_dir <- getwd()
   dir <- tempdir()
 
-  download.file(url, destfile = file, mode = "wb", quiet = quiet)
+  download.file(url, destfile = file, mode = "wb")
   unzip(file, exdir = dir)
   setwd(dir)
 
   chemical_file <- readr::read_csv("chemical.txt")
-  chemical_list[[year]] <- chemical_file
 
-  setwd(current_dir)
+  return(chemical_file)
 
 }
 
-usethis::use_data(chemical_list, internal = TRUE, overwrite = TRUE)
+chemical_list <- purrr::map(1990:2015, pull_chemical_list)
+names(chemical_list) <- 1990:2015
+
+usethis::use_data(chemical_list, overwrite = TRUE)

@@ -7,7 +7,7 @@
 chemical_search(year, chemicals)
 }
 \arguments{
-\item{year}{A four-digit numeric year in the range of 1990 to 2015. Indicates
+\item{year}{A four-digit  year in the range of 1990 to 2015. Indicates
 the year in which you would like to search for active ingredients.}
 
 \item{chemicals}{A string or vector of strings giving search terms of
@@ -19,7 +19,7 @@ A list of data frames (one data frame per search term). Each data
   frame has two columns: \code{chemname}, giving the active ingredient
   present in PUR records for that year, and \code{search_term}, giving the
   corresponding search term provided in the \code{chemicals} argument.
-  Elements of the list are named according to given search terms.
+  List elements are named according to given search terms.
 }
 \description{
 \code{chemical_search} returns a list of data frames with active ingredients

@@ -2,7 +2,7 @@
 % Please edit documentation in R/pull_pur.R
 \name{chemical_codes}
 \alias{chemical_codes}
-\title{Pull chemical codes from PUR Chemical Lookup Tables.}
+\title{Pull active ingredient chemical codes from PUR Chemical Lookup Tables.}
 \usage{
 chemical_codes(year, chemicals = "all")
 }
@@ -10,7 +10,7 @@ chemical_codes(year, chemicals = "all")
 \item{year}{A four-digit numeric year in the range of 1990 to 2015. Indicates
 the year in which you would like to match chemical codes.}
 
-\item{chemical}{A string or vector of strings giving search terms of
+\item{chemicals}{A string or vector of strings giving search terms of
 chemicals to match with active ingredients present in pesticides applied
 in the given year. The default value is "all", which returns codes for all
 active ingredients applied in a given year.}
@@ -18,12 +18,13 @@ active ingredients applied in a given year.}
 \value{
 A data frame with three columns:
   \itemize{
-    \item \code{chemical}, with search terms given in the \code{chemicals}
-    argument,
-    \item \code{chemname}, with unique active ingredients corresponding to
-    each search term, and
     \item \code{chem_code}, with chemical codes corresponding to each active
-    ingredient. \code{chem_code}s are used to later filter raw PUR datasets.
+    ingredient. \code{chem_code} values are used to later filter raw PUR
+    datasets.
+    \item \code{chemname}, with unique active ingredients corresponding to
+    each search term.
+    \item \code{chemical}, with search terms given in the \code{chemicals}
+    argument.
     }
 }
 \description{
@@ -42,6 +43,6 @@ by \code{chemical_search} for the same year.
 \examples{
 \dontrun{
 chemical_codes(2000, "methyl bromide")
-chemical_search(1995, c("ammonia", "benzene"))
+chemical_codes(1995, c("ammonia", "benzene"))
 }
 }

@@ -2,6 +2,8 @@
 
 export(chemical_codes)
 export(chemical_search)
+export(find_county_code)
+export(pull_pur_file)
+export(pull_raw_pur)
 export(pur_data)
-export(raw_pur)
 importFrom(dplyr,"%>%")
