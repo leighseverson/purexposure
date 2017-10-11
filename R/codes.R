@@ -1,6 +1,6 @@
 #' Pull active ingredient chemical codes from PUR Chemical Lookup Tables.
 #'
-#' For a vector of chemical names, \code{chemical_codes} returns
+#' For a vector of chemical names, \code{find_chemical_codes} returns
 #' a data frame with corresponding chemical codes from the PUR Chemical Lookup
 #' Table for a given year.
 #'
@@ -26,14 +26,14 @@
 #' The PUR Chemical Lookup Table for a year lists all active ingredients present
 #' in applied pesticides across the state of California. Therefore, PUR data for
 #' a particular county may not include records for active ingredients returned
-#' by \code{chemical_codes} for the same year.
+#' by \code{find_chemical_codes} for the same year.
 #'
 #' @examples
-#' chemical_codes(2000, "methyl bromide")
-#' chemical_codes(1995, c("ammonia", "benzene"))
+#' find_chemical_codes(2000, "methyl bromide")
+#' find_chemical_codes(1995, c("ammonia", "benzene"))
 #' @importFrom dplyr %>%
 #' @export
-chemical_codes <- function(year, chemicals = "all") {
+find_chemical_codes <- function(year, chemicals = "all") {
 
   df <- purexposure::chemical_list
   df <- df[[as.character(year)]]

@@ -28,7 +28,7 @@
 #'   \code{chemname}, and \code{chemical_class}. \code{chem_code} should have
 #'   integer values giving PUR chemical codes, and \code{chemname} should have
 #'   character strings with corresponding PUR chemical names (these can be
-#'   searched for using the \code{chemical_codes} function or with the
+#'   searched for using the \code{find_chemical_codes} function or with the
 #'   \code{chemical_list} dataset included with this package). The
 #'   \code{chemical_class} column should have character strings indicating the
 #'   chemical class corresponding to each \code{chem_code}. The
@@ -118,8 +118,8 @@
 #'                       unit = "township", sum_application = TRUE)
 #'
 #' # Or by chemical classes
-#' chemical_class_df <- rbind(chemical_codes(2000, "methylene"),
-#'                            chemical_codes(2000, "aldehyde")) %>%
+#' chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
+#'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
 #'
 #' df4 <- clean_pur_data(years = 1995,
@@ -184,7 +184,7 @@ clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
       dplyr::mutate(chemicals = purrr::map(data, tibble_to_vector))
 
     chem_df <- purrr::map2_dfr(years_chemicals$year, years_chemicals$chemicals,
-                               chemical_codes) %>% unique()
+                               find_chemical_codes) %>% unique()
 
     df <- df %>%
       dplyr::filter(chem_code %in% chem_df$chem_code) %>%
