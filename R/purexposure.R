@@ -4,8 +4,12 @@
 #' Pesticide Use Registry (PUR), as well as to calculate exposure to and
 #' visualize active ingredients present in applied pesticides.
 #'
-#' @section pull_ functions
-#' The pull_ functions are meant to ...
+#' @section find_* functions
+#' find_chemical_codes
+#' find_county_codes
+#'
+#' @section pull_* functions
+#' The pull_ functions ...
 #' \itemize{
 #'   \item{pull_pur_file}{pull one raw PUR file}
 #'   \item{pull_raw_pur}{pull raw PUR files for multiple years and counties}
