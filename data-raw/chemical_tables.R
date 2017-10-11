@@ -2,6 +2,7 @@
 library(readr)
 library(usethis)
 library(purrr)
+library(dplyr)
 
 pull_chemical_list <- function(year) {
 
@@ -16,7 +17,8 @@ pull_chemical_list <- function(year) {
   unzip(file, exdir = dir)
   setwd(dir)
 
-  chemical_file <- readr::read_csv("chemical.txt")
+  chemical_file <- readr::read_csv("chemical.txt") %>%
+    dplyr::select(-chemalpha_cd)
 
   return(chemical_file)
 

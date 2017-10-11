@@ -4,14 +4,15 @@
 \alias{pull_pur_file}
 \title{Pull raw PUR file for a single year and a county or counties.}
 \usage{
-pull_pur_file(year, counties, download_progress = FALSE)
+pull_pur_file(year, counties = "all", download_progress = FALSE)
 }
 \arguments{
 \item{counties}{A character string giving either county names or two digit
 county codes. Not case sensitive. California names and county codes as they
 appear in PUR datasets can be found in the county_codes dataset available
 with this package. For example, to return data for Alameda county, enter
-either "alameda" or "01" for the county argument.}
+either "alameda" or "01" for the county argument. \code{counties = "all"}
+will pull data for all 58 California counties.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that is downloaded.
@@ -24,7 +25,7 @@ A data frame with 33 columns. Counties are indicated by
 
 \dontrun{
 raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
-raw_file <- pull_pur_file(2015, "fresno")
+raw_file <- pull_pur_file(2015, "all")
 }
 }
 \description{

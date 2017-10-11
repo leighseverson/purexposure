@@ -4,19 +4,21 @@
 \alias{pull_raw_pur}
 \title{Pull raw PUR data by counties and years}
 \usage{
-pull_raw_pur(years, counties, verbose = TRUE, download_progress = FALSE)
+pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
+  download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
 1990 to 2015. Indicates the years for which you would like to pull PUR
 datasets. \code{years == "all"} will pull data from 1990 through 2015.}
 
-\item{counties}{A character string or vector of character strings giving either
-county names or a two digit county code for each county. Not case sensitive.
-California names and county codes as they appear in PUR dataset can be found
-in the \code{county_codes} dataset available with this package. For example,
-to return data for Alameda county, enter either "alameda" or "01" for the
-\code{counties} argument.}
+\item{counties}{A vector of character strings giving either a county name or
+a two digit county code for each county. Not case sensitive. California names
+and county codes as they appear in PUR datasets can be found in the
+\code{county_codes} dataset available with this package. For example, to
+return data for Alameda county, enter either "alameda" or "01" for the
+\code{counties} argument. \code{counties = "all"} will return data for
+all 58 California counties.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
@@ -32,8 +34,8 @@ A data frame with 33 columns. Different years and counties for which
   respectively.
 }
 \description{
-\code{pull_raw_pur} pulls a raw PUR dataset for a given California county and
-year.
+\code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
+  California counties.
 }
 \section{Note}{
  For documentation of raw PUR data, see the Pesticide Use
@@ -45,7 +47,7 @@ year.
 
 \examples{
 \dontrun{
-df <- pull_raw_pur(years = 1990:1993, counties = c("01", "02", "10"))
+df <- pull_raw_pur(download_progress = TRUE)
 df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
 df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 }

@@ -28,12 +28,10 @@
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 #'
 #' @format A list of 26 elements. Each element is a data frame with a variable
-#' number of rows ranging from 3,579 to 3,934 and  three columns:
+#' number of rows ranging from 3,579 to 3,934 and two columns:
 #' \describe{
 #'   \item{chem_code}{An integer giving the chemical code. This uniquely
 #'   identifies a chemical within a year.}
-#'   \item{chemalpa_cd}{An integer used to sort the chemical names in each data
-#'   frame alphabetically.}
 #'   \item{chemname}{A character vector giving common chemical name for each
 #'   active ingredient. These are usually listed on the pesticide product
 #'   label.}
