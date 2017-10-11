@@ -2,14 +2,14 @@
 % Please edit documentation in R/pull_pur.R
 \name{pull_pur_file}
 \alias{pull_pur_file}
-\title{Pull raw PUR file for a year and county or counties.}
+\title{Pull raw PUR file for a single year and a county or counties.}
 \usage{
-pull_pur_file(year, county, download_progress = FALSE)
+pull_pur_file(year, counties, download_progress = FALSE)
 }
 \arguments{
-\item{county}{A character string giving either a county name or a two digit
-county code. Not case sensitive. California names and county codes as they
-appear in PUR dataset can be found in the county_codes dataset available
+\item{counties}{A character string giving either county names or two digit
+county codes. Not case sensitive. California names and county codes as they
+appear in PUR datasets can be found in the county_codes dataset available
 with this package. For example, to return data for Alameda county, enter
 either "alameda" or "01" for the county argument.}
 
@@ -18,13 +18,16 @@ message and progress bar printed for each year of PUR data that is downloaded.
 The default value is FALSE.}
 }
 \value{
-A data frame with 33 columns. Year for which data was pulled is
-  indicated by \code{applic_dt}; county is indicated by \code{county_cd}.
+A data frame with 33 columns. Counties are indicated by
+  \code{county_cd}; the year for which data was pulled is indicated by
+  \code{applic_dt}.
 
 \dontrun{
-raw_file <- pull_pur_file(1999, "ventura")
+raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
+raw_file <- pull_pur_file(2015, "fresno")
 }
 }
 \description{
-\code{pull_pur_file} pulls the raw PUR dataset for a particular year.
+\code{pull_pur_file} pulls the raw PUR dataset for a particular year and
+saves datasets for specified counties in a data frame.
 }

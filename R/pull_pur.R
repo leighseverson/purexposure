@@ -122,7 +122,11 @@ chemical_codes <- function(year, chemicals = "all") {
 #'
 #' Given a county, \code{find_county_code} returns a PUR county code.
 #'
-#' @inheritParams pull_pur_file
+#' @param county  A character string giving either a county name or a two digit
+#'  PUR county code. Not case sensitive. California names and county codes as
+#'  they appear in PUR datasets can be found in the county_codes dataset
+#'  available with this package. For example, to return data for Alameda county,
+#'  enter either "alameda" or "01" for the county argument.
 #'
 #' @return A two-character string giving the corresponding PUR county code.
 #'
@@ -152,25 +156,28 @@ find_county_code <- function(county) {
 
 }
 
-#' Pull raw PUR file for a year and county or counties.
+#' Pull raw PUR file for a single year and a county or counties.
 #'
-#' \code{pull_pur_file} pulls the raw PUR dataset for a particular year.
+#' \code{pull_pur_file} pulls the raw PUR dataset for a particular year and
+#' saves datasets for specified counties in a data frame.
 #'
 #' @inheritParams pull_raw_pur
-#' @param county A character string giving either a county name or a two digit
-#'  county code. Not case sensitive. California names and county codes as they
-#'  appear in PUR dataset can be found in the county_codes dataset available
+#' @param counties A character string giving either county names or two digit
+#'  county codes. Not case sensitive. California names and county codes as they
+#'  appear in PUR datasets can be found in the county_codes dataset available
 #'  with this package. For example, to return data for Alameda county, enter
 #'  either "alameda" or "01" for the county argument.
 #'
-#' @return A data frame with 33 columns. Year for which data was pulled is
-#'   indicated by \code{applic_dt}; county is indicated by \code{county_cd}.
+#' @return A data frame with 33 columns. Counties are indicated by
+#'   \code{county_cd}; the year for which data was pulled is indicated by
+#'   \code{applic_dt}.
 #'
 #' \dontrun{
-#' raw_file <- pull_pur_file(1999, "ventura")
+#' raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
+#' raw_file <- pull_pur_file(2015, "fresno")
 #' }
 #' @export
-pull_pur_file <- function(year, county, download_progress = FALSE) {
+pull_pur_file <- function(year, counties, download_progress = FALSE) {
 
   current_dir <- getwd()
 
@@ -194,14 +201,21 @@ pull_pur_file <- function(year, county, download_progress = FALSE) {
 
   code <- find_county_code(county)
 
-  raw_data <- suppressWarnings(suppressMessages(
-    readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))
-  ))
+  codes <- purrr::map(counties, find_county_code) %>% unlist()
 
-  raw_data <- dplyr::mutate_all(raw_data, as.character)
+  read_in_counties <- function(code) {
+    raw_data <- suppressWarnings(suppressMessages(
+      readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))
+    ))
+    raw_data <- dplyr::mutate_all(raw_data, as.character)
+    return(raw_data)
+  }
+
+  counties_in_year <- purrr::map_dfr(codes, read_in_counties) %>%
+    arrange(applic_dt, county_cd)
 
   setwd(current_dir)
-  return(raw_data)
+  return(counties_in_year)
 
 }
 
@@ -384,12 +398,21 @@ pull_raw_pur <- function(years, counties, verbose = TRUE, download_progress = FA
 
   ## pull data
 
-  years_counties <- expand.grid(year = years, county = counties)
-  years_counties <- dplyr::mutate(years_counties, county = as.character(county))
-  raw_df_all <- purrr::map2_dfr(years_counties$year, years_counties$county,
-                                pull_pur_file)
+  cty_tibble_to_vector <- function(df) {
+    vec <- as.character(df$county)
+    return(vec)
+  }
 
-  return(raw_df_all)
+  years_counties <- expand.grid(year = years, county = counties) %>%
+    dplyr::group_by(year) %>%
+    tidyr::nest() %>%
+    dplyr::mutate(counties = purrr::map(data, cty_tibble_to_vector)) %>%
+    dplyr::select(-data)
+
+  raw_df <- purrr::map2_dfr(years_counties$year, years_counties$counties,
+                             pull_pur_file)
+
+  return(raw_df)
 
 }
 

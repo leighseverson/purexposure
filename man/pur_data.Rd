@@ -5,7 +5,8 @@
 \title{Pull cleaned PUR data by counties, years, and chemicals}
 \usage{
 pur_data(years, counties, chemicals, sum_application = TRUE,
-  unit = "section", verbose = TRUE, download_progress = FALSE)
+  unit = "section", include_ag = TRUE, verbose = TRUE,
+  download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -30,8 +31,15 @@ given in \code{unit}. The default value is TRUE.}
 
 \item{unit}{A character string giving either "section" or "township".
 Specifies whether applications of each active ingredient should be summed
-by California section (the default) or by township if \code{sum} is
+by California section (the default) or by township if \code{sum_application} is
 \code{TRUE}.}
+
+\item{include_ag}{TRUE / FALSE indicating if you would like to retain
+aerial/ground application data when summing application across sections or
+townships. The default is TRUE. \code{include_ag = TRUE} could result in
+more than one record per section, date, and active ingredient if
+\code{aerial_ground} application differs for the same chemical in the same
+section and on the same day.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
@@ -42,11 +50,11 @@ message and progress bar printed for each year of PUR data that is downloaded.
 The default value is FALSE.}
 }
 \value{
-A data frame with eleven columns:
+A data frame with 11 columns:
   \itemize{
     \item \code{chem_code} An integer value giving the PUR chemical code
     for the active ingredient applied.
-    \code{chemname} A character string giving PUR chemical active
+    \item \code{chemname} A character string giving PUR chemical active
     ingredient names. Unique values of \code{chemname} are matched with terms
     provided in the \code{chemicals} argument.
     \item \code{kg_chm_used} A numeric value giving the amount of the active
@@ -55,7 +63,7 @@ A data frame with eleven columns:
     of application. PLS sections are uniquely identified by a combination of
     base line meridian (S, M, or H), township (01-48), township direction
     (N or S), range (01-47), range direction (E or W) and section number
-    (01-36).
+    (01-36). (This column is not included if \code{sum_application} = TRUE).
     \item \code{township} A string 7 characters long indicating the township
     of application. PLS townships are uniquely identified by a combination of
     base line meridian (S, M, or H), township (01-48), township direction
@@ -66,15 +74,17 @@ A data frame with eleven columns:
     code where application took place.
     \item \code{date} the date of application (yyyy-mm-dd).
     \item \code{aerial_ground} A character giving the application method.
-    "A" = aerial, "G" = ground, and "O" = other.
+    "A" = aerial, "G" = ground, and "O" = other. (This column is not included if
+    you \code{sum_application} = TRUE and \code{include_ag} = FALSE.)
     \item \code{use_no} A character ID ID identifing unique application of an
     active ingredient across years. This value is a combination of the raw PUR
-    \item \code{use_no} and the year of application.
+    \code{use_no} and the year of application.
     \item \code{outlier} A logical value indicating whether the
     amount listed in \code{lbs_chm_used} has been corrected large amounts
     entered in error. The algorithm for identifying and replacing outliers
     was developed based on methods used by Gunier et al. (2001). Please see
-    the package vignette for more detail regarding these methods.
+    the package vignette for more detail regarding these methods. (This column
+    is not included if \code{sum_application} = TRUE).
   }
 }
 \description{

@@ -8,10 +8,10 @@ find_county_code(county)
 }
 \arguments{
 \item{county}{A character string giving either a county name or a two digit
-county code. Not case sensitive. California names and county codes as they
-appear in PUR dataset can be found in the county_codes dataset available
-with this package. For example, to return data for Alameda county, enter
-either "alameda" or "01" for the county argument.}
+PUR county code. Not case sensitive. California names and county codes as
+they appear in PUR datasets can be found in the county_codes dataset
+available with this package. For example, to return data for Alameda county,
+enter either "alameda" or "01" for the county argument.}
 }
 \value{
 A two-character string giving the corresponding PUR county code.
