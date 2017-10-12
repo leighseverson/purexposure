@@ -40,3 +40,15 @@
 #' @source
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 "chemical_list"
+
+#' California state SpatialPolygonsDataFrame object.
+#'
+#' A SpatialPolygonsDataFrame object for the outline of the state of California.
+#' Downloaded and subset from the 2016 U.S. Census Cartographic Boundary
+#' Shapefile for states.
+#'
+#' @format A SpatialPolygonsDataFrame object at the 1:20,000,000 resolution level.
+#'
+#' @source
+#' \url{https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html}
+"california_shp"

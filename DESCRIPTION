@@ -15,5 +15,10 @@ Imports:
     tidyr (>= 0.7.1),
     purrr (>= 0.2.3),
     stringr (>= 1.2.0),
-    lubridate (>= 1.6.0)
+    lubridate (>= 1.6.0),
+    rgdal (>= 1.2.8),
+    sp (>= 1.2.5),
+    broom (>= 0.4.2),
+    ggplot2 (>= 2.2),
+    ggmap
 RoxygenNote: 6.0.1
