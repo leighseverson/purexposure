@@ -217,11 +217,11 @@ find_location_county <- function(location, return = "name") {
   counties <- maps::map("county", fill = TRUE, col = "transparent", plot = FALSE)
   ids <- sapply(strsplit(counties$names, ":"), function(x) x[1])
   counties_sp <- maptools::map2SpatialPolygons(counties, IDs = ids,
-                                               proj4string = CRS("+proj=longlat +datum=WGS84"))
+                                               proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
 
   points_sp <- sp::SpatialPoints(data.frame(x = latlon_out[1],
                                             y = latlon_out[2]),
-                                 proj4string = CRS("+proj=longlat +datum=WGS84"))
+                                 proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
 
   index <- sp::over(points_sp, counties_sp)
 

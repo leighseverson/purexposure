@@ -7,7 +7,7 @@
 find_location_county(location, return = "name")
 }
 \arguments{
-\item{location}{A character string. Either a California address inclding
+\item{location}{A character string. Either a California address including
 street name, city, state, and zip code, or a pair of coordinates in the
 form "longitude, latitude".}
 

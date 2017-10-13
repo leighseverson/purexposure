@@ -91,9 +91,9 @@ pull_spdf <- function(county, section_township = "section",
 #' df <- spdf_to_df(pull_spdf("fresno"))
 #' df2 <- spdf_to_df(pull_spdf("sonoma"))
 #'
-#' # use view_county_df() function to easily plot the output data frames:
-#' view_county_df(df)
-#' view_county_df(df2)
+#' # use plot_tidy() function to easily plot the output data frames:
+#' plot_tidy(df)
+#' plot_tidy(df2)
 #' }
 #' @export
 spdf_to_df <- function(spdf) {
@@ -110,8 +110,9 @@ spdf_to_df <- function(spdf) {
 
 #' Plot data frame spatial objects.
 #'
-#' \code{view_county_df} plots a data frame spatial object. Meant to be
-#' analogous to the ease of using plot() to quickly view a
+#' \code{plot_tidy} plots a data frame spatial object. (A
+#' SpatialPolygonsDataFrame that has been "tidied" using the broom package.)
+#' Meant to be analogous to the ease of using plot() to quickly view a
 #' SpatialPolygonDataFrame object.
 #'
 #' @param df A data frame returned from the \code{spdf_to_df} function.
@@ -122,10 +123,10 @@ spdf_to_df <- function(spdf) {
 #' \dontrun{
 #' shp <- pull_spdf("san diego", "township")
 #' df <- spdf_to_df(shp)
-#' view_county_df(df)
+#' plot_tidy(df)
 #' }
 #' @export
-view_county_df <- function(df) {
+plot_tidy <- function(df) {
   plot <- ggplot2::ggplot(data = df, ggplot2::aes(x = long, y = lat,
                                                   group = group)) +
     ggplot2::geom_polygon(color = "black", fill = NA) +
