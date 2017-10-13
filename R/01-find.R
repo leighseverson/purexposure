@@ -2,7 +2,11 @@
 #'
 #' For a vector of chemical names, \code{find_chemical_codes} returns
 #' a data frame with corresponding chemical codes from the PUR Chemical Lookup
-#' Table for a given year.
+#' Table for a given year. This function uses pattern matching to return results.
+#' As a starting place, or for more thorough classifications, see the CA
+#' Department of Pesticide Regulation's Summary of Pesticide Use Report Data,
+#' Indexed by Chemical (2008):
+#' \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf}
 #'
 #' @param year A four-digit numeric year in the range of 1990 to 2015. Indicates
 #'   the year in which you would like to match chemical codes.
