@@ -9,7 +9,10 @@
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied in
 #'   the given years. The default value is "all", which returns records for all
-#'   active ingredients applied in a given year.
+#'   active ingredients applied in a given year. See the CDPR's Summary of PUR
+#'   Data document here:
+#'   \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
+#'   comprehensive classifications of active ingredients.
 #' @param sum_application TRUE / FALSE indicating if you would like to sum the
 #'   amounts of applied active ingredients by day, the geographic unit
 #'   given in \code{unit}, and by either active ingredients or chemical class
@@ -34,8 +37,10 @@
 #'   \code{chemical_class} column should have character strings indicating the
 #'   chemical class corresponding to each \code{chem_code}. The
 #'   \code{chemical_class} for a group of active ingredients should be decided
-#'   upon by the user. Only used if \code{sum = "chemical_class"}. Please see
-#'   the package vignette for more detail regarding this option.
+#'   upon by the user. Only used if \code{sum = "chemical_class"}. Again, see
+#'   the CDPR's Summary of PUR Data document here:
+#'   \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
+#'   comprehensive classifications of active ingredients.
 #' @param include_ag TRUE / FALSE indicating if you would like to retain
 #'   aerial/ground application data when summing application across sections or
 #'   townships and chemicals. The default is TRUE. \code{include_ag = TRUE}
