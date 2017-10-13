@@ -13,17 +13,18 @@
 #' @param sum_application TRUE / FALSE indicating if you would like to sum the
 #'   amounts of applied active ingredients by day, the geographic unit
 #'   given in \code{unit}, and by either active ingredients or chemical class
-#'   (indicated by \code{sum_by} and \code{chemical_class}). The default value
+#'   (indicated by \code{sum} and \code{chemical_class}). The default value
 #'   is FALSE.
 #' @param unit A character string giving either "section" or "township".
 #'   Specifies whether applications of each active ingredient should be summed
 #'   by California section (the default) or by township. Only used if
 #'   \code{sum_application} is \code{TRUE}.
-#' @param sum_by A character string giving either "active_ingredient" (the
+#' @param sum A character string giving either "all" (the
 #'   default) or "chemical_class". If \code{sum_application = TRUE},
-#'   \code{sum_by} indicates whether you would like to sum by each active
-#'   ingredient, or by a chemical class specified in a data frame given in the
-#'   argument \code{chemical_class}.
+#'   \code{sum} indicates whether you would like to sum across all active
+#'   ingredients, giving an estimation of the total pesticides applied in a
+#'   given section or township ("all"), or by a chemical class specified in a
+#'   data frame given in the argument \code{chemical_class}.
 #' @param chemical_class A data frame with three columns: \code{chem_code},
 #'   \code{chemname}, and \code{chemical_class}. \code{chem_code} should have
 #'   integer values giving PUR chemical codes, and \code{chemname} should have
@@ -33,7 +34,7 @@
 #'   \code{chemical_class} column should have character strings indicating the
 #'   chemical class corresponding to each \code{chem_code}. The
 #'   \code{chemical_class} for a group of active ingredients should be decided
-#'   upon by the user. Only used if \code{sum_by = "chemical_class"}. Please see
+#'   upon by the user. Only used if \code{sum = "chemical_class"}. Please see
 #'   the package vignette for more detail regarding this option.
 #' @param include_ag TRUE / FALSE indicating if you would like to retain
 #'   aerial/ground application data when summing application across sections or
@@ -46,13 +47,13 @@
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
 #'     for the active ingredient applied. Not included if
-#'     \code{sum_application = TRUE} and \code{sum_by = "chemical_class"}.}
+#'     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemname}{A character string giving PUR chemical active
 #'     ingredient names. Unique values of \code{chemname} are matched with terms
 #'     provided in the \code{chemicals} argument. Not included if
-#'     \code{sum_application = TRUE} and \code{sum_by = "chemical_class"}.}
+#'     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemical_class}{If \code{sum_application = TRUE} and
-#'     \code{sum_by = "chemical_class"}, this column will give values of the
+#'     \code{sum = "chemical_class"}, this column will give values of the
 #'     \code{chemical_class} column in the input \code{chemical_class} data frame.
 #'     If there are active ingredients pulled based on the
 #'     \code{chemicals} argument not present in the \code{chemical_class} data
@@ -126,7 +127,7 @@
 #'                       counties = "fresno",
 #'                       chemicals = chemical_class_df$chemname,
 #'                       sum_application = TRUE,
-#'                       sum_by = "chemical_class",
+#'                       sum = "chemical_class",
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
 #' }
@@ -134,7 +135,7 @@
 #' @export
 clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
-                           sum_by = "active_ingredient", chemical_class = NULL,
+                           sum = "all", chemical_class = NULL,
                            include_ag = TRUE, verbose = TRUE,
                            download_progress = FALSE) {
 
@@ -303,7 +304,7 @@ clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
       dplyr::select(section, township) %>%
       unique()
 
-    if (sum_by == "active_ingredient") {
+    if (sum == "all") {
       if (unit == "section") {
         if (include_ag) {
           #1
@@ -357,7 +358,7 @@ clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
                           county_name, county_code, date)
         }
       }
-    } else if (sum_by == "chemical_class") {
+    } else if (sum == "chemical_class") {
 
       ## error handling for chemical_class df
       if (!is.null(chemical_class) & !is.data.frame(chemical_class)) {
