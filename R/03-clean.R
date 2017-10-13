@@ -179,6 +179,11 @@ clean_pur_data <- function(years = "all", counties = "all", chemicals = "all",
 
   if (!"all" %in% chemicals) {
 
+    tibble_to_vector <- function(tib) {
+      vec <- tib %>% dplyr::pull(1) %>% as.character()
+      return(vec)
+    }
+
     years_chemicals <- expand.grid(year = years, chemicals = chemicals) %>%
       dplyr::group_by(year) %>%
       tidyr::nest() %>%

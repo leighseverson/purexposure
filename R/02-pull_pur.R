@@ -78,22 +78,6 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 
 }
 
-#' Extract a character vector from a tibble with one column.
-#'
-#' \code{tibble_to_vector} extracts the values from a tibble with one column and
-#' saves them as a character vector.
-#'
-#' @param df A tibble with one column.
-#'
-#' @return A character vector.
-#'
-#' @examples
-#' tibble_to_vector(tibble::tibble(x = 1:3))
-tibble_to_vector <- function(tib) {
-  vec <- tib %>% dplyr::pull(1) %>% as.character()
-  return(vec)
-}
-
 #' Pull raw PUR data by counties and years
 #'
 #' \code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
@@ -199,6 +183,11 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
   }
 
   ## pull data
+
+  tibble_to_vector <- function(tib) {
+    vec <- tib %>% dplyr::pull(1) %>% as.character()
+    return(vec)
+  }
 
   if (!"all" %in% counties) {
     years_counties <- expand.grid(year = years, county = counties) %>%
