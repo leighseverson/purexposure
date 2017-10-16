@@ -133,7 +133,7 @@
 #'                                 chemicals = "chemical_class")
 #'
 #' # incorporate aerial/ground application information
-#' clean_pur4 <- pull_clean_pur(2000, "Yolo", include_aerial_ground = TRUE)
+#' clean_pur4 <- pull_clean_pur(2000, "yolo", include_aerial_ground = TRUE)
 #' exp_list5 <- calculate_exposure(clean_pur4,
 #'                                 location = "-121.9018, 38.7646",
 #'                                 radius = 2500,

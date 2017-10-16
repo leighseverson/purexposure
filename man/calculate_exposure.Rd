@@ -5,7 +5,8 @@
 \title{Calculate exposure to active ingredients present in applied pesticides.}
 \usage{
 calculate_exposure(clean_pur_df, location, radius, time_period = NULL,
-  start_date = NULL, end_date = NULL, chemicals = "all")
+  start_date = NULL, end_date = NULL, chemicals = "all",
+  aerial_ground = FALSE)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
@@ -46,20 +47,30 @@ will calculate exposure to the summed active ingredients present in the
 \code{clean_pur_df} data frame. Enter "chemical_class" to calculate
 exposure to each of the chemical classes present in the \code{chemical_class}
 column of your \code{clean_pur_df} data frame.}
+
+\item{aerial_ground}{TRUE / FALSE for whether you would like to incorporate
+aerial/ground application into exposure calculations. If
+\code{aerial_ground = TRUE}, there should be an aerial_ground column in the
+input \code{clean_pur_df} data frame. There will be a value of exposure
+calculated for each chemical ("all" or by chemical class) and for each
+method of application: aerial or ground. The default is FALSE.}
 }
 \value{
 A list with four elements:
  \describe{
    \item{exposure}{A data frame with a row for each date
-   range for which exposure was calculated and seven columns: \code{exposure},
+   range for which exposure was calculated and eight columns: \code{exposure},
    the estimate of exposure in kg/m^2, \code{location}, \code{start_date} and
    \code{end_date}, \code{radius}, the radius in meters for the buffer
    extending from the location, and \code{chemcials}, (either "all", indicating
    that all active ingredients present in the \code{clean_pur_df} were summed,
    a particular active ingredient, or the chemical class(es) specified in the
-   \code{clean_pur_df} data frame). \code{none_recorded} is TRUE if exposure was
-   0 because there was no pesticide application recorded in the sections or
-   townships intersected by the buffer for that date range.}
+   \code{clean_pur_df} data frame). \code{aerial_ground} can take values of
+   "A" = aerial, "G" = ground, and "O" = others. If
+   the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground} will
+   be \code{NA} in the \code{exposure} data frame.\code{none_recorded} is
+   TRUE if exposure was 0 because there was no pesticide application recorded
+   in the sections or townships intersected by the buffer for that date range.}
    \item{meta_data}{A data frame with 11 columns and one row for every section
    or township intersected by the specified buffer extending from the
    given location. Columns include \code{location}, \code{section} or
@@ -123,7 +134,7 @@ exp_list2$exposure
 clean_pur2 <- pull_clean_pur(1995, counties = "san bernardino",
                              sum_application = TRUE, unit = "township")
 exp_list3 <- calculate_exposure(clean_pur2,
-                                location = c("-116.45, 34.96")
+                                location = "-116.45, 34.96"
                                 radius = 5000)
 plot_tidy(exp_list3$buffer_plot)
 
@@ -140,5 +151,13 @@ exp_list4 <- calculate_exposure(clean_pur3,
                                 location = "13883 Lassen Ave, Helm, CA 93627",
                                 radius = 1500,
                                 chemicals = "chemical_class")
+
+# incorporate aerial/ground application information
+clean_pur4 <- pull_clean_pur(2000, "yolo", include_aerial_ground = TRUE)
+exp_list5 <- calculate_exposure(clean_pur4,
+                                location = "-121.9018, 38.7646",
+                                radius = 2500,
+                                aerial_ground = TRUE)
+exp_list5$exposure
 }
 }
