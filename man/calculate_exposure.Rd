@@ -8,9 +8,9 @@ calculate_exposure(clean_pur_df, location, radius, time_period = NULL,
   start_date = NULL, end_date = NULL, chemicals = "all")
 }
 \arguments{
-\item{clean_pur_df}{A data frame returned by \code{clean_pur_data} that
+\item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
 includes data for the county in which your location is located (before
-running \code{clean_pur_data}, you can use the \code{find_location_county}
+running \code{pull_clean_pur}, you can use the \code{find_location_county}
 function to figure this out), the time period, and the active ingredients
 or chemical classes for which you want to calculate exposure.}
 
@@ -41,16 +41,14 @@ data frame.}
 estimation. This date should be present in the \code{clean_pur_df}
 data frame.}
 
-\item{chemicals}{A character string indicating active ingredients for which you
-would like to calculate exposure. The default is "all", which will calculate
-exposure to the summed active ingredients present in the \code{clean_pur_df}
-data frame. You can also enter a particular active ingredient that's present
-in your \code{clean_pur_df} data frame, or "chemical_class" to calculate
+\item{chemicals}{Either "all" or "chemical_class". The default is "all", which
+will calculate exposure to the summed active ingredients present in the
+\code{clean_pur_df} data frame. Enter "chemical_class" to calculate
 exposure to each of the chemical classes present in the \code{chemical_class}
 column of your \code{clean_pur_df} data frame.}
 }
 \value{
-A list with three elements:
+A list with four elements:
  \describe{
    \item{exposure}{A data frame with a row for each date
    range for which exposure was calculated and seven columns: \code{exposure},
@@ -78,6 +76,10 @@ A list with three elements:
    \code{plot_tidy} function to quickly plot and get a rough idea of the
    area for which exposure was calculated, before moving on to other map_*
    or plot_* functions.}
+   \item{county_plot}{A ggplot2 plot showing the location of your specified
+   buffer in the context of the county. Depending on if your \code{clean_pur_df}
+   data frame was summed by section or township, the county will be shown
+   with the relevant PLS units.}
  }
 }
 \description{
@@ -92,34 +94,51 @@ estimate of exposure in kg of active ingredient per m^2.
          arguments are all left as NULL (their defaults), then exposure will
          be estiamted across the entire date range of the \code{clean_pur_df}
          data frame.}
-   \item{If you pulled PUR data from \code{clean_pur_data} specifying
+   \item{If you pulled PUR data from \code{pull_clean_pur} specifying
          \code{sum_application = TRUE} and \code{unit = "township"}, then
          exposure will be calculated based on townships. Using the
          \code{plot_tidy} function to plot the returned \code{buffer_plot}
-         list element could be helpful to see the difference between
-         calculating exposure based on sections or townships for a certain
-         buffer radius.}
+         list element and taking a look at the \code{county_plot} plot element
+         could be helpful to see the difference between calculating exposure
+         based on sections or townships for a certain buffer radius.}
 }
 }
 
 \examples{
 \dontrun{
-clean_pur <- clean_pur_data(2000, "10", "all", TRUE)
+clean_pur <- pull_clean_pur(2000, counties = "10")
+exposure_list <- calculate_exposure(clean_pur,
+                                    location = "13883 Lassen Ave, Helm, CA 93627",
+                                    radius = 3000)
+exposure_list$county_plot
 
-pur_data <- clean_pur_data()
+# specify time intervals
+exp_list2 <- calculate_exposure(clean_pur,
+                                location = "13883 Lassen Ave, Helm, CA 93627",
+                                radius = 3000,
+                                time_period = "4 months")
+exp_list2$exposure
 
-# Time periods
+# calculate exposure by township
+clean_pur2 <- pull_clean_pur(1995, counties = "san bernardino",
+                             sum_application = TRUE, unit = "township")
+exp_list3 <- calculate_exposure(clean_pur2,
+                                location = c("-116.45, 34.96")
+                                radius = 5000)
+plot_tidy(exp_list3$buffer_plot)
 
-# Time periods with specified start and end date
-
-# Single time period
-
-# All active ingredients
-
-# A single active ingredient
-
-# By chemical class
-pur_data_classes <- clean_pur_data()
-
+# calculate exposure by specified chemical classes
+chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
+                           find_chemical_codes(2000, "aldehyde")) \%>\%
+   dplyr::rename(chemical_class = chemical)
+clean_pur3 <- pull_clean_pur(1995, "fresno",
+                             chemicals = chemical_class_df$chemname,
+                             sum_application = TRUE,
+                             sum = "chemical_class",
+                             chemical_class = chemical_class_df)
+exp_list4 <- calculate_exposure(clean_pur3,
+                                location = "13883 Lassen Ave, Helm, CA 93627",
+                                radius = 1500,
+                                chemicals = "chemical_class")
 }
 }
