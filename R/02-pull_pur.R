@@ -259,12 +259,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @param end_date Optional. "yyyy-mm-dd" Indicates an end date if you don't
 #'   want to return the entire date range pulled using the \code{years}
 #'   argument.
-#' @param include_ag TRUE / FALSE indicating if you would like to retain
-#'   aerial/ground application data when summing application across sections or
-#'   townships and chemicals. The default is TRUE. \code{include_ag = TRUE}
-#'   could result in more than one record per section, date, and active
-#'   ingredient or chemical class if \code{aerial_ground} application differs
-#'   for the same chemical in the same section on the same day.
+#' @param include_aerial_ground TRUE / FALSE indicating if you would like to
+#'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
+#'   "O" = other.) The default is FALSE.
 #'
 #' @return A data frame:
 #'   \describe{
@@ -299,8 +296,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     code where application took place.}
 #'     \item{date}{The date of application (yyyy-mm-dd).}
 #'     \item{aerial_ground}{A character giving the application method.
-#'     "A" = aerial, "G" = ground, and "O" = other. This column is not included if
-#'     \code{sum_application = TRUE} and \code{include_ag = FALSE}.}
+#'     "A" = aerial, "G" = ground, and "O" = other. This column is only included if
+#'     \code{include_aerial_ground = TRUE}.}
 #'     \item{use_no}{A character string identifing unique application of an
 #'     active ingredient across years. This value is a combination of the raw PUR
 #'     \code{use_no} column and the year of application. Not included if
@@ -333,7 +330,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' df <- pull_clean_pur(download_progress = TRUE)
 #' df2 <- pull_clean_pur(years = 2000:2010,
 #'                       counties = c("01", "nevada", "riverside"),
-#'                       chemicals = "methylene")
+#'                       chemicals = "methylene",
+#'                       include_aerial_ground = TRUE)
 #'
 #' # Sum application by active ingredients
 #' df3 <- pull_clean_pur(years = 2000:2010,
@@ -362,7 +360,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            start_date = NULL, end_date = NULL,
-                           include_ag = TRUE, verbose = TRUE,
+                           include_aerial_ground = FALSE, verbose = TRUE,
                            download_progress = FALSE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
@@ -537,7 +535,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
     if (sum == "all") {
       if (unit == "section") {
-        if (include_ag) {
+        if (include_aerial_ground) {
           #1
           out <- out %>%
             dplyr::group_by(chem_code, chemname, section, county_name, county_code,
@@ -565,7 +563,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
         }
       } else if (unit == "township") {
-        if (include_ag) {
+        if (include_aerial_ground) {
           #3
           out <- out %>%
             dplyr::group_by(chem_code, chemname, township, county_name, county_code,
@@ -618,7 +616,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       }
 
       if (unit == "section") {
-        if (include_ag) {
+        if (include_aerial_ground) {
           #5
           out <- out %>%
             dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
@@ -651,7 +649,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                           county_name, county_code, date)
         }
       } else if (unit == "township") {
-        if (include_ag) {
+        if (include_aerial_ground) {
           #7
           out <- out %>%
             dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
@@ -681,6 +679,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                           county_name, county_code, date)
         }
       }
+    }
+  } else {
+    if (!include_aerial_ground) {
+      out <- out %>% dplyr::select(-aerial_ground)
     }
   }
 

@@ -7,7 +7,8 @@
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
   chemical_class = NULL, start_date = NULL, end_date = NULL,
-  include_ag = TRUE, verbose = TRUE, download_progress = FALSE)
+  include_aerial_ground = FALSE, verbose = TRUE,
+  download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -70,12 +71,9 @@ argument.}
 want to return the entire date range pulled using the \code{years}
 argument.}
 
-\item{include_ag}{TRUE / FALSE indicating if you would like to retain
-aerial/ground application data when summing application across sections or
-townships and chemicals. The default is TRUE. \code{include_ag = TRUE}
-could result in more than one record per section, date, and active
-ingredient or chemical class if \code{aerial_ground} application differs
-for the same chemical in the same section on the same day.}
+\item{include_aerial_ground}{TRUE / FALSE indicating if you would like to
+retain aerial/ground application data ("A" = aerial, "G" = ground, and
+"O" = other.) The default is FALSE.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
@@ -119,8 +117,8 @@ A data frame:
     code where application took place.}
     \item{date}{The date of application (yyyy-mm-dd).}
     \item{aerial_ground}{A character giving the application method.
-    "A" = aerial, "G" = ground, and "O" = other. This column is not included if
-    \code{sum_application = TRUE} and \code{include_ag = FALSE}.}
+    "A" = aerial, "G" = ground, and "O" = other. This column is only included if
+    \code{include_aerial_ground = TRUE}.}
     \item{use_no}{A character string identifing unique application of an
     active ingredient across years. This value is a combination of the raw PUR
     \code{use_no} column and the year of application. Not included if
@@ -161,7 +159,8 @@ Public Land Survey (PLS) section or township.
 df <- pull_clean_pur(download_progress = TRUE)
 df2 <- pull_clean_pur(years = 2000:2010,
                       counties = c("01", "nevada", "riverside"),
-                      chemicals = "methylene")
+                      chemicals = "methylene",
+                      include_aerial_ground = TRUE)
 
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2000:2010,
@@ -176,7 +175,7 @@ chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
 
 df4 <- pull_clean_pur(years = 1995,
                       counties = "fresno",
-                      chemicals = chemical_class_df$chemname,
+                      chemicals = chemical_class_df$chemname
                       sum_application = TRUE,
                       sum = "chemical_class",
                       start_date = "1995-03-01",
