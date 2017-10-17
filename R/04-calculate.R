@@ -90,9 +90,13 @@
 #'          \code{sum_application = TRUE} and \code{unit = "township"}, then
 #'          exposure will be calculated based on townships. Using the
 #'          \code{plot_tidy} function to plot the returned \code{buffer_plot}
-#'          list element and taking a look at the \code{county_plot} plot element
+#'          list element to take a look at the \code{county_plot} plot element
 #'          could be helpful to see the difference between calculating exposure
 #'          based on sections or townships for a certain buffer radius.}
+#'     \item{This function takes advantage of the Google Maps Geocoding API, and
+#'           is limited by the standard usage limit of 2,500 free requests per
+#'           day and 50 requests per second.
+#' \url{https://developers.google.com/maps/documentation/geocoding/usage-limits}}
 #' }
 #'
 #' @examples
@@ -119,6 +123,7 @@
 #' plot_tidy(exp_list3$buffer_plot)
 #'
 #' # calculate exposure by specified chemical classes
+#' # this is an example of \code{none_recorded = TRUE}
 #' chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
 #'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)

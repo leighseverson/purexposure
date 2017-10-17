@@ -112,6 +112,10 @@ estimate of exposure in kg of active ingredient per m^2.
          list element and taking a look at the \code{county_plot} plot element
          could be helpful to see the difference between calculating exposure
          based on sections or townships for a certain buffer radius.}
+    \item{This function takes advantage of the Google Maps Geocoding API, and
+          is limited by the standard usage limit of 2,500 free requests per
+          day and 50 requests per second.
+\url{https://developers.google.com/maps/documentation/geocoding/usage-limits}}
 }
 }
 
