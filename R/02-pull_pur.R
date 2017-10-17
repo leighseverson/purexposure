@@ -364,13 +364,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            aerial_ground = FALSE, verbose = TRUE,
                            download_progress = FALSE) {
 
-  raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
-                         download_progress = download_progress)
+  # raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
+  #                        download_progress = download_progress)
 
   ### ftp is down
 
-  # raw_df <- readr::read_csv("~/Documents/pesticides_project/data-raw/PUR/1995/udc95_10.txt") %>%
-  #   dplyr::mutate_all(as.character)
+  raw_df <- readr::read_csv("~/Documents/pesticides_project/data-raw/PUR/1995/udc95_10.txt") %>%
+     dplyr::mutate_all(as.character)
 
   ###
 

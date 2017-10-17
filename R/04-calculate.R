@@ -183,18 +183,23 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                           max_long = max(long),
                                           max_lat = max(lat))
 
+  # if ("section" %in% colnames(clean_pur_df)) {
+  #   shp <- pull_spdf(county, "section")
+  #   df <- spdf_to_df(shp)
+  # } else {
+  #   shp <- pull_spdf(county, "township")
+  #   df <- spdf_to_df(shp)
+  # }
+
+  ### ftp is down (replaces ^)
+
   if ("section" %in% colnames(clean_pur_df)) {
-    shp <- pull_spdf(county, "section")
-    df <- spdf_to_df(shp)
+    shp <- readRDS("~/Documents/pesticides_project/data/fresno_shp.rds")
+    df <- readRDS("~/Documents/pesticides_project/data/fresno_coords.rds")
   } else {
-    shp <- pull_spdf(county, "township")
-    df <- spdf_to_df(shp)
+    shp <- readRDS("~/Documents/pesticides_project/data/fresno_township_shp.rds")
+    df <- readRDS("~/Documents/pesticides_project/data/fresno_township_coords.rds")
   }
-
-  ### ftp is down
-
-  # shp <- readRDS("~/Documents/pesticides_project/data/fresno_shp.rds")
-  # df <- readRDS("~/Documents/pesticides_project/data/fresno_coords.rds")
 
   ###
 
@@ -470,37 +475,64 @@ calculate_exposure <- function(clean_pur_df, location, radius,
       mutate_expr <- rlang::enquo(mtrs_mtr)
       rename_expr <- rlang::enquo(section_township)
 
-      classes <- unique(clean_pur_df$chemical_class)
-      n_classes <- length(classes)
-      pls <- as.character(pls_percents[,1])
-      n_pls <- length(pls)
+      if ("chemical_class" %in% colnames(clean_pur_df)) {
 
-      class_pls <- data.frame(pls = as.character(rep(pls, times = n_classes)),
-                              chemicals = rep(classes, each = n_pls)) %>%
-        dplyr::mutate(pls = as.character(pls))
+        classes <- unique(clean_pur_df$chemical_class)
+        n_classes <- length(classes)
+        pls <- as.character(pls_percents[,1])
+        n_pls <- length(pls)
 
-      pur_out2 <- pur_out %>%
-        dplyr::rename(pls := !!rename_expr,
-                      chemicals = chemical_class) %>%
-        dplyr::mutate(chemicals = as.character(chemicals))
+        class_pls <- data.frame(pls = as.character(rep(pls, times = n_classes)),
+                                chemicals = rep(classes, each = n_pls)) %>%
+          dplyr::mutate(pls = as.character(pls))
 
-      exp_0 <- pls_percents %>%
-        dplyr::rename(pls := !!mutate_expr) %>%
-        dplyr::mutate(pls = as.character(pls)) %>%
-        dplyr::full_join(class_pls, by = "pls") %>%
-        dplyr::arrange(chemicals) %>%
-        dplyr::mutate(chemicals = as.character(chemicals)) %>%
-        dplyr::left_join(pur_out2, by = c("pls", "chemicals")) %>% # brings in kg, maybe aerial_ground
-        dplyr::mutate(location = location,
-                      kg = ifelse(is.na(kg), 0, kg),
-                      none_recorded = ifelse(kg == 0, TRUE, FALSE),
-                      kg_intersection = percent * kg,
-                      start_date = start_date,
-                      end_date = end_date,
-                      radius = radius,
-                      area = buffer_area)
+        pur_out2 <- pur_out %>%
+          dplyr::rename(pls := !!rename_expr,
+                        chemicals = chemical_class) %>%
+          dplyr::mutate(chemicals = as.character(chemicals))
 
-      if ("aerial_ground" %in% colnames(exp)) {
+        exp_0 <- pls_percents %>%
+          dplyr::rename(pls := !!mutate_expr) %>%
+          dplyr::mutate(pls = as.character(pls)) %>%
+          dplyr::full_join(class_pls, by = "pls") %>%
+          dplyr::arrange(chemicals) %>%
+          dplyr::mutate(chemicals = as.character(chemicals)) %>%
+          dplyr::left_join(pur_out2, by = c("pls", "chemicals")) %>% # brings in kg, maybe aerial_ground
+          dplyr::mutate(location = location,
+                        kg = ifelse(is.na(kg), 0, kg),
+                        none_recorded = ifelse(kg == 0, TRUE, FALSE),
+                        kg_intersection = percent * kg,
+                        start_date = start_date,
+                        end_date = end_date,
+                        radius = radius,
+                        area = buffer_area)
+      } else {
+
+        class_pls <- data.frame(pls = as.character(pls_percents[,1]),
+                                chemicals = "all") %>%
+          dplyr::mutate(pls = as.character(pls))
+
+        pur_out2 <- pur_out %>%
+          dplyr::rename(pls := !!rename_expr)
+
+        exp_0 <- pls_percents %>%
+          dplyr::rename(pls := !!mutate_expr) %>%
+          dplyr::mutate(pls = as.character(pls)) %>%
+          dplyr::full_join(class_pls, by = "pls") %>%
+          dplyr::mutate(chemicals = as.character(chemicals)) %>%
+          dplyr::left_join(pur_out2, by = "pls") %>% # brings in kg, maybe aerial_ground
+          dplyr::mutate(location = location,
+                        kg = ifelse(is.na(kg), 0, kg),
+                        none_recorded = ifelse(kg == 0, TRUE, FALSE),
+                        kg_intersection = percent * kg,
+                        start_date = start_date,
+                        end_date = end_date,
+                        radius = radius,
+                        area = buffer_area)
+
+      }
+
+      if ("aerial_ground" %in% colnames(exp_0)) {
         exp <- exp_0 %>% dplyr::mutate(aerial_ground = as.character(aerial_ground))
       } else {
         exp <- exp_0 %>% dplyr::mutate(aerial_ground = NA)
@@ -584,6 +616,8 @@ calculate_exposure <- function(clean_pur_df, location, radius,
       meta_out <- rbind(meta_out, meta_data)
     }
   }
+
+  meta_out <- unique(meta_out)
 
   out <- list(exposure = row_out,
               meta_data = meta_out,
