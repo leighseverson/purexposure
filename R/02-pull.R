@@ -185,11 +185,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 
   ## pull data
 
-  tibble_to_vector <- function(tib) {
-    vec <- tib %>% dplyr::pull(1) %>% as.character()
-    return(vec)
-  }
-
   if (!"all" %in% counties) {
 
     years_counties <- expand.grid(year = years, county = counties) %>%
@@ -365,15 +360,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            aerial_ground = FALSE, verbose = TRUE,
                            download_progress = FALSE) {
 
-  # raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
-  #                        download_progress = download_progress)
-
-  ### ftp is down
-
-  raw_df <- readr::read_csv("~/Documents/pesticides_project/data-raw/PUR/1995/udc95_10.txt") %>%
-     dplyr::mutate_all(as.character)
-
-  ###
+  raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
+                         download_progress = download_progress)
 
   df <- raw_df %>%
     dplyr::mutate(township_pad = stringr::str_pad(raw_df$township, 2, "left", pad = "0"),
@@ -411,11 +399,6 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
   ## filter active ingredients, add chemname column
 
   if (!"all" %in% chemicals) {
-
-    tibble_to_vector <- function(tib) {
-      vec <- tib %>% dplyr::pull(1) %>% as.character()
-      return(vec)
-    }
 
     years_chemicals <- expand.grid(year = years, chemicals = chemicals) %>%
       dplyr::group_by(year) %>%
@@ -703,5 +686,81 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
   }
 
   return(out)
+
+}
+
+#' Pull California county SpatialPolygonsDataFrame
+#'
+#' \code{pull_spdf} pulls either the section or township-level
+#' SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
+#' shapefile.
+#'
+#' @inheritParams find_counties
+#' @param section_township Either "section" (the default) or "township".
+#'   Specifies whether you would like to pull a section- or township-level
+#'   SpatialPolygonsDataFrame.
+#' @param download_progress TRUE / FALSE indicating whether you would like a
+#'   message and progress bar printed for the shapefile that is downloaded.
+#'   The default value is FALSE.
+#'
+#' @return A SpatialPolygonsDataFrame object.
+#'
+#' @section Source:
+#' SpatialPolygonDataFrame objects are downloaded from GIS shapefiles provided
+#' by the California Department of Pesticide Regulation:
+#' \url{http://www.cdpr.ca.gov/docs/emon/grndwtr/gis_shapefiles.htm}
+#'
+#' @examples
+#' \dontrun{
+#' trinity_shp <- pull_spdf("trinity", download_progress = TRUE)
+#' plot(trinity_shp)
+#'
+#' del_norte_shp <- pull_spdf("08", "township", download_progress = TRUE)
+#' plot(del_norte_shp)
+#' }
+#' @export
+pull_spdf <- function(county, section_township = "section",
+                      download_progress = FALSE) {
+
+  if (county != "Statewide") {
+    county_name <- find_counties(county, return = "names")
+    county_name <- stringr::str_replace(county_name, " ", "_")
+
+    shp_url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/",
+                      county_name, "/", county_name, "_", section_township,
+                      "s.zip")
+    file <- paste0(county_name, "_", section_township, "s.zip")
+  } else {
+    shp_url <- "ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/Statewide/mtrnet.zip"
+    file <- "mtrnet.zip"
+  }
+
+  current_dir <- getwd()
+  temp_dir <- tempdir()
+  setwd(temp_dir)
+
+  invisible(suppressMessages(suppressWarnings(file.remove(list.files(temp_dir)))))
+
+  if (download_progress) {
+    quiet <- FALSE
+  } else {
+    quiet <- TRUE
+  }
+
+  download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
+
+  unzip(file, exdir = temp_dir)
+
+  shp_file <- list.files()[grepl(".shp", list.files()) &
+                             !grepl(".xml", list.files())]
+
+  shp <- rgdal::readOGR(shp_file,
+                        layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
+                        verbose = FALSE)
+  shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
+
+  setwd(current_dir)
+
+  return(shp)
 
 }

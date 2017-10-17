@@ -71,7 +71,7 @@
 #'    or township, date range, and chemicals, \code{location}, and \code{radius}}
 #'    \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
 #'    data for the buffer and overlapping sections or townships. You can use the
-#'    \code{plot_tidy} function to quickly plot and get a rough idea of the
+#'    \code{dataframe_plot} function to quickly plot and get a rough idea of the
 #'    area for which exposure was calculated, before moving on to other map_*
 #'    or plot_* functions.}
 #'    \item{county_plot}{A ggplot2 plot showing the location of your specified
@@ -89,7 +89,7 @@
 #'    \item{If you pulled PUR data from \code{pull_clean_pur} specifying
 #'          \code{sum_application = TRUE} and \code{unit = "township"}, then
 #'          exposure will be calculated based on townships. Using the
-#'          \code{plot_tidy} function to plot the returned \code{buffer_plot}
+#'          \code{dataframe_plot} function to plot the returned \code{buffer_plot}
 #'          list element to take a look at the \code{county_plot} plot element
 #'          could be helpful to see the difference between calculating exposure
 #'          based on sections or townships for a certain buffer radius.}
@@ -120,7 +120,7 @@
 #' exp_list3 <- calculate_exposure(clean_pur2,
 #'                                 location = "-116.45, 34.96",
 #'                                 radius = 5000)
-#' plot_tidy(exp_list3$buffer_plot)
+#' dataframe_plot(exp_list3$buffer_plot)
 #' exp_list3$county_plot
 #'
 #' # calculate exposure by specified chemical classes
@@ -194,25 +194,13 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                           max_long = max(long),
                                           max_lat = max(lat))
 
-  # if ("section" %in% colnames(clean_pur_df)) {
-  #   shp <- pull_spdf(county, "section")
-  #   df <- spdf_to_df(shp)
-  # } else {
-  #   shp <- pull_spdf(county, "township")
-  #   df <- spdf_to_df(shp)
-  # }
-
-  ### ftp is down (replaces ^)
-
   if ("section" %in% colnames(clean_pur_df)) {
-    shp <- readRDS("~/Documents/pesticides_project/data/fresno_shp.rds")
-    df <- readRDS("~/Documents/pesticides_project/data/fresno_coords.rds")
+    shp <- pull_spdf(county, "section")
+    df <- spdf_to_df(shp)
   } else {
-    shp <- readRDS("~/Documents/pesticides_project/data/fresno_township_shp.rds")
-    df <- readRDS("~/Documents/pesticides_project/data/fresno_township_coords.rds")
+    shp <- pull_spdf(county, "township")
+    df <- spdf_to_df(shp)
   }
-
-  ###
 
   context_plot <- ggplot2::ggplot(data = df) +
     ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group),
@@ -228,13 +216,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                        lat <= range$max_lat)
 
   if (nrow(which_pls) == 0) {
-
-    euc_distance <- function(long, lat, origin_long, origin_lat) {
-      x <- abs(lat - origin_lat)
-      y <- abs(long - origin_long)
-      dist <- sqrt((x^2) + (y^2))
-      out <- data.frame(long = long, lat = lat, dist = dist)
-    }
 
     if ("section" %in% colnames(clean_pur_df)) {
 
@@ -326,104 +307,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
          "for additional years using the pull_clean_pur() function." )
   }
 
- ##
-
-  pur_filt_df <- function(pls, pls_quote) {
-
-    pls_var <- rlang::enquo(pls)
-    pls_name <- rlang::quo_name(pls_quote)
-
-    tibble_to_vector <- function(tib) {
-      vec <- tib %>% dplyr::pull(1) %>% as.character()
-      return(vec)
-    }
-
-    pls_int <- which_pls %>%
-      tibble::as_tibble() %>%
-      dplyr::select(!!pls_name) %>%
-      unique() %>%
-      tibble_to_vector()
-
-    # filter shp file to include only sections intersecting w/ buffer
-    df_filtered <- df %>% dplyr::filter(rlang::UQ(pls_var) %in% pls_int)
-
-    # combine buffer to existing sections shp file
-    buffer_shp <- shp[1, ]
-    buffer_shp@polygons[[1]]@Polygons[[1]]@coords <- buffer
-    buffer_shp <- sp::spChFIDs(buffer_shp, paste("buffer", 1:nrow(buffer_shp), sep = ""))
-
-    if (pls_quote == "MTRS") {
-      buffer_shp@data$MTRS <- "buffer"
-    } else {
-      buffer_shp@data$MTR <- "buffer"
-    }
-
-    comb_shp <- maptools::spRbind(shp, buffer_shp)
-    suppressMessages(comb_df <- broom::tidy(comb_shp))
-
-    if (pls_quote == "MTRS") {
-      comb_shp_filt <- subset(comb_shp, MTRS %in% c(pls_int, "buffer"))
-    } else {
-      comb_shp_filt <- subset(comb_shp, MTR %in% c(pls_int, "buffer"))
-    }
-
-    buffer_poly <- length(comb_shp_filt@polygons)
-    section_polys <- 1:(length(comb_shp_filt@polygons) - 1)
-
-    for (i in 1:length(section_polys)) {
-
-      section_area <- comb_shp_filt@polygons[[i]]@Polygons[[1]]@area
-      intersection <- rgeos::gIntersection(sp::SpatialPolygons(comb_shp_filt@polygons[i]),
-                                           sp::SpatialPolygons(comb_shp_filt@polygons[buffer_poly]))
-
-      if (is.null(intersection)) {
-        intersected_area <- 0
-      } else {
-        intersected_area <- rgeos::gArea(intersection)
-      }
-
-      if (pls_quote == "MTRS") {
-        percent_df <- data.frame(MTRS = comb_shp_filt@data$MTRS[i],
-                                 percent = intersected_area/section_area)
-      } else {
-        percent_df <- data.frame(MTR = comb_shp_filt@data$MTR[i],
-                                 percent = intersected_area/section_area)
-      }
-
-      if (i == 1) {
-        out <- percent_df
-      } else {
-        out <- rbind(out, percent_df)
-      }
-    }
-
-    out <- dplyr::filter(out, percent != 0)
-    if (pls_quote == "MTRS") {
-      comb_shp_filt <- subset(comb_shp_filt, MTRS %in% c(as.character(out$MTRS),
-                                                         "buffer"))
-    } else {
-      comb_shp_filt <- subset(comb_shp_filt, MTR %in% c(as.character(out$MTR),
-                                                        "buffer"))
-    }
-
-    suppressMessages(comb_df_filt <- broom::tidy(comb_shp_filt))
-
-    comb_df_filt <- dplyr::mutate(comb_df_filt, group = as.character(group))
-
-    comb_df_filt <- df_filtered %>%
-      dplyr::mutate(group = as.character(group)) %>%
-      dplyr::right_join(comb_df_filt, by = c("long", "lat", "hole", "order",
-                                             "piece", "id", "group"))
-
-    pur_filt <- dplyr::filter(clean_pur_df, !is.na(kg_chm_used))
-    out <- list(pur_filt = pur_filt,
-                comb_df_filt = comb_df_filt,
-                pls_intersections = out,
-                pls_int = pls_int)
-    return(out)
-
-  }
-
   if ("section" %in% colnames(clean_pur_df)) {
     out_list <- pur_filt_df(MTRS, "MTRS")
   } else {
@@ -434,185 +317,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   comb_df_filt <- out_list$comb_df_filt
   pls_percents <- out_list$pls_intersections
   pls_int <- out_list$pls_int
-
-  ## calculate exposure for multiple start and end dates
-  ## returns a nested data frame - \code{row_out} and \code{meta_data}
-  calculate_exposure_bydate <- function(start_date, end_date) {
-
-    pur_out_df <- function(...) {
-      group_by <- rlang::quos(...)
-      pur_out <- pur_filt %>%
-        dplyr::filter(date >= start_date & date <= end_date) %>%
-        dplyr::group_by(!!!group_by) %>%
-        summarise(kg = sum(kg_chm_used)) %>%
-        dplyr::ungroup()
-      return(pur_out)
-    }
-
-    if (chemicals == "all") {
-      if ("section" %in% colnames(pur_filt)) {
-        if (aerial_ground) {
-          pur_out <- pur_out_df(section, aerial_ground)
-        } else {
-          pur_out <- pur_out_df(section)
-        }
-      } else {
-        if (aerial_ground) {
-          pur_out <- pur_out_df(township, aerial_ground)
-        } else {
-          pur_out <- pur_out_df(township)
-        }
-      }
-    } else {
-      if ("section" %in% colnames(pur_filt)) {
-        if (aerial_ground) {
-          pur_out <- pur_out_df(section, chemical_class, aerial_ground)
-        } else {
-          pur_out <- pur_out_df(section, chemical_class)
-        }
-      } else {
-        if (aerial_ground) {
-          pur_out <- pur_out_df(township, chemical_class, aerial_ground)
-        } else {
-          pur_out <- pur_out_df(township, chemical_class)
-        }
-      }
-    }
-
-    buffer_area <- pi * (radius^2)
-
-    exp_df <- function(mtrs_mtr, section_township) {
-
-      mutate_expr <- rlang::enquo(mtrs_mtr)
-      rename_expr <- rlang::enquo(section_township)
-
-      if ("chemical_class" %in% colnames(clean_pur_df)) {
-
-        classes <- unique(clean_pur_df$chemical_class)
-        n_classes <- length(classes)
-        pls <- as.character(pls_percents[,1])
-        n_pls <- length(pls)
-
-        class_pls <- data.frame(pls = as.character(rep(pls, times = n_classes)),
-                                chemicals = rep(classes, each = n_pls)) %>%
-          dplyr::mutate(pls = as.character(pls))
-
-        pur_out2 <- pur_out %>%
-          dplyr::rename(pls := !!rename_expr,
-                        chemicals = chemical_class) %>%
-          dplyr::mutate(chemicals = as.character(chemicals))
-
-        exp_0 <- pls_percents %>%
-          dplyr::rename(pls := !!mutate_expr) %>%
-          dplyr::mutate(pls = as.character(pls)) %>%
-          dplyr::full_join(class_pls, by = "pls") %>%
-          dplyr::arrange(chemicals) %>%
-          dplyr::mutate(chemicals = as.character(chemicals)) %>%
-          dplyr::left_join(pur_out2, by = c("pls", "chemicals")) %>% # brings in kg, maybe aerial_ground
-          dplyr::mutate(location = location,
-                        kg = ifelse(is.na(kg), 0, kg),
-                        none_recorded = ifelse(kg == 0, TRUE, FALSE),
-                        kg_intersection = percent * kg,
-                        start_date = start_date,
-                        end_date = end_date,
-                        radius = radius,
-                        area = buffer_area)
-      } else {
-
-        class_pls <- data.frame(pls = as.character(pls_percents[,1]),
-                                chemicals = "all") %>%
-          dplyr::mutate(pls = as.character(pls))
-
-        pur_out2 <- pur_out %>%
-          dplyr::rename(pls := !!rename_expr)
-
-        exp_0 <- pls_percents %>%
-          dplyr::rename(pls := !!mutate_expr) %>%
-          dplyr::mutate(pls = as.character(pls)) %>%
-          dplyr::full_join(class_pls, by = "pls") %>%
-          dplyr::mutate(chemicals = as.character(chemicals)) %>%
-          dplyr::left_join(pur_out2, by = "pls") %>% # brings in kg, maybe aerial_ground
-          dplyr::mutate(location = location,
-                        kg = ifelse(is.na(kg), 0, kg),
-                        none_recorded = ifelse(kg == 0, TRUE, FALSE),
-                        kg_intersection = percent * kg,
-                        start_date = start_date,
-                        end_date = end_date,
-                        radius = radius,
-                        area = buffer_area)
-
-      }
-
-      if ("aerial_ground" %in% colnames(exp_0)) {
-        exp <- exp_0 %>% dplyr::mutate(aerial_ground = as.character(aerial_ground))
-      } else {
-        exp <- exp_0 %>% dplyr::mutate(aerial_ground = NA)
-      }
-
-      exp <- exp %>%
-        dplyr::select(pls, chemicals, percent, kg, kg_intersection, start_date,
-                      end_date, aerial_ground, none_recorded, location, radius, area)
-
-      return(exp)
-
-    }
-
-    if ("section" %in% colnames(pur_filt)) {
-      exp <- exp_df(MTRS, section)
-    } else {
-      exp <- exp_df(MTR, township)
-    }
-
-    exp_out_df <- function(...) { # to calculate exposure, either want to
-      # group by only chemicals or by chemicals
-      # and aerial_ground
-      group_by_vars <- rlang::quos(...)
-      exp_out <- exp %>%
-        dplyr::group_by(!!!group_by_vars) %>%
-        dplyr::summarise(exposure = sum(kg_intersection, na.rm = TRUE) / buffer_area)
-      return(exp_out)
-    }
-
-    row_out_df <- function(...) { # either chemicals or chemicals, aerial_ground
-      vars <- rlang::quos(...)
-      row_out_0 <- exp_out_df(!!!vars)
-      if ("aerial_ground" %in% colnames(row_out_0)) {
-        row_out <- row_out_0 %>%
-          dplyr::mutate(start_date = start_date,
-                        end_date = end_date,
-                        location = location,
-                        radius = radius) %>%
-          dplyr::select(exposure, chemicals, start_date, end_date, aerial_ground,
-                        location, radius)
-
-      } else {
-        row_out <- row_out_0 %>%
-          dplyr::mutate(start_date = start_date,
-                        end_date = end_date,
-                        aerial_ground = NA,
-                        location = location,
-                        radius = radius) %>%
-          dplyr::select(exposure, chemicals, start_date, end_date, aerial_ground,
-                        location, radius)
-      }
-
-      return(row_out)
-
-    }
-
-    if (aerial_ground) {
-      row_out <- row_out_df(chemicals, aerial_ground)
-    } else {
-      row_out <- row_out_df(chemicals)
-    }
-
-    nested_df <- list(row_out = list(row_out), meta_data = list(exp))
-    attr(nested_df, "row.names") <- as.integer(1)
-    class(nested_df) <- c("tbl_df", "data.frame")
-
-    return(nested_df)
-
-  }
 
   out <- purrr::map2(time_df$start_date, time_df$end_date,
                      calculate_exposure_bydate)
@@ -628,8 +332,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     }
   }
 
-  meta_out <- unique(meta_out)
-
   out <- list(exposure = row_out,
               meta_data = meta_out,
               buffer_plot_df = comb_df_filt,
@@ -638,5 +340,3 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   return(out)
 
 }
-
-
