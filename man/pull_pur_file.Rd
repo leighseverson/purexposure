@@ -7,7 +7,7 @@
 pull_pur_file(year, counties = "all", download_progress = FALSE)
 }
 \arguments{
-\item{counties}{A character string giving either county names or two digit
+\item{counties}{A character vector giving either county names or two digit
 county codes. Not case sensitive. California names and county codes as they
 appear in PUR datasets can be found in the county_codes dataset available
 with this package. For example, to return data for Alameda county, enter

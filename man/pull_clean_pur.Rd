@@ -7,8 +7,7 @@
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
   chemical_class = NULL, start_date = NULL, end_date = NULL,
-  include_aerial_ground = FALSE, verbose = TRUE,
-  download_progress = FALSE)
+  aerial_ground = FALSE, verbose = TRUE, download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -71,7 +70,7 @@ argument.}
 want to return the entire date range pulled using the \code{years}
 argument.}
 
-\item{include_aerial_ground}{TRUE / FALSE indicating if you would like to
+\item{aerial_ground}{TRUE / FALSE indicating if you would like to
 retain aerial/ground application data ("A" = aerial, "G" = ground, and
 "O" = other.) The default is FALSE.}
 
@@ -118,7 +117,7 @@ A data frame:
     \item{date}{The date of application (yyyy-mm-dd).}
     \item{aerial_ground}{A character giving the application method.
     "A" = aerial, "G" = ground, and "O" = other. This column is only included if
-    \code{include_aerial_ground = TRUE}.}
+    \code{aerial_ground = TRUE}.}
     \item{use_no}{A character string identifing unique application of an
     active ingredient across years. This value is a combination of the raw PUR
     \code{use_no} column and the year of application. Not included if
@@ -160,7 +159,7 @@ df <- pull_clean_pur(download_progress = TRUE)
 df2 <- pull_clean_pur(years = 2000:2010,
                       counties = c("01", "nevada", "riverside"),
                       chemicals = "methylene",
-                      include_aerial_ground = TRUE)
+                      aerial_ground = TRUE)
 
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2000:2010,

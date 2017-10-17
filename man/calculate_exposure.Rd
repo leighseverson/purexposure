@@ -15,9 +15,9 @@ running \code{pull_clean_pur}, you can use the \code{find_location_county}
 function to figure this out), the time period, and the active ingredients
 or chemical classes for which you want to calculate exposure.}
 
-\item{location}{A character string. Either a California address including
-street name, city, state, and zip code, or a pair of coordinates in the
-form "longitude, latitude".}
+\item{location}{A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".}
 
 \item{radius}{A numeric value greater than zero that gives the radius in meters
 defining the buffer around your location in which you would like to
@@ -48,40 +48,40 @@ will calculate exposure to the summed active ingredients present in the
 exposure to each of the chemical classes present in the \code{chemical_class}
 column of your \code{clean_pur_df} data frame.}
 
-\item{aerial_ground}{TRUE / FALSE for whether you would like to incorporate
-aerial/ground application into exposure calculations. If
-\code{aerial_ground = TRUE}, there should be an aerial_ground column in the
-input \code{clean_pur_df} data frame. There will be a value of exposure
-calculated for each chemical ("all" or by chemical class) and for each
-method of application: aerial or ground. The default is FALSE.}
+\item{aerial_ground}{TRUE / FALSE for whether you would like to
+incorporate aerial/ground application into exposure calculations. If
+\code{aerial_ground = TRUE}, there should be an \code{aerial_ground}
+column in the input \code{clean_pur_df} data frame. There will be a value of
+exposure calculated for each chemical ("all" or by chemical class) and for
+each method of application: aerial or ground. The default is FALSE.}
 }
 \value{
 A list with four elements:
  \describe{
-   \item{exposure}{A data frame with a row for each date
-   range for which exposure was calculated and eight columns: \code{exposure},
-   the estimate of exposure in kg/m^2, \code{location}, \code{start_date} and
-   \code{end_date}, \code{radius}, the radius in meters for the buffer
-   extending from the location, and \code{chemcials}, (either "all", indicating
-   that all active ingredients present in the \code{clean_pur_df} were summed,
-   a particular active ingredient, or the chemical class(es) specified in the
-   \code{clean_pur_df} data frame). \code{aerial_ground} can take values of
-   "A" = aerial, "G" = ground, and "O" = others. If
-   the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground} will
-   be \code{NA} in the \code{exposure} data frame.\code{none_recorded} is
-   TRUE if exposure was 0 because there was no pesticide application recorded
-   in the sections or townships intersected by the buffer for that date range.}
-   \item{meta_data}{A data frame with 11 columns and one row for every section
-   or township intersected by the specified buffer extending from the
-   given location. Columns include \code{location}, \code{section} or
-   \code{township}, \code{percent}, the percent that the section is overlapped
-   by the buffer, \code{kg}, the total amount of kg applied for the specified
-   chemicals and date range in that section or township, \code{kg_int}, the
-   amount of kilograms applied multiplied by the percent of overlap,
-   \code{start_date} and \code{end_date}, \code{radius}, \code{chemicals},
-   \code{area}, the area of the buffer (m^2), and \code{none_recorded}, logical
+   \item{exposure}{A data frame with 7 columns: \code{exposure},
+   the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
+   indicating that all active ingredients present in the \code{clean_pur_df}
+   were summed or the chemical class(es) specified in the \code{clean_pur_df}
+   data frame), \code{start_date}, \code{end_date}, \code{aerial_ground},
+   which can take values of "A" = aerial, "G" = ground, and "O" = others, (if
+   the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground}
+   will be \code{NA} in the \code{exposure} data frame), \code{location}, and
+   \code{radius}, the radius in meters for the buffer extending from the
+   location}
+   \item{meta_data}{A data frame with 12 columns and at least one row for
+   every section or township intersected by the specified buffer extending
+   from the given location. Columns include \code{pls}, giving either the
+   Public Land Survey (PLS) section (9 characters long) or township (7
+   characters long), \code{chemicals}, \code{percent}, the percent that the
+   PLS unit is overlapped by the buffer, \code{kg}, the total amount of kg
+   applied for the specified chemicals and date range in that section or
+   township, \code{kg_intersection}, the amount of kilograms applied
+   multiplied by the percent of overlap, \code{start_date} and \code{end_date},
+   \code{aerial_ground}, which can take values of "A" (aerial), "G" (ground),
+   or "O" (other), and will be \code{NA} if exposure calculations did not
+   take aerial/ground application into account, \code{none_recorded}, logical
    for whether any pesticide application was recorded for the specified section
-   or township, date range, and chemicals.}
+   or township, date range, and chemicals, \code{location}, and \code{radius}}
    \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
    data for the buffer and overlapping sections or townships. You can use the
    \code{plot_tidy} function to quickly plot and get a rough idea of the
@@ -134,7 +134,7 @@ exp_list2$exposure
 clean_pur2 <- pull_clean_pur(1995, counties = "san bernardino",
                              sum_application = TRUE, unit = "township")
 exp_list3 <- calculate_exposure(clean_pur2,
-                                location = "-116.45, 34.96"
+                                location = "-116.45, 34.96",
                                 radius = 5000)
 plot_tidy(exp_list3$buffer_plot)
 
@@ -153,7 +153,7 @@ exp_list4 <- calculate_exposure(clean_pur3,
                                 chemicals = "chemical_class")
 
 # incorporate aerial/ground application information
-clean_pur4 <- pull_clean_pur(2000, "yolo", include_aerial_ground = TRUE)
+clean_pur4 <- pull_clean_pur(2000, "yolo", aerial_ground = TRUE)
 exp_list5 <- calculate_exposure(clean_pur4,
                                 location = "-121.9018, 38.7646",
                                 radius = 2500,
