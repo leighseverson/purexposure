@@ -337,9 +337,7 @@ exp_df <- function(mtrs_mtr, section_township) {
 #'
 #' @return A data frame with exposure values in kg/m^2 at a location for each
 #' relevant condition.
-exp_out_val <- function(...) { # to calculate exposure, either want to
-  # group by only chemicals or by chemicals
-  # and aerial_ground
+exp_out_val <- function(...) {
   group_by_vars <- rlang::quos(...)
   exp_out <- exp %>%
     dplyr::group_by(!!!group_by_vars) %>%
@@ -360,7 +358,7 @@ exp_out_val <- function(...) { # to calculate exposure, either want to
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
-row_out_df <- function(...) { # either chemicals or chemicals, aerial_ground
+row_out_df <- function(...) {
   vars <- rlang::quos(...)
   row_out_0 <- exp_out_val(!!!vars)
   if ("aerial_ground" %in% colnames(row_out_0)) {
@@ -454,14 +452,3 @@ calculate_exposure_bydate <- function(start_date, end_date) {
   return(nested_df)
 
 }
-
-
-
-
-
-
-
-
-
-
-
