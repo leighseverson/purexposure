@@ -35,7 +35,7 @@
 #' @examples
 #' find_chemical_codes(2000, "methyl bromide")
 #' find_chemical_codes(1995, c("ammonia", "benzene"))
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @export
 find_chemical_codes <- function(year, chemicals = "all") {
 
@@ -92,6 +92,7 @@ find_chemical_codes <- function(year, chemicals = "all") {
 #' find_counties(c("contra costa", "45"), return = "names")
 #'
 #' find_counties("blah")
+#' @importFrom magrittr %>%
 #' @export
 find_counties <- function(counties, return = "codes") {
 

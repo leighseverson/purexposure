@@ -109,7 +109,7 @@ estimate of exposure in kg of active ingredient per m^2.
          \code{sum_application = TRUE} and \code{unit = "township"}, then
          exposure will be calculated based on townships. Using the
          \code{plot_tidy} function to plot the returned \code{buffer_plot}
-         list element and taking a look at the \code{county_plot} plot element
+         list element to take a look at the \code{county_plot} plot element
          could be helpful to see the difference between calculating exposure
          based on sections or townships for a certain buffer radius.}
     \item{This function takes advantage of the Google Maps Geocoding API, and
@@ -143,6 +143,7 @@ exp_list3 <- calculate_exposure(clean_pur2,
 plot_tidy(exp_list3$buffer_plot)
 
 # calculate exposure by specified chemical classes
+# this is an example of `none_recorded = TRUE`
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) \%>\%
    dplyr::rename(chemical_class = chemical)

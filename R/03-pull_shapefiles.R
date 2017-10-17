@@ -95,8 +95,10 @@ pull_spdf <- function(county, section_township = "section",
 #' plot_tidy(df)
 #' plot_tidy(df2)
 #' }
+#' @importFrom magrittr %>%
 #' @export
 spdf_to_df <- function(spdf) {
+
   df <- suppressMessages(sp::merge(broom::tidy(spdf), as.data.frame(spdf),
                                    by.x = "id", by.y = 0))
   df <- df %>% dplyr::mutate(MTR = as.character(MTR))
@@ -127,9 +129,12 @@ spdf_to_df <- function(spdf) {
 #' }
 #' @export
 plot_tidy <- function(df) {
+
   plot <- ggplot2::ggplot(data = df, ggplot2::aes(x = long, y = lat,
                                                   group = group)) +
     ggplot2::geom_polygon(color = "black", fill = NA) +
     ggplot2::theme_void()
+
   return(plot)
+
 }

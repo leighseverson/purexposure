@@ -121,9 +121,10 @@
 #'                                 location = "-116.45, 34.96",
 #'                                 radius = 5000)
 #' plot_tidy(exp_list3$buffer_plot)
+#' exp_list3$county_plot
 #'
 #' # calculate exposure by specified chemical classes
-#' # this is an example of \code{none_recorded = TRUE}
+#' # this is an example of `none_recorded = TRUE`
 #' chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
 #'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
@@ -136,6 +137,7 @@
 #'                                 location = "13883 Lassen Ave, Helm, CA 93627",
 #'                                 radius = 1500,
 #'                                 chemicals = "chemical_class")
+#' exp_list4$meta_data
 #'
 #' # incorporate aerial/ground application information
 #' clean_pur4 <- pull_clean_pur(2000, "yolo", aerial_ground = TRUE)
@@ -145,6 +147,10 @@
 #'                                 aerial_ground = TRUE)
 #' exp_list5$exposure
 #' }
+#' @importFrom magrittr %>%
+#' @importFrom rlang :=
+#' @importFrom dplyr !!
+#' @importFrom dplyr !!!
 #' @export
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,

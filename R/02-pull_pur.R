@@ -19,6 +19,7 @@
 #' raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
 #' raw_file <- pull_pur_file(2015, "all")
 #' }
+#' @importFrom magrittr %>%
 #' @export
 pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 
@@ -116,7 +117,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 #' df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
 #' df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 #' }
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @export
 pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
                          download_progress = FALSE) {
@@ -355,7 +356,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
 #' }
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @export
 pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
