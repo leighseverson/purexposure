@@ -96,6 +96,7 @@ euc_distance <- function(long, lat, origin_long, origin_lat) {
 #' @param tib A tibble with only one column.
 #'
 #' @return A character vector.
+#' @importFrom magrittr %>%
 tibble_to_vector <- function(tib) {
   vec <- tib %>% dplyr::pull(1) %>% as.character()
   return(vec)
@@ -123,6 +124,8 @@ tibble_to_vector <- function(tib) {
 #'   \item{pls_int}{A character vector with all PLS units intersecting with the
 #'   buffer.}
 #' }
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!
 pur_filt_df <- function(pls, pls_quote) {
 
   pls_var <- rlang::enquo(pls)
@@ -226,6 +229,7 @@ pur_filt_df <- function(pls, pls_quote) {
 #'
 #' @return A data frame a \code{kg} column and one to three additional columns,
 #' depending on the grouping variables.
+#' @importFrom magrittr %>%
 pur_out_df <- function(...) {
   group_by <- rlang::quos(...)
   pur_out <- pur_filt %>%
@@ -248,6 +252,9 @@ pur_out_df <- function(...) {
 #'
 #' @return A data frame with the twelve columns in the
 #' \code{calculate_exposure$meta_data} data frame.
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!
+#' @importFrom rlang :=
 exp_df <- function(mtrs_mtr, section_township) {
 
   mutate_expr <- rlang::enquo(mtrs_mtr)
@@ -337,6 +344,8 @@ exp_df <- function(mtrs_mtr, section_township) {
 #'
 #' @return A data frame with exposure values in kg/m^2 at a location for each
 #' relevant condition.
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!!
 exp_out_val <- function(...) {
   group_by_vars <- rlang::quos(...)
   exp_out <- exp %>%
@@ -358,6 +367,8 @@ exp_out_val <- function(...) {
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!!
 row_out_df <- function(...) {
   vars <- rlang::quos(...)
   row_out_0 <- exp_out_val(!!!vars)
