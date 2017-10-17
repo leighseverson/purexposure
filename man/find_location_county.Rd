@@ -4,7 +4,7 @@
 \alias{find_location_county}
 \title{Find the county from an address or coordinate pair.}
 \usage{
-find_location_county(location, return = "name")
+find_location_county(location, return = "name", latlon_out = NULL)
 }
 \arguments{
 \item{location}{A length-one character string. Either a California address
