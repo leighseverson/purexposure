@@ -153,22 +153,25 @@ find_counties <- function(counties, return = "codes") {
 
   }
 
-  # purrr::map wasn't working v well w/ an error message..
-
   for (i in 1:length(counties)) {
+
     county_name <- find_county_code(counties[i])
     if (is.null(county_name)) {
+
       stop(paste0("\"", counties[i], "\"", " doesn't match any ",
                   "California counties. \nCheck out the ",
                   "county_codes dataset included with this ",
                   "package for county names and corresponding ",
                   "codes."))
+
     } else {
+
       if (i == 1) {
         out <- county_name
       } else {
         out <- c(out, county_name)
       }
+
     }
   }
 
@@ -184,7 +187,10 @@ find_counties <- function(counties, return = "codes") {
 #'
 #' @inheritParams calculate_exposure
 #' @param return Either "name" to return county name (the default) or "code"
-#'  to return county code.
+#'   to return county code.
+#' @param latlon_out A numeric vector of two with longitude and latitude
+#'   values. If the \code{geocode} code has been run earlier and this output is
+#'   available, this saves a redundant request to the Google Maps API.
 #'
 #' @return A character string giving the California county where the address or
 #' coordinate pair given in \code{location} is located.

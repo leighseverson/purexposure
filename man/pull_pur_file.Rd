@@ -22,13 +22,20 @@ The default value is FALSE.}
 A data frame with 33 columns. Counties are indicated by
   \code{county_cd}; the year for which data was pulled is indicated by
   \code{applic_dt}.
+}
+\description{
+\code{pull_pur_file} pulls the raw PUR dataset for a particular year and
+saves datasets for specified counties in a data frame.
+}
+\section{Note}{
+
+If this function returns an error (because the FTP site is down, for
+example), check your working directory. You may have to change it back from a
+temporary directory.
 
 \dontrun{
 raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
 raw_file <- pull_pur_file(2015, "all")
 }
 }
-\description{
-\code{pull_pur_file} pulls the raw PUR dataset for a particular year and
-saves datasets for specified counties in a data frame.
-}
+

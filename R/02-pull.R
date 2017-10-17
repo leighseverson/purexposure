@@ -15,6 +15,11 @@
 #'   \code{county_cd}; the year for which data was pulled is indicated by
 #'   \code{applic_dt}.
 #'
+#' @section Note:
+#' If this function returns an error (because the FTP site is down, for
+#' example), check your working directory. You may have to change it back from a
+#' temporary directory.
+#'
 #' \dontrun{
 #' raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
 #' raw_file <- pull_pur_file(2015, "all")
@@ -75,6 +80,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
   }
 
   setwd(current_dir)
+
   return(counties_in_year)
 
 }
@@ -105,11 +111,17 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 #'   data was pulled are indicated by \code{applic_dt} and \code{county_cd},
 #'   respectively.
 #'
-#' @section Note: For documentation of raw PUR data, see the Pesticide Use
+#' @section Note:
+#'  \itemize{
+#'    \item{For documentation of raw PUR data, see the Pesticide Use
 #'   Report Data User Guide & Documentation document published by the California
 #'   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
 #'   "pur[year].zip" file between 1990 and 2015 found here:
-#'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+#'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
+#'   \item{If this function returns an error (because the FTP site is down, for
+#'   example), check your working directory. You may have to change it back from
+#'   a temporary directory.}
+#' }
 #'
 #' @examples
 #' \dontrun{
@@ -320,6 +332,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     Pesticide Regulation. This file is saved as "cd_doc.pdf" in
 #'     any "pur[year].zip" file between 1990 and 2015 found here:
 #'     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+#'     \item{If this function returns an error, check your working directory.
+#'     You may have to change it back from a temporary directory.}
 #' }
 #'
 #' @examples
@@ -709,6 +723,11 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' SpatialPolygonDataFrame objects are downloaded from GIS shapefiles provided
 #' by the California Department of Pesticide Regulation:
 #' \url{http://www.cdpr.ca.gov/docs/emon/grndwtr/gis_shapefiles.htm}
+#'
+#' @section Note:
+#' If this function returns an error (because the FTP site is down, for
+#' example), check your working directory. You may have to change it back from
+#' a temporary directory.
 #'
 #' @examples
 #' \dontrun{

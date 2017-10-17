@@ -38,11 +38,17 @@ A data frame with 33 columns. Different years and counties for which
   California counties.
 }
 \section{Note}{
- For documentation of raw PUR data, see the Pesticide Use
+
+ \itemize{
+   \item{For documentation of raw PUR data, see the Pesticide Use
   Report Data User Guide & Documentation document published by the California
   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
   "pur[year].zip" file between 1990 and 2015 found here:
-  \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+  \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
+  \item{If this function returns an error (because the FTP site is down, for
+  example), check your working directory. You may have to change it back from
+  a temporary directory.}
+}
 }
 
 \examples{

@@ -42,6 +42,8 @@
 #'   column in the input \code{clean_pur_df} data frame. There will be a value of
 #'   exposure calculated for each chemical ("all" or by chemical class) and for
 #'   each method of application: aerial or ground. The default is FALSE.
+#' @param verbose TRUE / FALSE for whether you would like a message to print out
+#'   while the function is running. The default is \code{TRUE}.
 #'
 #' @return A list with four elements:
 #'  \describe{
@@ -155,7 +157,7 @@
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
                                end_date = NULL, chemicals = "all",
-                               aerial_ground = FALSE) {
+                               aerial_ground = FALSE, verbose = TRUE) {
 
   # get numeric coordinate vector from location
   if (length(grep("-", location)) == 1) {
@@ -180,6 +182,11 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     stop(paste0("\"", location,  "\"", " is located in ", county, " county. ",
                 "\nThe clean_pur_df data frame doesn't include data for this ",
                 "county."))
+  }
+
+  if (verbose) {
+    message(paste0("Calculating exposure for the location ", "\"", location,
+                   "\"", "."))
   }
 
   radius <- as.numeric(radius)

@@ -13,6 +13,10 @@ in the form "longitude, latitude".}
 
 \item{return}{Either "name" to return county name (the default) or "code"
 to return county code.}
+
+\item{latlon_out}{A numeric vector of two with longitude and latitude
+values. If the \code{geocode} code has been run earlier and this output is
+available, this saves a redundant request to the Google Maps API.}
 }
 \value{
 A character string giving the California county where the address or

@@ -79,10 +79,14 @@ spdf_to_df <- function(spdf) {
 #' \code{lat} give the second point's coordinates, and \code{dist} gives the
 #' euclidian distance from these coordinates from the origin.
 euc_distance <- function(long, lat, origin_long, origin_lat) {
+
   x <- abs(lat - origin_lat)
   y <- abs(long - origin_long)
   dist <- sqrt((x^2) + (y^2))
   out <- data.frame(long = long, lat = lat, dist = dist)
+
+  return(out)
+
 }
 
 #' Return a character vector from a tibble with one column.
@@ -98,8 +102,11 @@ euc_distance <- function(long, lat, origin_long, origin_lat) {
 #' @return A character vector.
 #' @importFrom magrittr %>%
 tibble_to_vector <- function(tib) {
+
   vec <- tib %>% dplyr::pull(1) %>% as.character()
+
   return(vec)
+
 }
 
 #' Find PLS units intersecting with a buffer.
@@ -213,6 +220,7 @@ pur_filt_df <- function(pls, pls_quote) {
               comb_df_filt = comb_df_filt,
               pls_intersections = out,
               pls_int = pls_int)
+
   return(out)
 
 }
@@ -230,14 +238,19 @@ pur_filt_df <- function(pls, pls_quote) {
 #' @return A data frame a \code{kg} column and one to three additional columns,
 #' depending on the grouping variables.
 #' @importFrom magrittr %>%
+#' @importFrom rlang !!!
 pur_out_df <- function(...) {
+
   group_by <- rlang::quos(...)
+
   pur_out <- pur_filt %>%
     dplyr::filter(date >= start_date & date <= end_date) %>%
     dplyr::group_by(!!!group_by) %>%
     dplyr::summarise(kg = sum(kg_chm_used)) %>%
     dplyr::ungroup()
+
   return(pur_out)
+
 }
 
 #' Return a the \code{meta_data} data frame
@@ -291,6 +304,7 @@ exp_df <- function(mtrs_mtr, section_township) {
                     end_date = end_date,
                     radius = radius,
                     area = buffer_area)
+
   } else {
 
     class_pls <- data.frame(pls = as.character(pls_percents[,1]),
@@ -347,11 +361,15 @@ exp_df <- function(mtrs_mtr, section_township) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 exp_out_val <- function(...) {
+
   group_by_vars <- rlang::quos(...)
+
   exp_out <- exp %>%
     dplyr::group_by(!!!group_by_vars) %>%
     dplyr::summarise(exposure = sum(kg_intersection, na.rm = TRUE) / buffer_area)
+
   return(exp_out)
+
 }
 
 #' Return a data frame with exposure values and other related data.
@@ -370,9 +388,13 @@ exp_out_val <- function(...) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 row_out_df <- function(...) {
+
   vars <- rlang::quos(...)
+
   row_out_0 <- exp_out_val(!!!vars)
+
   if ("aerial_ground" %in% colnames(row_out_0)) {
+
     row_out <- row_out_0 %>%
       dplyr::mutate(start_date = start_date,
                     end_date = end_date,
@@ -382,6 +404,7 @@ row_out_df <- function(...) {
                     location, radius)
 
   } else {
+
     row_out <- row_out_0 %>%
       dplyr::mutate(start_date = start_date,
                     end_date = end_date,
@@ -390,6 +413,7 @@ row_out_df <- function(...) {
                     radius = radius) %>%
       dplyr::select(exposure, chemicals, start_date, end_date, aerial_ground,
                     location, radius)
+
   }
 
   return(row_out)
