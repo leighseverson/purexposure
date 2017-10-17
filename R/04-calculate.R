@@ -4,9 +4,9 @@
 #' or class of active ingredients, \code{calculate_exposure} calculates an
 #' estimate of exposure in kg of active ingredient per m^2.
 #'
-#' @param location A character string. Either a California address including
-#'   street name, city, state, and zip code, or a pair of coordinates in the
-#'   form "longitude, latitude".
+#' @param location A length-one character string. Either a California address
+#'   including street name, city, state, and zip code, or a pair of coordinates
+#'   in the form "longitude, latitude".
 #' @param clean_pur_df A data frame returned by \code{pull_clean_pur} that
 #'   includes data for the county in which your location is located (before
 #'   running \code{pull_clean_pur}, you can use the \code{find_location_county}
@@ -45,29 +45,30 @@
 #'
 #' @return A list with four elements:
 #'  \describe{
-#'    \item{exposure}{A data frame with eight columns: \code{exposure},
-#'    the estimate of exposure in kg/m^2, \code{location}, \code{start_date} and
-#'    \code{end_date}, \code{radius}, the radius in meters for the buffer
-#'    extending from the location, and \code{chemcials}, (either "all", indicating
-#'    that all active ingredients present in the \code{clean_pur_df} were summed,
-#'    or the chemical class(es) specified in the \code{clean_pur_df} data frame).
-#'    \code{aerial_ground} can take values of "A" = aerial, "G" = ground, and
-#'    "O" = others. If the \code{aerial_ground} argument is \code{FALSE},
-#'    \code{aerial_ground} will be \code{NA} in the \code{exposure} data frame.
-#'    \code{none_recorded} is TRUE if exposure was 0 because there was no
-#'    pesticide application recorded in the sections or townships intersected by
-#'    the buffer for that date range.}
-#'    \item{meta_data}{A data frame with 11 columns and one row for every section
-#'    or township intersected by the specified buffer extending from the
-#'    given location. Columns include \code{location}, \code{section} or
-#'    \code{township}, \code{percent}, the percent that the section is overlapped
-#'    by the buffer, \code{kg}, the total amount of kg applied for the specified
-#'    chemicals and date range in that section or township, \code{kg_int}, the
-#'    amount of kilograms applied multiplied by the percent of overlap,
-#'    \code{start_date} and \code{end_date}, \code{radius}, \code{chemicals},
-#'    \code{area}, the area of the buffer (m^2), and \code{none_recorded}, logical
+#'    \item{exposure}{A data frame with 7 columns: \code{exposure},
+#'    the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
+#'    indicating that all active ingredients present in the \code{clean_pur_df}
+#'    were summed or the chemical class(es) specified in the \code{clean_pur_df}
+#'    data frame), \code{start_date}, \code{end_date}, \code{aerial_ground},
+#'    which can take values of "A" = aerial, "G" = ground, and "O" = others, (if
+#'    the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground}
+#'    will be \code{NA} in the \code{exposure} data frame), \code{location}, and
+#'    \code{radius}, the radius in meters for the buffer extending from the
+#'    location}
+#'    \item{meta_data}{A data frame with 12 columns and at least one row for
+#'    every section or township intersected by the specified buffer extending
+#'    from the given location. Columns include \code{pls}, giving either the
+#'    Public Land Survey (PLS) section (9 characters long) or township (7
+#'    characters long), \code{chemicals}, \code{percent}, the percent that the
+#'    PLS unit is overlapped by the buffer, \code{kg}, the total amount of kg
+#'    applied for the specified chemicals and date range in that section or
+#'    township, \code{kg_intersection}, the amount of kilograms applied
+#'    multiplied by the percent of overlap, \code{start_date} and \code{end_date},
+#'    \code{aerial_ground}, which can take values of "A" (aerial), "G" (ground),
+#'    or "O" (other), and will be \code{NA} if exposure calculations did not
+#'    take aerial/ground application into account, \code{none_recorded}, logical
 #'    for whether any pesticide application was recorded for the specified section
-#'    or township, date range, and chemicals.}
+#'    or township, date range, and chemicals, \code{location}, and \code{radius}}
 #'    \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
 #'    data for the buffer and overlapping sections or townships. You can use the
 #'    \code{plot_tidy} function to quickly plot and get a rough idea of the
