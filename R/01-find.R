@@ -198,21 +198,26 @@ find_counties <- function(counties, return = "codes") {
 #' find_location_county(location = long_lat)
 #' }
 #' @export
-find_location_county <- function(location, return = "name") {
+find_location_county <- function(location, return = "name",
+                                 latlon_out = NULL) {
 
-  if (length(grep("-", location)) == 1) {
-    latlon <- location
-    latlon_vec <- as.numeric(as.vector(sapply(unlist(strsplit(latlon, ",")),
-                                              stringr::str_trim)))
-    address_x <- latlon_vec[1]
-    address_y <- latlon_vec[2]
-    latlon_out <- latlon_vec
+  if (is.null(latlon_out)) {
+    if (length(grep("-", location)) == 1) {
+      latlon <- location
+      latlon_vec <- as.numeric(as.vector(sapply(unlist(strsplit(latlon, ",")),
+                                                stringr::str_trim)))
+      address_x <- latlon_vec[1]
+      address_y <- latlon_vec[2]
+      latlon_out <- latlon_vec
+    } else {
+      address <- location
+      suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
+      address_x <- latlon_df$lon
+      address_y <- latlon_df$lat
+      latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
+    }
   } else {
-    address <- location
-    suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
-    address_x <- latlon_df$lon
-    address_y <- latlon_df$lat
-    latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
+    latlon_out <- latlon_out
   }
 
   counties <- maps::map("county", fill = TRUE, col = "transparent", plot = FALSE)
