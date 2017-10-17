@@ -149,8 +149,8 @@
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom rlang :=
-#' @importFrom dplyr !!
-#' @importFrom dplyr !!!
+#' @importFrom rlang !!
+#' @importFrom rlang !!!
 #' @export
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
