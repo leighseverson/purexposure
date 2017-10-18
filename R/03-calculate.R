@@ -326,7 +326,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   pls_int <- out_list$pls_int
 
   out <- purrr::map2(time_df$start_date, time_df$end_date,
-                     calculate_exposure_bydate)
+                     daterange_calcexp)
   for (i in 1:length(out)) {
     exp_row <- out[[i]]$row_out[[1]]
     meta_data <- out[[i]]$meta_data[[1]]

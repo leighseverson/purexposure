@@ -230,7 +230,7 @@ pur_filt_df <- function(pls, pls_quote) {
 #' \code{pur_out_df} finds the summed amount of applied active ingredients by
 #' section or township, chemical class, and aerial/ground application.
 #'
-#' This is a helper function for \code{calculate_exposure_bydate}.
+#' This is a helper function for \code{daterange_calcexp}.
 #'
 #' @param ... A list of variables to group by. Options include \code{section},
 #' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted.
@@ -258,7 +258,7 @@ pur_out_df <- function(...) {
 #' \code{exp_df} returns a data frame to be output as the \code{meta_data}
 #' element in the list returned from \code{calculate_exposure}.
 #'
-#' This is a helper function for \code{calculate_exposure_bydate}.
+#' This is a helper function for \code{daterange_calcexp}.
 #'
 #' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted.
 #' @param section_township Either \code{section} or \code{township}. Not quoted.
@@ -351,7 +351,7 @@ exp_df <- function(mtrs_mtr, section_township) {
 #' chemicals (including \code{chemicals = "all"}) or by chemicals and aerial/ground
 #' application.
 #'
-#' This is a helper function for \code{calculate_exposure_bydate}.
+#' This is a helper function for \code{daterange_calcexp}.
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #' quoted.
@@ -422,7 +422,7 @@ row_out_df <- function(...) {
 
 #' Return exposure data for a single start and end date
 #'
-#' For a single date range, \code{calculate_exposure_bydate} returns the
+#' For a single date range, \code{daterange_calcexp} returns the
 #' \code{exposure} and \code{meta_data} data frames to be output in the
 #' \code{calculate_exposure} list as a nested data frame.
 #'
@@ -434,7 +434,7 @@ row_out_df <- function(...) {
 #' @return A nested data frame with two columns: The \code{row_out} column
 #' contains the \code{exposure} data frame for the date range, and
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
-calculate_exposure_bydate <- function(start_date, end_date) {
+daterange_calcexp <- function(start_date, end_date) {
 
   if (chemicals == "all") {
     if ("section" %in% colnames(pur_filt)) {
