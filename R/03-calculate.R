@@ -73,7 +73,7 @@
 #'    or township, date range, and chemicals, \code{location}, and \code{radius}}
 #'    \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
 #'    data for the buffer and overlapping sections or townships. You can use the
-#'    \code{dataframe_plot} function to quickly plot and get a rough idea of the
+#'    \code{df_plot} function to quickly plot and get a rough idea of the
 #'    area for which exposure was calculated, before moving on to other map_*
 #'    or plot_* functions.}
 #'    \item{county_plot}{A ggplot2 plot showing the location of your specified
@@ -91,7 +91,7 @@
 #'    \item{If you pulled PUR data from \code{pull_clean_pur} specifying
 #'          \code{sum_application = TRUE} and \code{unit = "township"}, then
 #'          exposure will be calculated based on townships. Using the
-#'          \code{dataframe_plot} function to plot the returned \code{buffer_plot}
+#'          \code{df_plot} function to plot the returned \code{buffer_plot}
 #'          list element to take a look at the \code{county_plot} plot element
 #'          could be helpful to see the difference between calculating exposure
 #'          based on sections or townships for a certain buffer radius.}
@@ -122,7 +122,7 @@
 #' exp_list3 <- calculate_exposure(clean_pur2,
 #'                                 location = "-116.45, 34.96",
 #'                                 radius = 5000)
-#' dataframe_plot(exp_list3$buffer_plot)
+#' df_plot(exp_list3$buffer_plot)
 #' exp_list3$county_plot
 #'
 #' # calculate exposure by specified chemical classes
