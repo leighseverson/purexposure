@@ -191,10 +191,21 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
       tidyr::nest() %>%
       dplyr::mutate(counties = purrr::map(data, tibble_to_vector))
 
-    raw_df <- purrr::map2_dfr(years_counties$year,
-                              years_counties$counties,
-                              pull_pur_file,
-                              download_progress = download_progress)
+    # hmm..
+    for (i in 1:nrow(years_counties)) {
+      df <- purrr::map2_dfr(years_counties$year[[i]],
+                            years_counties$counties[[i]],
+                            pull_pur_file, download_progress = download_progress)
+      if (i == 1) {
+        out <- df
+      } else {
+        out <- rbind(out, df)
+      }
+    }
+
+    raw_df <- out
+
+
   } else {
 
     raw_df <- purrr::map_dfr(years, pull_pur_file, counties = "all",
