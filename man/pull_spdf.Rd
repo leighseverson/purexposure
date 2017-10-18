@@ -35,6 +35,13 @@ by the California Department of Pesticide Regulation:
 \url{http://www.cdpr.ca.gov/docs/emon/grndwtr/gis_shapefiles.htm}
 }
 
+\section{Note}{
+
+If this function returns an error (because the FTP site is down, for
+example), check your working directory. You may want to change it back from
+a temporary directory.
+}
+
 \examples{
 \dontrun{
 trinity_shp <- pull_spdf("trinity", download_progress = TRUE)

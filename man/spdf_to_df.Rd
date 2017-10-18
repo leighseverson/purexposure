@@ -24,8 +24,8 @@ the \code{pull_spdf} function to a data frame.
 df <- spdf_to_df(pull_spdf("fresno"))
 df2 <- spdf_to_df(pull_spdf("sonoma"))
 
-# use dataframe_plot() function to easily plot the output data frames:
-dataframe_plot(df)
-dataframe_plot(df2)
+# use df_plot() function to easily plot the output data frames:
+df_plot(df)
+df_plot(df2)
 }
 }

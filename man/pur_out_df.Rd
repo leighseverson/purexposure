@@ -19,5 +19,5 @@ depending on the grouping variables.
 section or township, chemical class, and aerial/ground application.
 }
 \details{
-This is a helper function for \code{calculate_exposure_bydate}.
+This is a helper function for \code{daterange_calcexp}.
 }

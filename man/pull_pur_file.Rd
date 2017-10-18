@@ -30,7 +30,7 @@ saves datasets for specified counties in a data frame.
 \section{Note}{
 
 If this function returns an error (because the FTP site is down, for
-example), check your working directory. You may have to change it back from a
+example), check your working directory. You may want to change it back from a
 temporary directory.
 
 \dontrun{

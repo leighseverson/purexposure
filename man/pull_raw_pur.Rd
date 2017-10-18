@@ -46,7 +46,7 @@ A data frame with 33 columns. Different years and counties for which
   "pur[year].zip" file between 1990 and 2015 found here:
   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
   \item{If this function returns an error (because the FTP site is down, for
-  example), check your working directory. You may have to change it back from
+  example), check your working directory. You may want to change it back from
   a temporary directory.}
 }
 }

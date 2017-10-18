@@ -150,6 +150,8 @@ Public Land Survey (PLS) section or township.
     Pesticide Regulation. This file is saved as "cd_doc.pdf" in
     any "pur[year].zip" file between 1990 and 2015 found here:
     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+    \item{If this function returns an error, check your working directory.
+    You may want to change it back from a temporary directory.}
 }
 }
 

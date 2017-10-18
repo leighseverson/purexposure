@@ -20,5 +20,5 @@ chemicals (including \code{chemicals = "all"}) or by chemicals and aerial/ground
 application.
 }
 \details{
-This is a helper function for \code{calculate_exposure_bydate}.
+This is a helper function for \code{daterange_calcexp}.
 }
