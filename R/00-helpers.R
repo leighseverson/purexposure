@@ -1,6 +1,118 @@
+#' Read in PUR county dataset for a year.
+#'
+#' Once a year of PUR data has been downloaded, this function reads in a
+#' selected county's dataset.
+#'
+#' This is a helper function for \code{pull_pur_file}.
+#'
+#' @param code_or_file A PUR county code or a file name for a county's dataset.
+#' @param type Either "codes" or "files", specifying the type of argument supplied
+#' to \code{code_or_file}.
+#'
+#' @return A data frame of raw PUR data for a single county and year.
+read_in_counties <- function(code_or_file, type) {
+
+  if (type == "codes") {
+
+    raw_data <- suppressWarnings(suppressMessages(
+      readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))))
+    raw_data <- dplyr::mutate_all(raw_data, as.character)
+
+    return(raw_data)
+
+  } else if (type == "files") {
+
+    raw_data <- suppressWarnings(suppressMessages(
+      readr::read_csv(file)))
+    raw_data <- dplyr::mutate_all(raw_data, as.character)
+
+    return(raw_data)
+
+  }
+}
+
+#' Find California county code or name
+#'
+#' Given a county, \code{single_county_code} returns either the PUR
+#' county code or name.
+#'
+#' This is a helper function for \code{find_counties}.
+#'
+#' @param county A character string giving either a county name or
+#'  two digit PUR county code. Not case sensitive. California names and county
+#'  codes as they appear in PUR datasets can be found in the \code{county_codes}
+#'  dataset available with this package.
+#' @param return Either "codes" to return county code (the default) or "names"
+#'  to return county name.
+#'
+#' @return If \code{return = "codes"}, a two-character string giving
+#'   the corresponding PUR county codes. If \code{return = "names"}, a county
+#'   name.
+#'
+#' @examples
+#' single_county_code("01", find = "names")
+#' single_county_code("contra costa", find = "codes")
+#' @importFrom magrittr %>%
+single_county_code <- function(county, find = "codes") {
+
+  code_df <- purexposure::county_codes
+
+  test <- suppressWarnings(as.numeric(county))
+
+  if (is.na(test)) {
+
+    county_upper <- toupper(county)
+    county_nm <- grep(county_upper, code_df$county_name, value = TRUE)
+
+    if (length(county_nm) != 1) {
+      error <- "yes"
+    } else {
+      error <- NULL
+
+      code <- as.character(code_df %>%
+                             dplyr::filter(county_name == county_nm) %>%
+                             dplyr::select(county_code))
+
+      name <- strsplit(tolower(county_nm), " ")[[1]]
+      name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
+                    sep = "", collapse = " ")
+    }
+
+  } else {
+
+    county_cd <- county
+    code <- grep(county_cd, code_df$county_code, value = TRUE)
+
+    if (length(code) != 1) {
+      error <- "yes"
+    } else {
+      error <- NULL
+
+      county_nm <- as.character(code_df %>%
+                                  dplyr::filter(county_code == code) %>%
+                                  dplyr::select(county_name))
+
+      name <- strsplit(tolower(county_nm), " ")[[1]]
+      name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
+                    sep = "", collapse = " ")
+    }
+  }
+
+  if (is.null(error)) {
+    if (find == "codes") {
+      return(code)
+    } else if (find == "names") {
+      return(name)
+    }
+  } else {
+    return(NULL)
+  }
+
+}
+
 #' Plot data frame spatial objects.
 #'
-#' \code{dataframe_plot} plots a data frame spatial object. (A
+#' \code{df_plot} plots a data frame spatial object. (A
 #' SpatialPolygonsDataFrame that has been "tidied" using the broom package.)
 #' Meant to be analogous to the ease of using plot() to quickly view a
 #' SpatialPolygonDataFrame object.
@@ -13,10 +125,10 @@
 #' \dontrun{
 #' shp <- pull_spdf("san diego", "township")
 #' df <- spdf_to_df(shp)
-#' dataframe_plot(df)
+#' df_plot(df)
 #' }
 #' @export
-dataframe_plot <- function(df) {
+df_plot <- function(df) {
 
   plot <- ggplot2::ggplot(data = df, ggplot2::aes(x = long, y = lat,
                                                   group = group)) +
@@ -44,9 +156,9 @@ dataframe_plot <- function(df) {
 #' df <- spdf_to_df(pull_spdf("fresno"))
 #' df2 <- spdf_to_df(pull_spdf("sonoma"))
 #'
-#' # use dataframe_plot() function to easily plot the output data frames:
-#' dataframe_plot(df)
-#' dataframe_plot(df2)
+#' # use df_plot() function to easily plot the output data frames:
+#' df_plot(df)
+#' df_plot(df2)
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -54,9 +166,12 @@ spdf_to_df <- function(spdf) {
 
   df <- suppressMessages(sp::merge(broom::tidy(spdf), as.data.frame(spdf),
                                    by.x = "id", by.y = 0))
-  df <- df %>% dplyr::mutate(MTR = as.character(MTR))
+
   if ("MTRS" %in% colnames(df)) {
     df <- df %>% dplyr::mutate(MTRS = as.character(MTRS))
+  }
+  if ("MTR" %in% colnames(df)) {
+    df <- df %>% dplyr::mutate(MTR = as.character(MTR))
   }
 
   return(df)

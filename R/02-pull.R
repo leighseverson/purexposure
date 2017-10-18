@@ -52,29 +52,13 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
   if (!"all" %in% counties) {
     codes <- find_counties(counties)
 
-    read_in_counties <- function(code) {
-      raw_data <- suppressWarnings(suppressMessages(
-        readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))
-      ))
-      raw_data <- dplyr::mutate_all(raw_data, as.character)
-      return(raw_data)
-    }
-
-    counties_in_year <- purrr::map_dfr(codes, read_in_counties) %>%
+    counties_in_year <- purrr::map_dfr(codes, read_in_counties, type = "codes") %>%
       dplyr::arrange(applic_dt, county_cd)
 
   } else {
     files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
 
-    read_in_counties2 <- function(file) {
-      raw_data <- suppressWarnings(suppressMessages(
-        readr::read_csv(file)
-      ))
-      raw_data <- dplyr::mutate_all(raw_data, as.character)
-      return(raw_data)
-    }
-
-    counties_in_year <- purrr::map_dfr(files, read_in_counties2) %>%
+    counties_in_year <- purrr::map_dfr(files, read_in_counties, type = "files") %>%
       dplyr::arrange(applic_dt, county_cd)
 
   }

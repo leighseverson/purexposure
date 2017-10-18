@@ -90,72 +90,13 @@ find_chemical_codes <- function(year, chemicals = "all") {
 #'
 #' find_counties(c("01", "03", "el dorado"), return = "names")
 #' find_counties(c("contra costa", "45"), return = "names")
-#'
-#' find_counties("blah")
 #' @importFrom magrittr %>%
 #' @export
 find_counties <- function(counties, return = "codes") {
 
-  find_county_code <- function(county, find = return) {
-
-    code_df <- purexposure::county_codes
-
-    test <- suppressWarnings(as.numeric(county))
-
-    if (is.na(test)) {
-
-      county_upper <- toupper(county)
-      county_nm <- grep(county_upper, code_df$county_name, value = TRUE)
-
-      if (length(county_nm) != 1) {
-        error <- "yes"
-      } else {
-        error <- NULL
-
-        code <- as.character(code_df %>%
-                               dplyr::filter(county_name == county_nm) %>%
-                               dplyr::select(county_code))
-
-        name <- strsplit(tolower(county_nm), " ")[[1]]
-        name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
-                      sep = "", collapse = " ")
-      }
-
-    } else {
-
-      county_cd <- county
-      code <- grep(county_cd, code_df$county_code, value = TRUE)
-
-      if (length(code) != 1) {
-        error <- "yes"
-      } else {
-        error <- NULL
-
-        county_nm <- as.character(code_df %>%
-                                    dplyr::filter(county_code == code) %>%
-                                    dplyr::select(county_name))
-
-        name <- strsplit(tolower(county_nm), " ")[[1]]
-        name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
-                      sep = "", collapse = " ")
-      }
-    }
-
-    if (is.null(error)) {
-      if (find == "codes") {
-        return(code)
-      } else if (find == "names") {
-        return(name)
-      }
-    } else {
-      return(NULL)
-    }
-
-  }
-
   for (i in 1:length(counties)) {
 
-    county_name <- find_county_code(counties[i])
+    county_name <- single_county_code(counties[i], find = return)
     if (is.null(county_name)) {
 
       stop(paste0("\"", counties[i], "\"", " doesn't match any ",
