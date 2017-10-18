@@ -8,8 +8,8 @@
 #'   including street name, city, state, and zip code, or a pair of coordinates
 #'   in the form "longitude, latitude".
 #' @param clean_pur_df A data frame returned by \code{pull_clean_pur} that
-#'   includes data for the county in which your location is located (before
-#'   running \code{pull_clean_pur}, you can use the \code{find_location_county}
+#'   includes data for the county of your location (before running
+#'   \code{pull_clean_pur}, you can use the \code{find_location_county}
 #'   function to figure this out), the time period, and the active ingredients
 #'   or chemical classes for which you want to calculate exposure.
 #' @param radius A numeric value greater than zero that gives the radius in meters
