@@ -17,7 +17,7 @@
 #'
 #' @section Note:
 #' If this function returns an error (because the FTP site is down, for
-#' example), check your working directory. You may have to change it back from a
+#' example), check your working directory. You may want to change it back from a
 #' temporary directory.
 #'
 #' \dontrun{
@@ -48,17 +48,20 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 
   sm_year <- substr(year, 3, 4)
 
-
   if (!"all" %in% counties) {
-    codes <- find_counties(counties)
 
-    counties_in_year <- purrr::map_dfr(codes, read_in_counties, type = "codes") %>%
+    codes <- find_counties(counties[[1]])
+
+    counties_in_year <- purrr::map_dfr(codes, read_in_counties, type = "codes",
+                                       year = year) %>%
       dplyr::arrange(applic_dt, county_cd)
 
   } else {
+
     files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
 
-    counties_in_year <- purrr::map_dfr(files, read_in_counties, type = "files") %>%
+    counties_in_year <- purrr::map_dfr(files, read_in_counties, type = "files",
+                                       year = year) %>%
       dplyr::arrange(applic_dt, county_cd)
 
   }
@@ -103,7 +106,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 #'   "pur[year].zip" file between 1990 and 2015 found here:
 #'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
 #'   \item{If this function returns an error (because the FTP site is down, for
-#'   example), check your working directory. You may have to change it back from
+#'   example), check your working directory. You may want to change it back from
 #'   a temporary directory.}
 #' }
 #'
@@ -317,7 +320,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     any "pur[year].zip" file between 1990 and 2015 found here:
 #'     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
 #'     \item{If this function returns an error, check your working directory.
-#'     You may have to change it back from a temporary directory.}
+#'     You may want to change it back from a temporary directory.}
 #' }
 #'
 #' @examples
@@ -710,7 +713,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #'
 #' @section Note:
 #' If this function returns an error (because the FTP site is down, for
-#' example), check your working directory. You may have to change it back from
+#' example), check your working directory. You may want to change it back from
 #' a temporary directory.
 #'
 #' @examples

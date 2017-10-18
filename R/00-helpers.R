@@ -8,14 +8,17 @@
 #' @param code_or_file A PUR county code or a file name for a county's dataset.
 #' @param type Either "codes" or "files", specifying the type of argument supplied
 #' to \code{code_or_file}.
+#' @param year A four digit year.
 #'
 #' @return A data frame of raw PUR data for a single county and year.
-read_in_counties <- function(code_or_file, type) {
+read_in_counties <- function(code_or_file, type, year) {
+
+  sm_year <- substr(year, 3, 4)
 
   if (type == "codes") {
 
     raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(paste0("udc", sm_year, "_", code, ".txt"))))
+      readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"))))
     raw_data <- dplyr::mutate_all(raw_data, as.character)
 
     return(raw_data)
@@ -23,7 +26,7 @@ read_in_counties <- function(code_or_file, type) {
   } else if (type == "files") {
 
     raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(file)))
+      readr::read_csv(code_or_file)))
     raw_data <- dplyr::mutate_all(raw_data, as.character)
 
     return(raw_data)
