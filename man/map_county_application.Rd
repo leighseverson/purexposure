@@ -55,11 +55,15 @@ a specific active ingredient present in the \code{chemname} column of the
 sections or townships with recorded application data.}
 }
 \value{
-A list with two elements:
+A list with three elements:
 \describe{
   \item{plot}{A plot of the county with application summed by section or
   township and colored by amount or by percentile}
   \item{data}{A data frame with the plotted application data.}
+  \item{percentile_values}{A data frame with two columns: \code{percentile},
+  and \code{kg}, giving the cut points for each percentile in the
+  \code{clean_pur_df} for the specified chemicals. This element of the list
+  is not returned if \code{color_by = "amount"}.}
 }
 }
 \description{
@@ -71,8 +75,35 @@ percentile.
 }
 \examples{
 \dontrun{
+# plot all active ingredients
 pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-fresno_list <- map_county_application(pur_df)
+fresno_list <- map_county_application(pur_df,
+                                      percentile = c(0.2, 0.4, 0.6, 0.8))
+fresno_list$plot
+head(fresno_list$data)
+fresno_list$percentile_values
+
+# plot a specific active ingredient
+fresno_list2 <- map_county_application(pur_df, pls = "township",
+                                       color_by = "amount",
+                                       chemicals = "sulfur",
+                                       fill_option = "plasma")
+fresno_list2$plot
+
+# plot a chemical class
+chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
+                                             "naled", "malathion",
+                                             "trichlorfon"),
+                                     find_chemical_codes) \%>\%
+     dplyr::mutate(chemical_class = "organophosphates") \%>\%
+     dplyr::select(-chemical)
+op_yuba <- pull_clean_pur(2010, "yuba",
+                          chemicals = chemical_class_df$chemname,
+                          verbose = F, sum_application = T,
+                          sum = "chemical_class",
+                          chemical_class = chemical_class_df) \%>\%
+   map_county_application(color_by = "amount")
+op_yuba$plot
 }
 
 }
