@@ -172,8 +172,8 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'   \item{plot}{A plot of the county with application summed by section or
 #'   township and colored by amount or by percentile}
 #'   \item{data}{A data frame with the plotted application data.}
-#'   \item{perc_values}{A data frame with two columns: \code{percentile}, and
-#'   \code{kg}, giving the cut points for each percentile in the
+#'   \item{percentile_values}{A data frame with two columns: \code{percentile},
+#'   and \code{kg}, giving the cut points for each percentile in the
 #'   \code{clean_pur_df} for the specified chemicals. This element of the list
 #'   is not returned if \code{color_by = "amount"}.}
 #' }
@@ -186,6 +186,7 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 #' fresno_list$plot
 #' head(fresno_list$data)
+#' fresno_list$percentile_values
 #'
 #' # plot a specific active ingredient
 #' fresno_list2 <- map_county_application(pur_df, pls = "township",
@@ -204,11 +205,10 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #' op_yuba <- pull_clean_pur(2010, "yuba",
 #'                           chemicals = chemical_class_df$chemname,
 #'                           verbose = F, sum_application = T,
-#'                           sum = "chemical_class", unit = "township",
+#'                           sum = "chemical_class",
 #'                           chemical_class = chemical_class_df) %>%
 #'    map_county_application(color_by = "amount")
 #' op_yuba$plot
-#' op_yuba$data
 #' }
 #'
 #' @importFrom dplyr %>%
