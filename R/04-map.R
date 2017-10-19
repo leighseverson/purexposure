@@ -223,7 +223,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                    crop = FALSE) {
 
   if (is.null(pls)) {
-    if ("section" %in% colnames(clean_pur_df)) {
+    if (!all(is.na(clean_pur_df$section))) {
       section_township <- "section"
     } else {
       section_township <- "township"
@@ -258,7 +258,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
     pur_df <- clean_pur_df
 
-  } else if ("chemical_class" %in% colnames(clean_pur_df)) {
+  } else if (!all(is.na(clean_pur_df$chemical_class))) {
 
     if (!chemicals %in% unique(clean_pur_df$chemical_class)) {
       stop(paste0("The input clean_pur_df is summed by chemical_class,\nand the ",

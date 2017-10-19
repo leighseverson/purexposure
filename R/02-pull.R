@@ -247,7 +247,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   ingredients, giving an estimation of the total pesticides applied in a
 #'   given section or township ("all"), or by a chemical class specified in a
 #'   data frame given in the argument \code{chemical_class}.
-#' @param chemical_class A data frame with three columns: \code{chem_code},
+#' @param chemical_class A data frame with only three columns: \code{chem_code},
 #'   \code{chemname}, and \code{chemical_class}. \code{chem_code} should have
 #'   integer values giving PUR chemical codes, and \code{chemname} should have
 #'   character strings with corresponding PUR chemical names (these can be
@@ -256,7 +256,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   \code{chemical_class} column should have character strings indicating the
 #'   chemical class corresponding to each \code{chem_code}. The
 #'   \code{chemical_class} for a group of active ingredients should be decided
-#'   upon by the user. Only used if \code{sum = "chemical_class"}. Again, see
+#'   upon by the user. Only used if \code{sum = "chemical_class"}. See
 #'   the CDPR's Summary of PUR Data document here:
 #'   \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
 #'   comprehensive classifications of active ingredients.
@@ -268,31 +268,31 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   argument.
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
-#'   "O" = other.) The default is FALSE.
+#'   "O" = other.) The default is TRUE.
 #'
-#' @return A data frame:
+#' @return A data frame with 12 columns:
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
-#'     for the active ingredient applied. Not included if
+#'     for the active ingredient applied. Will have values of \code{NA} if
 #'     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemname}{A character string giving PUR chemical active
 #'     ingredient names. Unique values of \code{chemname} are matched with terms
-#'     provided in the \code{chemicals} argument. Not included if
-#'     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
+#'     provided in the \code{chemicals} argument. Will have values of \code{NA}
+#'     if \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemical_class}{If \code{sum_application = TRUE} and
 #'     \code{sum = "chemical_class"}, this column will give values of the
 #'     \code{chemical_class} column in the input \code{chemical_class} data frame.
 #'     If there are active ingredients pulled based on the
-#'     \code{chemicals} argument not present in the \code{chemical_class} data
-#'     frame, these chemicals will be summed under the class "other".}
+#'     \code{chemicals} argument that are not present in the \code{chemical_class}
+#'     data frame, these chemicals will be summed under the class "other".}
 #'     \item{kg_chm_used}{A numeric value giving the amount of the active
 #'     ingredient applied (kilograms).}
 #'     \item{section}{A string nine characters long indicating the section
 #'     of application. PLS sections are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
 #'     (N or S), range (01-47), range direction (E or W) and section number
-#'     (01-36). This column is not included if \code{sum_application = TRUE} and
-#'     \code{unit = "township"}.}
+#'     (01-36). This column will have values of \code{NA} if
+#'     \code{sum_application = TRUE} and \code{unit = "township"}.}
 #'     \item{township}{A string 7 characters long indicating the township
 #'     of application. PLS townships are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
@@ -303,18 +303,18 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     code where application took place.}
 #'     \item{date}{The date of application (yyyy-mm-dd).}
 #'     \item{aerial_ground}{A character giving the application method.
-#'     "A" = aerial, "G" = ground, and "O" = other. This column is only included if
-#'     \code{aerial_ground = TRUE}.}
+#'     "A" = aerial, "G" = ground, and "O" = other. Will have values of \code{NA}
+#'     if \code{aerial_ground = FALSE}.}
 #'     \item{use_no}{A character string identifing unique application of an
 #'     active ingredient across years. This value is a combination of the raw PUR
-#'     \code{use_no} column and the year of application. Not included if
-#'     \code{sum_appliction = TRUE}.}
+#'     \code{use_no} column and the year of application. Will have values of
+#'     \code{NA} if \code{sum_appliction = TRUE}.}
 #'     \item{outlier}{A logical value indicating whether the
 #'     amount listed in \code{kg_chm_used} has been corrected large amounts
 #'     entered in error. The algorithm for identifying and replacing outliers
 #'     was developed based on methods used by Gunier et al. (2001). Please see
-#'     the package vignette for more detail regarding these methods. Not included
-#'     if \code{sum_application = TRUE}.}
+#'     the package vignette for more detail regarding these methods. Will have
+#'     values of \code{NA} if \code{sum_application = TRUE}.}
 #'  }
 #'
 #' @section Note:
@@ -369,7 +369,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            start_date = NULL, end_date = NULL,
-                           aerial_ground = FALSE, verbose = TRUE,
+                           aerial_ground = TRUE, verbose = TRUE,
                            download_progress = FALSE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
@@ -540,55 +540,23 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     if (sum == "all") {
       if (unit == "section") {
         if (aerial_ground) {
-          #1
-          out <- out %>%
-            dplyr::group_by(chem_code, chemname, section, county_name, county_code,
-                            date, aerial_ground) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::left_join(section_townships, by = "section") %>%
-            dplyr::arrange(date, county_name, county_code, chemname, chem_code,
-                           township) %>%
-            dplyr::select(chem_code, chemname, kg_chm_used, section, township,
-                          county_name, county_code, date, aerial_ground)
-
+          out <- sum_application_by(out, "all", "section", TRUE, chem_code,
+                                    chemname, section, county_name, county_code,
+                                    date, aerial_ground)
         } else {
-          #2
-          out <- out %>%
-            dplyr::group_by(chem_code, chemname, section, county_name, county_code,
-                            date) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::left_join(section_townships, by = "section") %>%
-            dplyr::arrange(date, county_name, county_code, chemname, chem_code,
-                           township) %>%
-            dplyr::select(chem_code, chemname, kg_chm_used, section, township,
-                          county_name, county_code, date)
-
+          out <- sum_application_by(out, "all", "section", FALSE, chem_code,
+                                    chemname, section, county_name, county_code,
+                                    date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
-          #3
-          out <- out %>%
-            dplyr::group_by(chem_code, chemname, township, county_name, county_code,
-                            date, aerial_ground) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::arrange(date, county_name, county_code, chemname, chem_code,
-                           township) %>%
-            dplyr::select(chem_code, chemname, kg_chm_used, township,
-                          county_name, county_code, date, aerial_ground)
+          out <- sum_application_by(out, "all", "township", TRUE, chem_code,
+                                    chemname, township, county_name, county_code,
+                                    date, aerial_ground)
         } else {
-          #4
-          out <- out %>%
-            dplyr::group_by(chem_code, chemname, township, county_name, county_code,
-                            date) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::arrange(date, county_name, county_code, chemname, chem_code,
-                           township) %>%
-            dplyr::select(chem_code, chemname, kg_chm_used, township,
-                          county_name, county_code, date)
+          out <- sum_application_by(out, "all", "township", FALSE, chem_code,
+                                    chemname, township, county_name, county_code,
+                                    date)
         }
       }
     } else if (sum == "chemical_class") {
@@ -600,7 +568,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       if (!is.null(chemical_class) & is.data.frame(chemical_class) &
           !all(colnames(chemical_class) == c("chem_code", "chemname", "chemical_class"))) {
         stop(writeLines(paste0("The data frame entered in the chemical class ",
-                               "argument should have three columns named chem_code, ",
+                               "argument should have only three columns named chem_code, ",
                                "chemname, and chemical_class.")))
       }
       if (!is.null(chemical_class) & is.data.frame(chemical_class) &
@@ -621,67 +589,24 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
       if (unit == "section") {
         if (aerial_ground) {
-          #5
-          out <- out %>%
-            dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
-            dplyr::mutate(chemical_class = ifelse(is.na(chemical_class), "other",
-                                                  chemical_class)) %>%
-            dplyr::group_by(chemical_class, section, county_name, county_code,
-                            date, aerial_ground) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::left_join(section_townships, by = "section") %>%
-            dplyr::arrange(date, county_name, county_code, chemical_class,
-                           township) %>%
-            dplyr::select(chemical_class, kg_chm_used, section, township,
-                          county_name, county_code, date, aerial_ground)
-
+          out <- sum_application_by(out, "chemical_class", "section", TRUE,
+                                    chemical_class, section, county_name,
+                                    county_code, date, aerial_ground)
         } else {
-          #6
-          out <- out %>%
-            dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
-            dplyr::mutate(chemical_class = ifelse(is.na(chemical_class), "other",
-                                                  chemical_class)) %>%
-            dplyr::group_by(chemical_class, section, county_name, county_code,
-                            date) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::left_join(section_townships, by = "section") %>%
-            dplyr::arrange(date, county_name, county_code, chemical_class,
-                           township) %>%
-            dplyr::select(chemical_class, kg_chm_used, section, township,
-                          county_name, county_code, date)
+          out <- sum_application_by(out, "chemical_class", "section", FALSE,
+                                    chemical_class, section, county_name,
+                                    county_code, date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
-          #7
-          out <- out %>%
-            dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
-            dplyr::mutate(chemical_class = ifelse(is.na(chemical_class), "other",
-                                                  chemical_class)) %>%
-            dplyr::group_by(chemical_class, township, county_name, county_code,
-                            date, aerial_ground) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::arrange(date, county_name, county_code, chemical_class,
-                           township) %>%
-            dplyr::select(chemical_class, kg_chm_used, township,
-                          county_name, county_code, date, aerial_ground)
+          out <- sum_application_by(out, "chemical_class", "township", TRUE,
+                                    chemical_class, township, county_name,
+                                    county_code, date, aerial_ground)
         } else {
-          #8
-          out <- out %>%
-            dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
-            dplyr::mutate(chemical_class = ifelse(is.na(chemical_class), "other",
-                                                  chemical_class)) %>%
-            dplyr::group_by(chemical_class, township, county_name, county_code,
-                            date) %>%
-            dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
-            dplyr::ungroup() %>%
-            dplyr::arrange(date, county_name, county_code, chemical_class,
-                           township) %>%
-            dplyr::select(chemical_class, kg_chm_used, township,
-                          county_name, county_code, date)
-        }
+          out <- sum_application_by(out, "chemical_class", "township", FALSE,
+                                    chemical_class, township, county_name,
+                                    county_code, date)
+          }
       }
     }
   } else {

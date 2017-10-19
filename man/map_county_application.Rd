@@ -58,9 +58,9 @@ sections or townships with recorded application data.}
 A list with three elements:
 \describe{
   \item{plot}{A plot of the county with application summed by section or
-  township and colored by amount or by percentile}
+  township and colored by amount or by percentile.}
   \item{data}{A data frame with the plotted application data.}
-  \item{percentile_values}{A data frame with two columns: \code{percentile},
+  \item{percentile_values}{A data frame with two columns: \code{percentile}
   and \code{kg}, giving the cut points for each percentile in the
   \code{clean_pur_df} for the specified chemicals. This element of the list
   is not returned if \code{color_by = "amount"}.}

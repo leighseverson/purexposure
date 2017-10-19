@@ -181,6 +181,65 @@ spdf_to_df <- function(spdf) {
 
 }
 
+#' Sum application
+#'
+#' \code{sum_application_by} sums application of a PUR dataset by chemicals,
+#' PLS unit, and aerial/ground application.
+#'
+#' This is a helper function for \code{pull_clean_pur}.
+#'
+#' @param df A data frame from \code{pull_clean_pur} before summing has taken
+#' place
+#' @param sum "all" or "chemical_class"
+#' @param unit either "section" or "township"
+#' @param aerial_ground TRUE / FALSE
+#' @param ... grouping variables
+#'
+#' @return A data frame with 12 columns. Some will have missing values.
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!!
+sum_application_by <- function(df, sum, unit, aerial_ground, ...) {
+
+  group_by_vars <- rlang::quos(...)
+
+  if (sum == "chemical_class") {
+    df <- df %>%
+      dplyr::left_join(chemical_class, by = c("chem_code", "chemname")) %>%
+      dplyr::mutate(chemical_class = ifelse(is.na(chemical_class), "other",
+                                            chemical_class))
+  }
+
+  df <- df %>%
+    dplyr::group_by(!!!group_by_vars) %>%
+    dplyr::summarise(kg_chm_used = sum(kg_chm_used, na.rm = TRUE)) %>%
+    dplyr::ungroup()
+
+  if (unit == "section") {
+    df <- df %>% dplyr::left_join(section_townships, by = "section")
+  }
+
+  all_cols <- c("chem_code", "chemname", "chemical_class", "kg_chm_used",
+                "section", "township", "county_name", "county_code",
+                "date", "aerial_ground", "use_no", "outlier")
+
+  missing <- all_cols[!all_cols %in% colnames(df)]
+
+  for (i in 1:length(missing)) {
+    new_col <- rlang::quo_name(missing[i])
+    df <- df %>% dplyr::mutate(!!new_col := NA)
+  }
+
+  df <- df %>%
+    dplyr::arrange(date, county_name, county_code, chemical_class, chemname,
+                   chem_code, section, township) %>%
+    dplyr::select(chem_code, chemname, chemical_class, kg_chm_used,
+                  section, township, county_name, county_code,
+                  date, aerial_ground, use_no, outlier)
+
+  return(df)
+
+}
+
 #' Calculate euclidean distance between two points.
 #'
 #' \code{euc_distance} calculates the straight-line distance between
@@ -391,7 +450,7 @@ exp_df <- function(mtrs_mtr, section_township) {
   mutate_expr <- rlang::enquo(mtrs_mtr)
   rename_expr <- rlang::enquo(section_township)
 
-  if ("chemical_class" %in% colnames(clean_pur_df)) {
+  if (!all(is.na(clean_pur_df$section))) {
 
     classes <- unique(clean_pur_df$chemical_class)
     n_classes <- length(classes)
@@ -449,7 +508,7 @@ exp_df <- function(mtrs_mtr, section_township) {
 
   }
 
-  if ("aerial_ground" %in% colnames(exp_0)) {
+  if (!all(is.na(exp_0$aerial_ground))) {
     exp <- exp_0 %>% dplyr::mutate(aerial_ground = as.character(aerial_ground))
   } else {
     exp <- exp_0 %>% dplyr::mutate(aerial_ground = NA)
@@ -511,7 +570,7 @@ row_out_df <- function(...) {
 
   row_out_0 <- exp_out_val(!!!vars)
 
-  if ("aerial_ground" %in% colnames(row_out_0)) {
+  if (!all(is.na(row_out_0$aerial_ground))) {
 
     row_out <- row_out_0 %>%
       dplyr::mutate(start_date = start_date,
@@ -555,7 +614,7 @@ row_out_df <- function(...) {
 daterange_calcexp <- function(start_date, end_date) {
 
   if (chemicals == "all") {
-    if ("section" %in% colnames(pur_filt)) {
+    if (!all(is.na(pur_filt$section))) {
       if (aerial_ground) {
         pur_out <- pur_out_df(section, aerial_ground)
       } else {
@@ -569,7 +628,7 @@ daterange_calcexp <- function(start_date, end_date) {
       }
     }
   } else {
-    if ("section" %in% colnames(pur_filt)) {
+    if (!all(is.na(pur_filt$section))) {
       if (aerial_ground) {
         pur_out <- pur_out_df(section, chemical_class, aerial_ground)
       } else {
@@ -586,7 +645,7 @@ daterange_calcexp <- function(start_date, end_date) {
 
   buffer_area <- pi * (radius^2)
 
-  if ("section" %in% colnames(pur_filt)) {
+  if (!all(is.na(pur_filt$section))) {
     exp <- exp_df(MTRS, section)
   } else {
     exp <- exp_df(MTR, township)
