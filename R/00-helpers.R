@@ -361,13 +361,7 @@ pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
     tibble_to_vector()
 
   # filter shp file to include only sections intersecting w/ buffer-
-  # df_filtered <- df %>% dplyr::filter(rlang::UQ(pls_var) %in% pls_int)
-
-  if (pls_name == "MTRS") {
-    df_filtered <- df %>% dplyr::filter(MTRS %in% pls_int)
-  } else if (pls_name == "MTR") {
-    df_filtered <- df %>% dplyr::filter(MTR %in% pls_int)
-  }
+  df_filtered <- df %>% dplyr::filter(rlang::UQ(pls_var) %in% pls_int)
 
   # combine buffer to existing sections shp file
   buffer_shp <- shp[1, ]
