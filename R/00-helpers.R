@@ -195,7 +195,8 @@ spdf_to_df <- function(spdf) {
 #' @param aerial_ground TRUE / FALSE
 #' @param ... grouping variables
 #'
-#' @return A data frame with 12 columns. Some will have missing values.
+#' @return A data frame. The number of columns is dependent on the grouping
+#' variables supplied to the \code{...} argument.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 sum_application_by <- function(df, sum, unit, aerial_ground, ...) {
@@ -236,7 +237,39 @@ sum_application_by <- function(df, sum, unit, aerial_ground, ...) {
                   section, township, county_name, county_code,
                   date, aerial_ground, use_no, outlier)
 
+  cols_to_remove <- purrr::map_dfr(colnames(df), remove_cols, df = df) %>%
+    dplyr::filter(all_missing == T) %>%
+    dplyr::select(col) %>%
+    tibble_to_vector()
+
+  cols_to_keep <- colnames(df)[!colnames(df) %in% cols_to_remove]
+  cols_names <- unlist(purrr::map(cols_to_keep, quo_name))
+  df <- df %>% dplyr::select(!!cols_names)
+
   return(df)
+
+}
+
+#' Remove columns with all missing values
+#'
+#' Given a quoted column name and its data frame, \code{remove_cols} determines
+#' if that column has all missing values or not.
+#'
+#' This is a helper function for \code{sum_application}.
+#'
+#' @param col_quote A quoted column name
+#' @param df A data frame
+#'
+#' @return A data frame with two columns: \code{col} gives the column name, and
+#' \code{all_missing} is a logical value.
+remove_cols <- function(col_quote, df) {
+
+  col_name <- rlang::quo_name(col_quote)
+  vals <- df %>% dplyr::select(!!col_name) %>% tibble_to_vector()
+  logical_val <- all(is.na(vals))
+  out_df <- data.frame(col = col_name, all_missing = logical_val)
+
+  return(out_df)
 
 }
 
@@ -450,7 +483,7 @@ exp_df <- function(mtrs_mtr, section_township) {
   mutate_expr <- rlang::enquo(mtrs_mtr)
   rename_expr <- rlang::enquo(section_township)
 
-  if (!all(is.na(clean_pur_df$section))) {
+  if ("section" %in% colnames(clean_pur_df)){
 
     classes <- unique(clean_pur_df$chemical_class)
     n_classes <- length(classes)
@@ -508,7 +541,7 @@ exp_df <- function(mtrs_mtr, section_township) {
 
   }
 
-  if (!all(is.na(exp_0$aerial_ground))) {
+  if ("aerial_ground" %in% colnames(exp_0)){
     exp <- exp_0 %>% dplyr::mutate(aerial_ground = as.character(aerial_ground))
   } else {
     exp <- exp_0 %>% dplyr::mutate(aerial_ground = NA)
@@ -570,7 +603,7 @@ row_out_df <- function(...) {
 
   row_out_0 <- exp_out_val(!!!vars)
 
-  if (!all(is.na(row_out_0$aerial_ground))) {
+  if ("aerial_ground" %in% colnames(row_out_0)) {
 
     row_out <- row_out_0 %>%
       dplyr::mutate(start_date = start_date,
@@ -614,7 +647,7 @@ row_out_df <- function(...) {
 daterange_calcexp <- function(start_date, end_date) {
 
   if (chemicals == "all") {
-    if (!all(is.na(pur_filt$section))) {
+    if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
         pur_out <- pur_out_df(section, aerial_ground)
       } else {
@@ -628,7 +661,7 @@ daterange_calcexp <- function(start_date, end_date) {
       }
     }
   } else {
-    if (!all(is.na(pur_filt$section))) {
+    if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
         pur_out <- pur_out_df(section, chemical_class, aerial_ground)
       } else {
@@ -645,7 +678,7 @@ daterange_calcexp <- function(start_date, end_date) {
 
   buffer_area <- pi * (radius^2)
 
-  if (!all(is.na(pur_filt$section))) {
+  if ("section" %in% colnames(pur_filt)) {
     exp <- exp_df(MTRS, section)
   } else {
     exp <- exp_df(MTR, township)

@@ -273,11 +273,11 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @return A data frame with 12 columns:
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
-#'     for the active ingredient applied. Will have values of \code{NA} if
+#'     for the active ingredient applied. Not included if
 #'     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemname}{A character string giving PUR chemical active
 #'     ingredient names. Unique values of \code{chemname} are matched with terms
-#'     provided in the \code{chemicals} argument. Will have values of \code{NA}
+#'     provided in the \code{chemicals} argument. Not included
 #'     if \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
 #'     \item{chemical_class}{If \code{sum_application = TRUE} and
 #'     \code{sum = "chemical_class"}, this column will give values of the
@@ -291,7 +291,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     of application. PLS sections are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
 #'     (N or S), range (01-47), range direction (E or W) and section number
-#'     (01-36). This column will have values of \code{NA} if
+#'     (01-36). This column is not included if
 #'     \code{sum_application = TRUE} and \code{unit = "township"}.}
 #'     \item{township}{A string 7 characters long indicating the township
 #'     of application. PLS townships are uniquely identified by a combination of
@@ -303,7 +303,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     code where application took place.}
 #'     \item{date}{The date of application (yyyy-mm-dd).}
 #'     \item{aerial_ground}{A character giving the application method.
-#'     "A" = aerial, "G" = ground, and "O" = other. Will have values of \code{NA}
+#'     "A" = aerial, "G" = ground, and "O" = other. Not included
 #'     if \code{aerial_ground = FALSE}.}
 #'     \item{use_no}{A character string identifing unique application of an
 #'     active ingredient across years. This value is a combination of the raw PUR
@@ -355,7 +355,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'
 #' df4 <- pull_clean_pur(years = 1995,
 #'                       counties = "fresno",
-#'                       chemicals = chemical_class_df$chemname
+#'                       chemicals = chemical_class_df$chemname,
 #'                       sum_application = TRUE,
 #'                       sum = "chemical_class",
 #'                       start_date = "1995-03-01",

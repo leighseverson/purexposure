@@ -201,7 +201,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                           max_long = max(long),
                                           max_lat = max(lat))
 
-  if (!all(is.na(clean_pur_df$section))) {
+  if ("section" %in% colnames(clean_pur_df)) {
     shp <- pull_spdf(county, "section")
     df <- spdf_to_df(shp)
   } else {
@@ -224,7 +224,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
 
   if (nrow(which_pls) == 0) {
 
-    if (!all(is.na(clean_pur_df$section))) {
+    if ("section" %in% colnames(clean_pur_df)) {
 
       borders <- df %>% group_by(MTRS) %>%
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
@@ -314,7 +314,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
          "for additional years using the pull_clean_pur() function." )
   }
 
-  if (!all(is.na(clean_pur_df$section))) {
+  if ("section" %in% colnames(clean_pur_df)) {
     out_list <- pur_filt_df(MTRS, "MTRS")
   } else {
     out_list <- pur_filt_df(MTR, "MTR")
