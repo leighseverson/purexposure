@@ -329,6 +329,11 @@ tibble_to_vector <- function(tib) {
 #'
 #' @param pls Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted.
 #' @param pls_quote Either \code{"MTRS"} or \code{"MTR"}
+#' @param which_pls A vector of character string PLS units
+#' @param shp A county's shapefile.
+#' @param buffer A data frame with buffer coordinates.
+#' @param df
+#' @param clean_pur_df
 #'
 #' @return A list with four elements:
 #' \describe{
@@ -343,7 +348,8 @@ tibble_to_vector <- function(tib) {
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
-pur_filt_df <- function(pls, pls_quote) {
+pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
+                        clean_pur_df) {
 
   pls_var <- rlang::enquo(pls)
   pls_name <- rlang::quo_name(pls_quote)
@@ -354,8 +360,14 @@ pur_filt_df <- function(pls, pls_quote) {
     unique() %>%
     tibble_to_vector()
 
-  # filter shp file to include only sections intersecting w/ buffer
-  df_filtered <- df %>% dplyr::filter(rlang::UQ(pls_var) %in% pls_int)
+  # filter shp file to include only sections intersecting w/ buffer-
+  # df_filtered <- df %>% dplyr::filter(rlang::UQ(pls_var) %in% pls_int)
+
+  if (pls_name == "MTRS") {
+    df_filtered <- df %>% dplyr::filter(MTRS %in% pls_int)
+  } else if (pls_name == "MTR") {
+    df_filtered <- df %>% dplyr::filter(MTR %in% pls_int)
+  }
 
   # combine buffer to existing sections shp file
   buffer_shp <- shp[1, ]
@@ -444,22 +456,25 @@ pur_filt_df <- function(pls, pls_quote) {
 #'
 #' @param ... A list of variables to group by. Options include \code{section},
 #' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted.
+#' @param pur_filt
+#' @param start_date
+#' @param end_date
 #'
 #' @return A data frame a \code{kg} column and one to three additional columns,
 #' depending on the grouping variables.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-pur_out_df <- function(...) {
+pur_out_df <- function(pur_filt, start_date, end_date, ...) {
 
   group_by <- rlang::quos(...)
 
-  pur_out <- pur_filt %>%
+  pur_summed <- pur_filt %>%
     dplyr::filter(date >= start_date & date <= end_date) %>%
     dplyr::group_by(!!!group_by) %>%
     dplyr::summarise(kg = sum(kg_chm_used)) %>%
     dplyr::ungroup()
 
-  return(pur_out)
+  return(pur_summed)
 
 }
 
@@ -472,18 +487,29 @@ pur_out_df <- function(...) {
 #'
 #' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted.
 #' @param section_township Either \code{section} or \code{township}. Not quoted.
+#' @param clean_pur_df,
+#' @param pls_percents
+#' @param pls
+#' @param pur_out
+#' @param location
+#' @param start_date
+#' @param end_date
+#' @param radius
+#' @param buffer_area
 #'
 #' @return A data frame with the twelve columns in the
 #' \code{calculate_exposure$meta_data} data frame.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @importFrom rlang :=
-exp_df <- function(mtrs_mtr, section_township) {
+exp_df <- function(clean_pur_df, pls_percents, pls, pur_out, location,
+                   start_date, end_date, radius, buffer_area,
+                   mtrs_mtr, section_township) {
 
   mutate_expr <- rlang::enquo(mtrs_mtr)
   rename_expr <- rlang::enquo(section_township)
 
-  if ("section" %in% colnames(clean_pur_df)){
+  if ("chemical_class" %in% colnames(clean_pur_df)){
 
     classes <- unique(clean_pur_df$chemical_class)
     n_classes <- length(classes)
@@ -565,12 +591,14 @@ exp_df <- function(mtrs_mtr, section_township) {
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #' quoted.
+#' @param exp exp data frame
+#' @param buffer_area numeric value
 #'
 #' @return A data frame with exposure values in kg/m^2 at a location for each
 #' relevant condition.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-exp_out_val <- function(...) {
+exp_out_val <- function(exp, buffer_area, ...) {
 
   group_by_vars <- rlang::quos(...)
 
@@ -592,16 +620,21 @@ exp_out_val <- function(...) {
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #'   quoted.
+#' @param start_date
+#' @param end_date
+#' @param location
+#' @param radius
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-row_out_df <- function(...) {
+row_out_df <- function(start_date, end_date, location, radius,
+                       exp, buffer_area, ...) {
 
   vars <- rlang::quos(...)
 
-  row_out_0 <- exp_out_val(!!!vars)
+  row_out_0 <- exp_out_val(exp, buffer_area, !!!vars)
 
   if ("aerial_ground" %in% colnames(row_out_0)) {
 
@@ -640,38 +673,55 @@ row_out_df <- function(...) {
 #'
 #' @param start_date A date, "yyyy-mm-dd"
 #' @param end_date A date, "yyyy-mm-dd"
+#' @inheritParams exp_df
+#' @inheritParams pur_out_df
+#' @inheritParams row_out_df
+#' @inheritParams exp_out_val
+#' @param chemicals
+#' @param aerial_ground
 #'
 #' @return A nested data frame with two columns: The \code{row_out} column
 #' contains the \code{exposure} data frame for the date range, and
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
-daterange_calcexp <- function(start_date, end_date) {
+daterange_calcexp <- function(start_date, end_date, aerial_ground,
+                              buffer_area, chemicals,
+                              clean_pur_df,
+                              exp, location, pls, pls_percents,
+                              pur_filt, pur_out, radius) {
 
   if (chemicals == "all") {
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
-        pur_out <- pur_out_df(section, aerial_ground)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              section, aerial_ground)
       } else {
-        pur_out <- pur_out_df(section)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              section)
       }
     } else {
       if (aerial_ground) {
-        pur_out <- pur_out_df(township, aerial_ground)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              township, aerial_ground)
       } else {
-        pur_out <- pur_out_df(township)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date, township)
       }
     }
   } else {
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
-        pur_out <- pur_out_df(section, chemical_class, aerial_ground)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              section, chemical_class, aerial_ground)
       } else {
-        pur_out <- pur_out_df(section, chemical_class)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              section, chemical_class)
       }
     } else {
       if (aerial_ground) {
-        pur_out <- pur_out_df(township, chemical_class, aerial_ground)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              township, chemical_class, aerial_ground)
       } else {
-        pur_out <- pur_out_df(township, chemical_class)
+        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+                              township, chemical_class)
       }
     }
   }
@@ -679,15 +729,21 @@ daterange_calcexp <- function(start_date, end_date) {
   buffer_area <- pi * (radius^2)
 
   if ("section" %in% colnames(pur_filt)) {
-    exp <- exp_df(MTRS, section)
+    exp <- exp_df(clean_pur_df, pls_percents, pls, pur_out, location, start_date,
+                  end_date, radius, buffer_area,
+                  MTRS, section)
   } else {
-    exp <- exp_df(MTR, township)
+    exp <- exp_df(clean_pur_df, pls_percents, pls, pur_out, location, start_date,
+                  end_date, radius, buffer_area,
+                  MTR, township)
   }
 
   if (aerial_ground) {
-    row_out <- row_out_df(chemicals, aerial_ground)
+    row_out <- row_out_df(start_date, end_date, location, radius, exp, buffer_area,
+                          chemicals, aerial_ground)
   } else {
-    row_out <- row_out_df(chemicals)
+    row_out <- row_out_df(start_date, end_date, location, radius, exp, buffer_area,
+                          chemicals)
   }
 
   nested_df <- list(row_out = list(row_out), meta_data = list(exp))

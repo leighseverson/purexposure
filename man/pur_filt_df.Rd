@@ -4,12 +4,20 @@
 \alias{pur_filt_df}
 \title{Find PLS units intersecting with a buffer.}
 \usage{
-pur_filt_df(pls, pls_quote)
+pur_filt_df(pls, pls_quote, which_pls, shp, buffer, df, clean_pur_df)
 }
 \arguments{
 \item{pls}{Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted.}
 
 \item{pls_quote}{Either \code{"MTRS"} or \code{"MTR"}}
+
+\item{which_pls}{A vector of character string PLS units}
+
+\item{shp}{A county's shapefile.}
+
+\item{buffer}{A data frame with buffer coordinates.}
+
+\item{clean_pur_df}{}
 }
 \value{
 A list with four elements:

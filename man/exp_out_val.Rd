@@ -4,9 +4,13 @@
 \alias{exp_out_val}
 \title{Return a single exposure value for each combination of conditions.}
 \usage{
-exp_out_val(...)
+exp_out_val(exp, buffer_area, ...)
 }
 \arguments{
+\item{exp}{exp data frame}
+
+\item{buffer_area}{numeric value}
+
 \item{...}{Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 quoted.}
 }

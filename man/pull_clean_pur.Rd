@@ -7,7 +7,7 @@
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
   chemical_class = NULL, start_date = NULL, end_date = NULL,
-  aerial_ground = FALSE, verbose = TRUE, download_progress = FALSE)
+  aerial_ground = TRUE, verbose = TRUE, download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -48,7 +48,7 @@ ingredients, giving an estimation of the total pesticides applied in a
 given section or township ("all"), or by a chemical class specified in a
 data frame given in the argument \code{chemical_class}.}
 
-\item{chemical_class}{A data frame with three columns: \code{chem_code},
+\item{chemical_class}{A data frame with only three columns: \code{chem_code},
 \code{chemname}, and \code{chemical_class}. \code{chem_code} should have
 integer values giving PUR chemical codes, and \code{chemname} should have
 character strings with corresponding PUR chemical names (these can be
@@ -57,7 +57,7 @@ searched for using the \code{find_chemical_codes} function or with the
 \code{chemical_class} column should have character strings indicating the
 chemical class corresponding to each \code{chem_code}. The
 \code{chemical_class} for a group of active ingredients should be decided
-upon by the user. Only used if \code{sum = "chemical_class"}. Again, see
+upon by the user. Only used if \code{sum = "chemical_class"}. See
 the CDPR's Summary of PUR Data document here:
 \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
 comprehensive classifications of active ingredients.}
@@ -72,7 +72,7 @@ argument.}
 
 \item{aerial_ground}{TRUE / FALSE indicating if you would like to
 retain aerial/ground application data ("A" = aerial, "G" = ground, and
-"O" = other.) The default is FALSE.}
+"O" = other.) The default is TRUE.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
@@ -83,29 +83,29 @@ message and progress bar printed for each year of PUR data that is downloaded.
 The default value is FALSE.}
 }
 \value{
-A data frame:
+A data frame with 12 columns:
   \describe{
     \item{chem_code}{An integer value giving the PUR chemical code
     for the active ingredient applied. Not included if
     \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
     \item{chemname}{A character string giving PUR chemical active
     ingredient names. Unique values of \code{chemname} are matched with terms
-    provided in the \code{chemicals} argument. Not included if
-    \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
+    provided in the \code{chemicals} argument. Not included
+    if \code{sum_application = TRUE} and \code{sum = "chemical_class"}.}
     \item{chemical_class}{If \code{sum_application = TRUE} and
     \code{sum = "chemical_class"}, this column will give values of the
     \code{chemical_class} column in the input \code{chemical_class} data frame.
     If there are active ingredients pulled based on the
-    \code{chemicals} argument not present in the \code{chemical_class} data
-    frame, these chemicals will be summed under the class "other".}
+    \code{chemicals} argument that are not present in the \code{chemical_class}
+    data frame, these chemicals will be summed under the class "other".}
     \item{kg_chm_used}{A numeric value giving the amount of the active
     ingredient applied (kilograms).}
     \item{section}{A string nine characters long indicating the section
     of application. PLS sections are uniquely identified by a combination of
     base line meridian (S, M, or H), township (01-48), township direction
     (N or S), range (01-47), range direction (E or W) and section number
-    (01-36). This column is not included if \code{sum_application = TRUE} and
-    \code{unit = "township"}.}
+    (01-36). This column is not included if
+    \code{sum_application = TRUE} and \code{unit = "township"}.}
     \item{township}{A string 7 characters long indicating the township
     of application. PLS townships are uniquely identified by a combination of
     base line meridian (S, M, or H), township (01-48), township direction
@@ -116,18 +116,18 @@ A data frame:
     code where application took place.}
     \item{date}{The date of application (yyyy-mm-dd).}
     \item{aerial_ground}{A character giving the application method.
-    "A" = aerial, "G" = ground, and "O" = other. This column is only included if
-    \code{aerial_ground = TRUE}.}
+    "A" = aerial, "G" = ground, and "O" = other. Not included
+    if \code{aerial_ground = FALSE}.}
     \item{use_no}{A character string identifing unique application of an
     active ingredient across years. This value is a combination of the raw PUR
-    \code{use_no} column and the year of application. Not included if
-    \code{sum_appliction = TRUE}.}
+    \code{use_no} column and the year of application. Will have values of
+    \code{NA} if \code{sum_appliction = TRUE}.}
     \item{outlier}{A logical value indicating whether the
     amount listed in \code{kg_chm_used} has been corrected large amounts
     entered in error. The algorithm for identifying and replacing outliers
     was developed based on methods used by Gunier et al. (2001). Please see
-    the package vignette for more detail regarding these methods. Not included
-    if \code{sum_application = TRUE}.}
+    the package vignette for more detail regarding these methods. Will have
+    values of \code{NA} if \code{sum_application = TRUE}.}
  }
 }
 \description{
@@ -176,7 +176,7 @@ chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
 
 df4 <- pull_clean_pur(years = 1995,
                       counties = "fresno",
-                      chemicals = chemical_class_df$chemname
+                      chemicals = chemical_class_df$chemname,
                       sum_application = TRUE,
                       sum = "chemical_class",
                       start_date = "1995-03-01",

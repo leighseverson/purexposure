@@ -315,9 +315,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   }
 
   if ("section" %in% colnames(clean_pur_df)) {
-    out_list <- pur_filt_df(MTRS, "MTRS")
+    out_list <- pur_filt_df(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
   } else {
-    out_list <- pur_filt_df(MTR, "MTR")
+    out_list <- pur_filt_df(MTR, "MTR", which_pls, shp, buffer, df, clean_pur_df)
   }
 
   pur_filt <- out_list$pur_filt
@@ -326,7 +326,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   pls_int <- out_list$pls_int
 
   out <- purrr::map2(time_df$start_date, time_df$end_date,
-                     daterange_calcexp)
+                     daterange_calcexp, aerial_ground, buffer_area, chemicals,
+                     clean_pur_df, exp, location, pls, pls_percents, pur_filt,
+                     pur_out, radius)
   for (i in 1:length(out)) {
     exp_row <- out[[i]]$row_out[[1]]
     meta_data <- out[[i]]$meta_data[[1]]

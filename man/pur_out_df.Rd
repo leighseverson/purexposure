@@ -4,9 +4,11 @@
 \alias{pur_out_df}
 \title{Find summed applied active ingredients}
 \usage{
-pur_out_df(...)
+pur_out_df(pur_filt, start_date, end_date, ...)
 }
 \arguments{
+\item{end_date}{}
+
 \item{...}{A list of variables to group by. Options include \code{section},
 \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted.}
 }

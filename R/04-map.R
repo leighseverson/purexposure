@@ -401,4 +401,8 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
 map_exposure <- function() {}
 
+
+
+
+
 map_application <- function() {}

@@ -4,9 +4,11 @@
 \alias{row_out_df}
 \title{Return a data frame with exposure values and other related data.}
 \usage{
-row_out_df(...)
+row_out_df(start_date, end_date, location, radius, exp, buffer_area, ...)
 }
 \arguments{
+\item{radius}{}
+
 \item{...}{Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 quoted.}
 }

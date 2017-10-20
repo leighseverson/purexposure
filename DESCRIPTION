@@ -30,3 +30,5 @@ Imports:
     utils (>= 3.4.1),
     viridis
 RoxygenNote: 6.0.1
+Suggests: 
+    testthat
