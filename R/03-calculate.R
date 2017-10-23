@@ -45,7 +45,7 @@
 #' @param verbose TRUE / FALSE for whether you would like a message to print out
 #'   while the function is running. The default is \code{TRUE}.
 #'
-#' @return A list with four elements:
+#' @return A list with five elements:
 #'  \describe{
 #'    \item{exposure}{A data frame with 7 columns: \code{exposure},
 #'    the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
@@ -80,6 +80,8 @@
 #'    buffer in the context of the county. Depending on if your \code{clean_pur_df}
 #'    data frame was summed by section or township, the county will be shown
 #'    with the relevant PLS units.}
+#'    \item{clean_pur_df}{The data frame supplied to the \code{clean_pur_df}
+#'    argument.}
 #'  }
 #'
 #' @section Note:
@@ -341,10 +343,15 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     }
   }
 
+  row_out <- dplyr::mutate(row_out,
+                           longitude = latlon_out[1],
+                           latitude = latlon_out[2])
+
   out <- list(exposure = row_out,
               meta_data = meta_out,
               buffer_plot_df = comb_df_filt,
-              county_plot = context_plot)
+              county_plot = context_plot,
+              clean_pur_df = clean_pur_df)
 
   return(out)
 

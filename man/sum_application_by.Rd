@@ -4,7 +4,8 @@
 \alias{sum_application_by}
 \title{Sum application}
 \usage{
-sum_application_by(df, sum, unit, aerial_ground, ...)
+sum_application_by(df, sum, unit, aerial_ground, section_townships,
+  chemical_class = NULL, ...)
 }
 \arguments{
 \item{df}{A data frame from \code{pull_clean_pur} before summing has taken
@@ -15,6 +16,10 @@ place}
 \item{unit}{either "section" or "township"}
 
 \item{aerial_ground}{TRUE / FALSE}
+
+\item{section_townships}{A section_townships data frame}
+
+\item{chemical_class}{A chemical_class data frame}
 
 \item{...}{grouping variables}
 }

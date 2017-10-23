@@ -369,7 +369,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            start_date = NULL, end_date = NULL,
-                           aerial_ground = TRUE, verbose = TRUE,
+                           aerial_ground = FALSE, verbose = TRUE,
                            download_progress = FALSE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
@@ -540,21 +540,29 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     if (sum == "all") {
       if (unit == "section") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "all", "section", TRUE, chem_code,
+          out <- sum_application_by(out, "all", "section", TRUE,
+                                    section_townships,
+                                    chem_code,
                                     chemname, section, county_name, county_code,
                                     date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "all", "section", FALSE, chem_code,
+          out <- sum_application_by(out, "all", "section", FALSE,
+                                    section_townships,
+                                    chem_code,
                                     chemname, section, county_name, county_code,
                                     date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "all", "township", TRUE, chem_code,
+          out <- sum_application_by(out, "all", "township", TRUE,
+                                    section_townships,
+                                    chem_code,
                                     chemname, township, county_name, county_code,
                                     date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "all", "township", FALSE, chem_code,
+          out <- sum_application_by(out, "all", "township", FALSE,
+                                    section_townships,
+                                    chem_code,
                                     chemname, township, county_name, county_code,
                                     date)
         }
@@ -590,20 +598,28 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       if (unit == "section") {
         if (aerial_ground) {
           out <- sum_application_by(out, "chemical_class", "section", TRUE,
+                                    section_townships,
+                                    chemical_class = chemical_class,
                                     chemical_class, section, county_name,
                                     county_code, date, aerial_ground)
         } else {
           out <- sum_application_by(out, "chemical_class", "section", FALSE,
+                                    section_townships,
+                                    chemical_class = chemical_class,
                                     chemical_class, section, county_name,
                                     county_code, date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
           out <- sum_application_by(out, "chemical_class", "township", TRUE,
+                                    section_townships,
+                                    chemical_class = chemical_class,
                                     chemical_class, township, county_name,
                                     county_code, date, aerial_ground)
         } else {
           out <- sum_application_by(out, "chemical_class", "township", FALSE,
+                                    section_townships,
+                                    chemical_class = chemical_class,
                                     chemical_class, township, county_name,
                                     county_code, date)
           }

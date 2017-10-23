@@ -193,13 +193,17 @@ spdf_to_df <- function(spdf) {
 #' @param sum "all" or "chemical_class"
 #' @param unit either "section" or "township"
 #' @param aerial_ground TRUE / FALSE
+#' @param chemical_class A chemical_class data frame
+#' @param section_townships A section_townships data frame
 #' @param ... grouping variables
 #'
 #' @return A data frame. The number of columns is dependent on the grouping
 #' variables supplied to the \code{...} argument.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-sum_application_by <- function(df, sum, unit, aerial_ground, ...) {
+sum_application_by <- function(df, sum, unit, aerial_ground,
+                               section_townships, chemical_class = NULL,
+                               ...) {
 
   group_by_vars <- rlang::quos(...)
 
@@ -746,4 +750,41 @@ daterange_calcexp <- function(start_date, end_date, aerial_ground,
 
   return(nested_df)
 
+}
+
+#' Include alpha in ggplot2::scale_fill_gradientn()
+#'
+#' This function adds an `alpha` argument to scale_fill_gradientn() from the
+#' ggplot2 package.
+scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
+                                  na.value = "grey50", guide = "colourbar", colors,
+                                  alpha = NULL) {
+  colours <- if (missing(colours)) colors else colours
+
+  continuous_scale("fill", "gradientn",
+                   gradient_n_pal2(colours, values, space, alpha = alpha),
+                   na.value = na.value, guide = guide, ...)
+}
+
+#' Include alpha option in scales::gradient_n_pal()
+#'
+#' This function adds an "alpha" argument from gradient_n_pal() from the scales
+#' package.
+gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL) {
+  if (!identical(space, "Lab")) {
+    warning("Non Lab interpolation is deprecated", call. = FALSE)
+  }
+  ramp <- colour_ramp(colours, alpha = alpha)
+
+  function(x) {
+    if (length(x) == 0) return(character())
+
+    if (!is.null(values)) {
+      xs <- seq(0, 1, length.out = length(values))
+      f <- stats::approxfun(values, xs)
+      x <- f(x)
+    }
+
+    ramp(x)
+  }
 }
