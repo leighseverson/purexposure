@@ -81,7 +81,8 @@
 #'    data frame was summed by section or township, the county will be shown
 #'    with the relevant PLS units.}
 #'    \item{clean_pur_df}{The data frame supplied to the \code{clean_pur_df}
-#'    argument.}
+#'    argument, filtered to the county and date range for which exposure
+#'    was calcualted.}
 #'  }
 #'
 #' @section Note:
@@ -185,6 +186,8 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                 "\nThe clean_pur_df data frame doesn't include data for this ",
                 "county."))
   }
+
+  clean_pur_df <- clean_pur_df %>% dplyr::filter(county_name == toupper(county))
 
   if (verbose) {
     message(paste0("Calculating exposure for the location ", "\"", location,
@@ -306,6 +309,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
 
   }
 
+  clean_pur_df <- clean_pur_df %>% dplyr::filter(date >= lubridate::ymd(min(time_df$start_date)) &
+                                                   date <= lubridate::ymd(max(time_df$end_date)))
+
   # check_dates
   check_min_date <- min(time_df$start_date) == min(clean_pur_df$date)
   check_max_date <- max(time_df$end_date) == max(clean_pur_df$date)
@@ -331,6 +337,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                      daterange_calcexp, aerial_ground, buffer_area, chemicals,
                      clean_pur_df, exp, location, pls, pls_percents, pur_filt,
                      pur_out, radius)
+
   for (i in 1:length(out)) {
     exp_row <- out[[i]]$row_out[[1]]
     meta_data <- out[[i]]$meta_data[[1]]

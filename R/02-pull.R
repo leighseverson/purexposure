@@ -260,15 +260,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   the CDPR's Summary of PUR Data document here:
 #'   \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
 #'   comprehensive classifications of active ingredients.
-#' @param start_date Optional. "yyyy-mm-dd" Indicates a start date if you don't
-#'   want to return the entire date range pulled using the \code{years}
-#'   argument.
-#' @param end_date Optional. "yyyy-mm-dd" Indicates an end date if you don't
-#'   want to return the entire date range pulled using the \code{years}
-#'   argument.
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
-#'   "O" = other.) The default is TRUE.
+#'   "O" = other.) The default is FALSE.
 #'
 #' @return A data frame with 12 columns:
 #'   \describe{
@@ -358,8 +352,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       chemicals = chemical_class_df$chemname,
 #'                       sum_application = TRUE,
 #'                       sum = "chemical_class",
-#'                       start_date = "1995-03-01",
-#'                       end_date = "1995-08-01",
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
 #' }
@@ -368,7 +360,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
-                           start_date = NULL, end_date = NULL,
                            aerial_ground = FALSE, verbose = TRUE,
                            download_progress = FALSE) {
 
@@ -629,13 +620,6 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     if (!aerial_ground) {
       out <- out %>% dplyr::select(-aerial_ground)
     }
-  }
-
-  if (!is.null(start_date)) {
-    out <- out %>% dplyr::filter(date >= lubridate::ymd(start_date))
-  }
-  if (!is.null(end_date)) {
-    out <- out %>% dplyr::filter(date <= lubridate::ymd(end_date))
   }
 
   return(out)

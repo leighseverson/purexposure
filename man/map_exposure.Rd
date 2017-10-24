@@ -2,9 +2,42 @@
 % Please edit documentation in R/04-map.R
 \name{map_exposure}
 \alias{map_exposure}
-\title{Map exposure to pesticides by PLS unit and buffer.}
+\title{Map exposure to applied pesticides by PLS unit and buffer.}
 \usage{
-map_exposure(exposure_list)
+map_exposure(exposure_list, color_by = "percentile", percentile = c(0.25,
+  0.5, 0.75), fill_option, alpha, buffer_or_county, county = NULL)
+}
+\arguments{
+\item{exposure_list}{A list returned from the calculate_exposure() function.}
+
+\item{color_by}{Either "amount" or "percentile" (the default). Specifies
+whether you would like application amounts to be colored according to
+amount, resulting in a gradient legend, or by the percentile that they fall
+into for the given dataset and date range. You can specify percentile
+cutpoints with the \code{percentile} argument.}
+
+\item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints.
+The default is \code{c(0.25, 0.5, 0.75)}, which results in four categories:
+< 25th percentile, >= 25th to < 50th, >= 50th to < 75th, and >= 75th.}
+
+\item{fill_option}{An argument passed on to the \code{option} argument of
+\code{scale_fill_viridis}. Either "viridis", "inferno", "magma", or
+"plasma". The default is "viridis".}
+
+\item{buffer_or_county}{legend scale based on buffer or on county/chemical_class?
+In which context do you want PLS units to be filled?}
+
+\item{county}{which county?
+
+$ list w/in out_list
+$ plot
+$ one-row data frame with location, longitude, latidue, exposure,
+radius, buffer_area, chemicals, start_date, end_date, aerial_ground
+- each one-row data frame and represents a unique exposure estimate for unique
+combination of column values
+- better way to organize this?
+
+clean_pur_df included in exposure_list.}
 }
 \description{
 - list from calculate_exposure() for single location and radius
@@ -13,13 +46,5 @@ and chemicals (if chemical_class was used in calculate_exposure()
 combination)
 - amounts of active ingredients are plotted based on the % intersection of the
 PLS unit with the buffer around a location (for time period, a/g, and chemicals)
-}
-\details{
-$ list w/in out_list
-$ plot
-$ one-row data frame with location, longitude, latidue, exposure,
-radius, buffer_area, chemicals, start_date, end_date, aerial_ground
-- each one-row data frame and represents a unique exposure estimate for unique
-combination of column values
-- better way to organize this?
+- ^ this function plots amount, not exposure.
 }

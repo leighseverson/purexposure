@@ -49,7 +49,8 @@ a specific active ingredient present in the \code{chemname} column of the
 \code{clean_pur_df} data frame.}
 
 \item{fill_option}{An argument passed on to the \code{option} argument of
-\code{scale_fill_viridis}. The default is "viridis".}
+\code{scale_fill_viridis}. Either "viridis", "inferno", "magma", or
+"plasma". The default is "viridis".}
 
 \item{crop}{TRUE / FALSE for whether you would like your plot zoomed in on
 sections or townships with recorded application data.}

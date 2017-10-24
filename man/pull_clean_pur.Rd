@@ -6,8 +6,8 @@
 \usage{
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
-  chemical_class = NULL, start_date = NULL, end_date = NULL,
-  aerial_ground = TRUE, verbose = TRUE, download_progress = FALSE)
+  chemical_class = NULL, aerial_ground = FALSE, verbose = TRUE,
+  download_progress = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -61,14 +61,6 @@ upon by the user. Only used if \code{sum = "chemical_class"}. See
 the CDPR's Summary of PUR Data document here:
 \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
 comprehensive classifications of active ingredients.}
-
-\item{start_date}{Optional. "yyyy-mm-dd" Indicates a start date if you don't
-want to return the entire date range pulled using the \code{years}
-argument.}
-
-\item{end_date}{Optional. "yyyy-mm-dd" Indicates an end date if you don't
-want to return the entire date range pulled using the \code{years}
-argument.}
 
 \item{aerial_ground}{TRUE / FALSE indicating if you would like to
 retain aerial/ground application data ("A" = aerial, "G" = ground, and
@@ -179,8 +171,6 @@ df4 <- pull_clean_pur(years = 1995,
                       chemicals = chemical_class_df$chemname,
                       sum_application = TRUE,
                       sum = "chemical_class",
-                      start_date = "1995-03-01",
-                      end_date = "1995-08-01",
                       unit = "township",
                       chemical_class = chemical_class_df)
 }

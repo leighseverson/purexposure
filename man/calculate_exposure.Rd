@@ -59,7 +59,7 @@ each method of application: aerial or ground. The default is FALSE.}
 while the function is running. The default is \code{TRUE}.}
 }
 \value{
-A list with four elements:
+A list with five elements:
  \describe{
    \item{exposure}{A data frame with 7 columns: \code{exposure},
    the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
@@ -94,6 +94,9 @@ A list with four elements:
    buffer in the context of the county. Depending on if your \code{clean_pur_df}
    data frame was summed by section or township, the county will be shown
    with the relevant PLS units.}
+   \item{clean_pur_df}{The data frame supplied to the \code{clean_pur_df}
+   argument, filtered to the county and date range for which exposure
+   was calcualted.}
  }
 }
 \description{
