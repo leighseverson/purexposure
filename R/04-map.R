@@ -377,7 +377,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
     viridis::scale_fill_viridis(na.value = "white",
                                 name = legend_label,
                                 discrete = viridis_discrete,
-                                option = fill_option) +
+                                option = fill_option) + #### ooh maybe replace this w/ code below--- use any colormap color.
     ggplot2::theme_void() +
     ggplot2::coord_map(xlim = long_range, ylim = lat_range)
 
@@ -409,7 +409,8 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' combination)
 #' - amounts of active ingredients are plotted based on the % intersection of the
 #' PLS unit with the buffer around a location (for time period, a/g, and chemicals)
-#' - ^ this function plots amount, not exposure.
+#' - ^ this function plots amount, not exposure. BUT it's relevant to exposure.
+#' it's how exposure was calculated.
 #'
 #' @inheritParams map_county_application
 #' @param exposure_list A list returned from the calculate_exposure() function.
@@ -429,253 +430,75 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' clean_pur_df included in exposure_list.
 #'
+#' @examples
+#' \dontrun{
+#' maps <- map_exposure(exposure_list)
+#' length(maps)
+#' }
+#'
 map_exposure <- function(exposure_list, color_by = "percentile",
                          percentile = c(0.25, 0.5, 0.75),
-                         fill_option, alpha, buffer_or_county,
-                         county = NULL) {
+                         fill_option = "viridis", alpha = 0.7,
+                         buffer_or_county = "county",
+                         pls_labels = TRUE,
+                         pls_labels_size = 3) {
 
   buffer_df <- exposure_list$buffer_plot_df
+
+  clean_pur <- exposure_list$clean_pur_df
 
   pls_data <- exposure_list$meta_data %>%
     dplyr::group_by(start_date, end_date, aerial_ground, chemicals) %>%
     tidyr::nest()
+  # each $data row is input into function below to return a plot.
 
-  if (all(is.na(exposure_list$meta_data$aerial_ground))) {
-    aerial_ground <- FALSE
-  } else {
-    aerial_ground <- TRUE
+  colormaps_vec <- unlist(colormap::colormaps)
+  names(colormaps_vec) <- NULL
+
+  if (!fill_option %in% colormaps_vec) {
+    stop(paste0("The fill_option argument should be a color palette from the ",
+                "colormap package."))
   }
 
-  if (!fill_option %in% c("viridis", "inferno", "magma", "plasma")) {
-    stop(paste0("The fill_option argument should be either \"viridis\",",
-                " \"inferno\", \"magma\", or \"plasma\"."))
-  }
   gradient <- colormap::colormap(fill_option, nshades = 100, alpha = alpha)
 
   location_longitude <- unique(exposure_list$exposure$longitude)
   location_latitude <- unique(exposure_list$exposure$latitude)
 
-  # map other function to each $data data frame
+  buffer2 <- buffer_df %>%
+    dplyr::filter(id == "buffer1")
 
+  buffer_df <- buffer_df %>%
+    tidyr::gather(key = "section_or_township", value = "pls", MTR, MTRS)
 
+  buffer <- dplyr::select(buffer2, long, lat)
+  buffer <- buffer[grDevices::chull(buffer), ]
+  buffer <- methods::as(buffer, "gpc.poly")
 
+  pls_data <- pls_data %>% dplyr::rename(data_pls = data)
 
+  suppressMessages(suppressWarnings(
+    out_maps <- purrr::pmap(pls_data, plot_pls, gradient, location_longitude,
+                            location_latitude, buffer_df, buffer2, buffer,
+                            percentile, buffer_or_county, alpha, clean_pur,
+                            pls_labels, pls_labels_size, percentile)
+    ## probs!!!
+  ))
 
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-##
-# need clean_pur_df if percentile = TRUE
-
-# plot_pls <- function(df, pur_data_chemical, buffer_df, clean_pur_df = NULL,
-#                      county = NULL, location_longitude,  location_latitude,
-#                      percentile, buffer_or_county, alpha) {
-#
-#   buffer_df2 <- buffer_df %>%
-#     dplyr::filter(id == "buffer1")
-#
-#   buffer_df <- buffer_df %>%
-#     tidyr::gather(key = "section_or_township", value = "pls", MTR, MTRS)
-#
-#   pls_df <- buffer_df %>%
-#     dplyr::right_join(df, by = "pls")
-#
-#   section_or_township <- unique(pls_df$section_or_township)
-#
-#   if (section_or_township == "MTRS") {
-#     s_t <- "section"
-#     if ("chemical_class" %in% colnames(clean_pur_df)) {
-#       grouping_vars <- rlang::quos(chemical_class)
-#     } else {
-#       grouping_vars <- rlang::quos()
-#     }
-#   } else if (section_or_township == "MTR") {
-#     s_t <- "township"
-#     if ("chemical_class" %in% colnames(clean_pur_df)) {
-#       grouping_vars <- rlang::quos(chemical_class)
-#     } else {
-#       grouping_vars <- rlang::quos()
-#     }
-#   }
-#
-#   legend_label <- paste0("Applied Pesticides\n(kg/", s_t, ")")
-#
-#   buffer <- dplyr::select(buffer_df2, long, lat)
-#   buffer <- buffer[grDevices::chull(buffer), ]
-#   buffer <- methods::as(buffer, "gpc.poly")
-#
-#   full <- dplyr::filter(df, percent > 0.999)
-#   full_pls_df <- buffer_df %>%
-#     dplyr::right_join(full, by = "pls") %>%
-#     dplyr::select(long, lat, group, kg_intersection) %>%
-#     dplyr::rename(kg = kg_intersection) %>%
-#     unique()
-#
-#   partial <- dplyr::filter(df, percent <= 0.999)
-#   partial_pls_df <- buffer_df %>%
-#     dplyr::right_join(partial, by = "pls")
-#
-#   pls_partials <- unique(partial_pls_df$pls)
-#
-#   for (i in 1:length(pls_partials)) {
-#
-#     df <- dplyr::filter(partial_pls_df, pls == pls_partials[i])
-#
-#     pls <- dplyr::select(df, long, lat)
-#     pls <- pls[grDevices::chull(pls), ]
-#     pls <- methods::as(pls, "gpc.poly")
-#
-#
-#     plot(append.poly(pls, buffer))
-#     plot(intersect(pls, buffer), poly.args = list(col = 2), add = TRUE)
-#
-#     intersection <- raster::intersect(pls, buffer)
-#
-#     int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
-#       dplyr::rename(long = x,
-#                     lat = y) %>%
-#       dplyr::mutate(group = paste0("int", i),
-#                     kg = unique(df$kg_intersection))
-#
-#     if (i == 1) {
-#       out_int <- int_df
-#     } else {
-#       out_int <- rbind(out_int, int_df)
-#     }
-#   }
-#
-#   section_data <- rbind(out_int, full_pls_df)
-#
-#   plot <- section_data %>%
-#     ggplot2::ggplot() +
-#     ggplot2::theme_void()
-#
-#   if (color_by = "amount") {
-#
-#     plot <- plot +
-#       ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group,
-#                                          fill = kg), color = "black")
-#
-#     if (buffer_or_county == "county") { ## this needs more work
-#       pur_limits <- clean_pur_df %>%
-#         dplyr::group_by(!!!grouping_vars) %>%
-#         dplyr::summarise(min = min(kg_chm_used, na.rm = TRUE),
-#                          max = max(kg_chm_used, na.rm = TRUE)) %>%
-#         dplyr::ungroup()
-#       if ("chemical_class" %in% colnames(clean_pur_df)) {
-#         pur_limits <- pur_limits %>% dplyr::filter(chemical_class == pur_data_chemical)
-#       }
-#       plot <- plot + scale_fill_gradientn2(colors = gradient, alpha = alpha,
-#                                            name = legend_label,
-#                                            limits = c(pur_limits$min, pur_limits$max))
-#     } else if (buffer_or_county == "buffer") {
-#       plot <- plot + scale_fill_gradientn2(colors = gradient, alpha = alpha,
-#                                            name = legend_label)
-#     }
-#   } else if (color_by = "percentile") {
-#
-#     cutpoint_list <- find_cutpoints(section_data, buffer_or_county =
-#                                       buffer_or_county)
-#     section_data2 <- cutpoint_list$df
-#
-#     categories <- cutpoint_list$categories
-#     n_cols <- as.integer(length(gradient)/4)
-#     for (i in 1:length(categories)) {
-#       col_vec <- gradient[n_cols*i]
-#       if (i == 1) {
-#         out <- col_vec
-#       } else {
-#         out <- c(out, col_vec)
-#       }
-#     }
-#
-#     names(out) <- categories
-#
-#     plot <- plot +
-#       ggplot2::geom_polygon(data = section_data2,
-#                             ggplot2::aes(x = long, y = lat, group = group,
-#                                          fill = category), color = "black") +
-#       ggplot2::scale_fill_manual(values = out, name = legend_label)
-#
-#   }
-#
-#   plot <- plot + ggplot2::geom_polygon(data = buffer_df,
-#                                        ggplot2::aes(x = long, y = lat, group = group),
-#                                        color ="black", fill = NA) +
-#     ggplot2::geom_point(x = location_longitude, y = location_latitude, size = 2)
-#
-#
-#   return(plot)
-#
-# }
-
-# create cutpoints
-
-# data frame with two columns: place and amount
-# in above context, give it pls_df with pls renamed to place and kg_intersection
-# renamed to amount
-
-find_cutpoints <- function(section_data, buffer_or_county) {
-
-  if (buffer_or_county == "buffer") {
-    perc <- as.data.frame(t(quantile(unique(section_data$kg),
-                                     probs = percentile, na.rm = TRUE)))
-    vec <- 0
-    for (i in 1:length(percentile)) {
-      vec <- c(vec, perc[, i])
-    }
-    vec <- c(vec, max(unique(section_data$kg),
-                      na.rm = TRUE))
-    perc_numbers <- as.character(percentile * 100)
-    first <- paste0("<=", perc_numbers[1], "th percentile")
-    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
-
-    for (i in 1:(length(perc_numbers) - 1)) {
-      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
-      if (i == 1) {
-        middle <- label
-      } else {
-        middle <- c(middle, label)
-      }
-    }
-
-    labels <- c(first, middle, last)
-
-    df_out <- section_data %>%
-      dplyr::mutate(category = as.character(cut(section_data$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "Missing", category))
-
-    if ("Missing" %in% unique(df_out$category)) {
-      df_out$category <- factor(df_out$category, levels = c(labels, "Missing"))
-    } else {
-      df_out$category <- factor(df_out$category, levels = labels)
-    }
-
-  } else if (buffer_or_county == "county") {
-    ## unclear
+  # reformat list
+  plots <- list()
+  dfs <- list()
+  for (i in 1:length(out_maps)) {
+    plots[[i]] <- out_maps[[i]][[1]]
+    dfs[[i]] <- out_maps[[i]][[2]]
   }
 
-  out <- list(df = df_out, categories = labels)
-  return(out)
+  out_maps_list <- list(plots = plots, data = dfs)
 
+  # need to think about a better way to return this data.
+  # want to incorporate $exposure - explains # of plots (one for each exposure combination)
+  return(out_maps_list)
 }
-
-
-
-##
-
-
 
 
 

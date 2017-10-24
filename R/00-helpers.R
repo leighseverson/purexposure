@@ -788,3 +788,266 @@ gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL)
     ramp(x)
   }
 }
+
+#' helper function for map_exposure()
+plot_pls <- function(start_date, end_date, aerial_ground,
+                     chemicals, data_pls, gradient, location_longitude,
+                     location_latitude, buffer_df, buffer2, buffer,
+                     buffer_or_county, alpha, clean_pur, pls_labels,
+                     pls_labels_size, percentile) {
+
+  pls_df <- buffer_df %>%
+    dplyr::right_join(data_pls, by = "pls")
+
+  section_or_township <- unique(pls_df$section_or_township)
+
+  if (section_or_township == "MTRS") {
+    s_t <- "section"
+  } else if (section_or_township == "MTR") {
+    s_t <- "township"
+  }
+
+  legend_label <- paste0("Applied Pesticides\n(kg/", s_t, ")")
+
+  full <- dplyr::filter(data_pls, percent > 0.999)
+  full_pls_df <- buffer_df %>%
+    dplyr::right_join(full, by = "pls") %>%
+    dplyr::select(long, lat, group, kg_intersection) %>%
+    dplyr::rename(kg = kg_intersection) %>%
+    unique()
+
+  partial <- dplyr::filter(data_pls, percent <= 0.999)
+  partial_pls_df <- buffer_df %>%
+    dplyr::right_join(partial, by = "pls")
+
+  pls_partials <- unique(partial_pls_df$pls)
+
+  for (i in 1:length(pls_partials)) {
+
+    df2 <- dplyr::filter(partial_pls_df, pls == pls_partials[i])
+
+    pls <- dplyr::select(df2, long, lat)
+    pls <- pls[grDevices::chull(pls), ]
+    pls <- methods::as(pls, "gpc.poly")
+
+    intersection <- raster::intersect(pls, buffer)
+
+    int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
+      dplyr::rename(long = x,
+                    lat = y) %>%
+      dplyr::mutate(group = paste0("int", i),
+                    kg = unique(df2$kg_intersection))
+
+    if (i == 1) {
+      out_int <- int_df
+    } else {
+      out_int <- rbind(out_int, int_df)
+    }
+  }
+
+  section_data <- rbind(out_int, full_pls_df)
+
+  cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
+                                  start_date, end_date, aerial_ground,
+                                  chemicals, clean_pur, s_t, percentile)
+
+  plot <- section_data %>%
+    ggplot2::ggplot() +
+    ggplot2::theme_void()
+
+  if (color_by == "amount") {
+
+    plot <- plot +
+      geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
+                   color = "black") +
+      scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label)
+
+  } else if (color_by == "percentile") {
+
+    section_data2 <- cutpoint_list$df
+
+    categories <- cutpoint_list$categories
+    n_cols <- as.integer(length(gradient)/4)
+    for (i in 1:length(categories)) {
+      col_vec <- gradient[n_cols*i]
+      if (i == 1) {
+        out <- col_vec
+      } else {
+        out <- c(out, col_vec)
+      }
+    }
+
+    names(out) <- categories
+
+    plot <- plot +
+      ggplot2::geom_polygon(data = section_data2,
+                            ggplot2::aes(x = long, y = lat, group = group,
+                                         fill = category), color = "black") +
+      ggplot2::scale_fill_manual(values = out, name = legend_label)
+
+  }
+
+  plot <- plot + ggplot2::geom_polygon(data = buffer_df,
+                                       ggplot2::aes(x = long, y = lat, group = group),
+                                       color ="black", fill = NA) +
+    ggplot2::geom_point(x = location_longitude, y = location_latitude, size = 2)
+
+  if (pls_labels) {
+
+    df_all <- dplyr::select(pls_df, pls, DDLONG, DDLAT) %>% unique()
+
+    plot <- plot +
+      ggplot2::geom_text(data = df_all, ggplot2::aes(x = DDLONG, y = DDLAT,
+                                                     label = pls),
+                         size = pls_labels_size, fontface = "bold")
+
+  }
+
+  data_pls <- data_pls %>%
+    dplyr::mutate(start_date = start_date,
+                  end_date = end_date,
+                  chemicals = chemicals, aerial_ground = aerial_ground) %>%
+    dplyr::select(pls, percent, kg, kg_intersection, start_date, end_date,
+                  chemicals, aerial_ground, none_recorded, location, radius,
+                  area)
+
+  return(list(plot = plot, data = data_pls))
+
+}
+
+
+#' helper function for plot_pls()
+find_cutpoints <- function(section_data, buffer_or_county,
+                           start_date, end_date, aerial_ground,
+                           chemicals, clean_pur, s_t, percentile) {
+
+  if (buffer_or_county == "buffer") {
+    perc <- as.data.frame(t(quantile(unique(section_data$kg),
+                                     probs = percentile, na.rm = TRUE)))
+    vec <- 0
+    for (i in 1:length(percentile)) {
+      vec <- c(vec, perc[, i])
+    }
+    vec <- c(vec, max(unique(section_data$kg),
+                      na.rm = TRUE))
+    perc_numbers <- as.character(percentile * 100)
+    first <- paste0("<=", perc_numbers[1], "th percentile")
+    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
+
+    for (i in 1:(length(perc_numbers) - 1)) {
+      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
+      if (i == 1) {
+        middle <- label
+      } else {
+        middle <- c(middle, label)
+      }
+    }
+
+    labels <- c(first, middle, last)
+
+    df_out <- section_data %>%
+      dplyr::mutate(category = as.character(cut(section_data$kg, vec, labels = labels)),
+                    category = ifelse(is.na(category), "Missing", category))
+
+    if ("Missing" %in% unique(df_out$category)) {
+      df_out$category <- factor(df_out$category, levels = c(labels, "Missing"))
+    } else {
+      df_out$category <- factor(df_out$category, levels = labels)
+    }
+
+  } else if (buffer_or_county == "county") {
+
+    if (!is.na(aerial_ground)) {
+      clean_pur <- clean_pur %>%
+        dplyr::filter(aerial_ground == aerial_ground)
+    }
+
+    if (chemicals != "all") {
+      if ("chemical_class" %in% colnames(clean_pur)) {
+        clean_pur <- clean_pur %>%
+          dplyr::filter(chemical_class == chemicals)
+      }
+    }
+
+    if (s_t == "section") {
+
+      clean_pur2 <- clean_pur %>%
+        dplyr::filter(date >= lubridate::ymd(start_date) &
+                        date <= lubridate::ymd(end_date)) %>%
+        dplyr::group_by(section) %>%
+        dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE))
+
+    } else if (s_t == "township") {
+
+      clean_pur2 <- clean_pur %>%
+        dplyr::filter(date >= lubridate::ymd(start_date) &
+                        date <= lubridate::ymd(end_date)) %>%
+        dplyr::group_by(township) %>%
+        dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE))
+
+    }
+
+    clean_pur3 <- clean_pur2 %>%
+      dplyr::mutate(source = "county")
+
+    section_data <- section_data %>%
+      dplyr::mutate(source = "buffer")
+
+    to_join <- section_data %>%
+      dplyr::select(group, kg, source)
+
+    all_pls <- clean_pur3 %>%
+      dplyr::full_join(to_join, by = c("kg", "source"))
+
+    perc <- as.data.frame(t(quantile(unique(all_pls$kg),
+                                     probs = percentile, na.rm = TRUE)))
+    vec <- 0
+    for (i in 1:length(percentile)) {
+      vec <- c(vec, perc[, i])
+    }
+    vec <- c(vec, max(unique(all_pls$kg),
+                      na.rm = TRUE))
+    perc_numbers <- as.character(percentile * 100)
+    first <- paste0("<=", perc_numbers[1], "th percentile")
+    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
+
+    for (i in 1:(length(perc_numbers) - 1)) {
+      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
+      if (i == 1) {
+        middle <- label
+      } else {
+        middle <- c(middle, label)
+      }
+    }
+
+    labels <- c(first, middle, last)
+
+    all_pls_out <- all_pls %>%
+      dplyr::mutate(category = as.character(cut(all_pls$kg, vec, labels = labels)),
+                    category = ifelse(is.na(category), "Missing", category))
+
+    df_out2 <- section_data %>%
+      dplyr::mutate(category = as.character(cut(section_data$kg, vec, labels = labels)),
+                    category = ifelse(is.na(category), "Missing", category))
+
+    buffer_pls <- df_out2 %>%
+      dplyr::filter(source == "buffer") %>%
+      dplyr::select(kg, source, group, category) %>%
+      dplyr::full_join(section_data, c("kg", "source", "group")) %>%
+      dplyr::select(long, lat, group, kg, category)
+
+    if ("Missing" %in% unique(buffer_pls$category)) {
+      buffer_pls$category <- factor(buffer_pls$category, levels = c(labels, "Missing"))
+    } else {
+      buffer_pls$category <- factor(buffer_pls$category, levels = labels)
+    }
+
+    df_out <- buffer_pls
+
+  }
+
+  out <- list(df = df_out, categories = labels)
+
+  return(out)
+
+}

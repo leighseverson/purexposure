@@ -28,7 +28,10 @@ Imports:
     rgeos (>= 0.3.23),
     magrittr (>= 1.5),
     utils (>= 3.4.1),
-    viridis
+    viridis,
+    colormap,
+    grDevices,
+    methods
 RoxygenNote: 6.0.1
 Suggests: 
     testthat,
