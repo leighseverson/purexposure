@@ -1,0 +1,151 @@
+---
+title: "Using the `purexposure` package"
+author: "Rachel Severson"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo = FALSE, eval = FALSE}
+library(purexposure)
+```
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  error = TRUE
+)
+```
+
+The California Department of Pesticide Regulation publishes free copies of Pesticide Use Reports online through the California Pesticide Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The `purexposure` package makes it easy to download Pesticide Use Report (PUR) raw data, output reports in a clean and tidy format, calculate exposure to applied pesticides, and visualize application for counties or more specific locations. 
+
+The `purexposure` has five main categories of functions: `find_*`, `pull_*`, `calculate_*`, `map_*`, and `plot_*`. `find_*` functions are designed to explore active ingredients present in applied pesticides, return county names or codes as they are used in PUR datasets, and find the county of a particular location. `pull_*`
+functions pull raw or cleaned PUR datasets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `map_*` and `plot_*` functions return visualizations of application and exposure.  
+
+`purexposure` currently exists in a development version on GitHub. You can install and load the package with the following code: 
+
+```{r eval = FALSE}
+devtools::install_github("leighseverson/purexposure")
+library(purexposure)
+```
+
+## Example of using the package 
+
+**Some text about the designed pathway of the package for an analysis** ? Is this redundant? 
+
+### Explore active ingredients present in applied pesticides 
+
+PUR data is recorded by each active ingredient present in an applied pesticide product. By default, the package works with all recorded active ingredients. However, if you're interested in analyzing application of a specific active ingredient or chemcial class of active ingredients, the `find_chemical_codes` function is useful as a starting point to see what active ingredients were present in applied pesticides in a given year. 
+
+For example, too see how active ingredients matching "methyl bromide" or "abietic" were recorded in the year 2000, we would run: 
+
+```{r}
+find_chemical_codes(year = 2000, chemicals = c("methyl bromide", "abietic"))
+```
+
+The `chem_code` column gives the PUR chemical code for the active ingredient, and `chemname` gives the PUR chemical name. `chemical` gives the search terms input in the `chemicals` argument. This function can also be useful to find the number of unqiue active ingredients that were recorded in applied pesticides in a given year: 
+
+```{r}
+nrow(find_chemical_codes(2000))
+```
+
+3,637 unique active ingredients were present in applied pesticides in California in the year 2000. 
+
+The `find_chemical_codes` function works using `grep` to perform pattern matching. Therefore, it may not be effective in returning all active ingredients that should fall under your search term. To find an exhaustive list of all active ingredients that fall under a chemical class, you may find it useful to refer to the CA Department of Pesticide Regulation (DPR)'s [Summary of Pesticide Use Report Data, Indexed by Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf). Chemical classes available in the Summary include:
+
+- chemicals known to cause reproductive toxicity, 
+- chemcials known to cause cancer, 
+- cholinesterase-inhibiting pesticides (organophosphate and carbamate active ingredients),
+- pesticides on DPR's ground water protection list,
+- pesticides on DPR's toxic air contaminants list, 
+- fumigant pesticides, 
+- oil pesticides, and 
+- biopesticides. 
+
+You can use active ingredients listed under the relevant class to include in the `chemicals` argument of `find_chemical_codes` to find if those active ingredients were present in applied pesticides in a given year.
+
+### Pull PUR data 
+
+#### Raw data 
+
+The `pull_raw_pur` function will pull raw PUR data from the California Department of Pesticide Regulation's FTP server: 
+
+```{r message = FALSE, warning = FALSE, eval = FALSE, echo = 1}
+raw_pur <- pull_raw_pur(years = 1995, counties = "fresno")
+save(raw_pur, file = "data/raw_pur.RData")
+```
+```{r echo = FALSE}
+load("data/raw_pur.RData")
+```
+```{r}
+head(raw_pur, 3)
+```
+
+Raw PUR data has 33 columns. For documentation of raw PUR data, you can reference the Pesticide Use Report Data User Guide & Documentation document published by the CA Department of Pesticide Regulation. The file is saved as "cd_doc.pdf in any "pur[year].zip" file between 1990 and 2015 found here: ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/. To pull raw data for all counties from 1990 to 2015, you can run: 
+
+```{r eval = FALSE}
+all_pur_data <- pull_raw_pur()
+```
+
+This will take a while to run. 
+
+#### Cleaned data 
+
+The `pull_clean_pur` function pulls and cleans PUR data. You can similarly pull data by years and by counties, with additional arguments to specify the format and contents of your cleaned dataset. By default, the function will pull cleaned data for 1990 through 2015 for every county in California. Here's what a cleaned dataset for Fresno county looks like for 2005: 
+
+```{r message = FALSE, warning = FALSE, eval = FALSE, echo = 1}
+fresno_clean <- pull_clean_pur(2005, "fresno")
+save(fresno_clean, file = "data/fresno_clean.RData")
+```
+```{r echo = FALSE}
+load("data/fresno_clean.RData")
+```
+```{r}
+head(fresno_clean, 10)
+```
+
+- column explanation: table 
+- further explanation of cleaning algorithm, including outlier calculation, is further below. 
+- you can change the format of the cleaned data with additional arguments: 
+
+PUR data is reported by Public Land Survey (PLS) sections, which are one-square-mile parcels of land. A collection of no more than 48 sections comprises a township. You can aggregate pesticide application by section or county with the `sum_application` (T/F) and `unit` ("section" or "township") arguments. 
+
+- example: sum by section, there will be one record per active ingredient per section 
+- if you sum by township, section data will not be included 
+
+The default is to pull all active ingredients present in applied pesticides. If you're interested in a certain subset of active ingredients, you can list them with the `chemicals` argument. To sum across sections or townships by one or more chemical classes that define these chemicals, you can input `sum = "chemical_class` and use the `chemical_class` argument to specify which chemicals belong to which chemical class. 
+
+- chemical_class column instead of chem_code or chemname 
+- example of ^ 
+
+PUR datasets also include information about the method of application. By setting `aerial_ground = TRUE`, you can retain aerial/ground application data: 
+
+- incldue aerial_ground column 
+
+For each record, the `aerial_ground` column will specify "A" for aerial application, "G" for ground, and "O" for other. 
+
+### Calculate exposure 
+
+- use one of the example datasets from above 
+- go through each element of the returned list 
+- only run once (run for all, and for a time period (this is optional), but explain that you could run for chemical classes as well.)
+
+### Visualization 
+
+- map_ functions: related to county plots, PLS units 
+- plot_ functions: timeseries (application and exposure) 
+-- exposure timeseries..... relevant if you've calculated exposure for several locations or 
+for one location over a long period of time. This will take a while to run. Make sure to 
+code this so geocoding isn't running several times for the same location. 
+
+
+
+
+
+
+
+
+
+
