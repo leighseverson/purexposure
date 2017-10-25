@@ -467,7 +467,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' # exposure to a particular active ingredient
 #' # plot amounts instead of percentile categories
-#' chemical_df <- find_chemical_codes(2009, "metam-sodium") %>%
+#' chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium")) %>%
 #'      dplyr::rename(chemical_class = chemical)
 #'
 #' santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
@@ -602,11 +602,5 @@ map_exposure <- function(exposure_list,
                           cutoff_values = cutoff_values)
   }
 
-  # need to think about a better way to return this data.
-  # want to incorporate $exposure - explains # of plots (one for each exposure combination)
   return(out_maps_list)
 }
-
-
-
-map_application <- function() {}
