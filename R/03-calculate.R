@@ -274,12 +274,14 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   if (!is.null(time_period)) {
     # multiple time periods
     if (is.null(start_date)) {
-      start_date <- min(clean_pur_df$date)
+      year <- lubridate::year(min(clean_pur_df$date))
+      start_date <- lubridate::ymd(paste0(year, "-01-01"))
     } else {
       start_date <- lubridate::ymd(start_date)
     }
     if (is.null(end_date)) {
-      end_date <- max(clean_pur_df$date)
+      year <- lubridate::year(max(clean_pur_df$date))
+      end_date <- lubridate::ymd(paste0(year, "12-31"))
     } else {
       end_date <- lubridate::ymd(end_date)
     }
@@ -312,16 +314,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   clean_pur_df <- clean_pur_df %>% dplyr::filter(date >= lubridate::ymd(min(time_df$start_date)) &
                                                    date <= lubridate::ymd(max(time_df$end_date)))
 
-  # check_dates
-  check_min_date <- min(time_df$start_date) == min(clean_pur_df$date)
-  check_max_date <- max(time_df$end_date) == max(clean_pur_df$date)
-
-  if (!check_min_date | !check_max_date) {
-    stop("Your pur_clean_df data frame doesn't contain data for the entire date\n ",
-         "range speficied by start_date and end_date. You may need to pull data\n ",
-         "for additional years using the pull_clean_pur() function." )
-  }
-
   if ("section" %in% colnames(clean_pur_df)) {
     out_list <- pur_filt_df(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
   } else {
@@ -334,9 +326,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   pls_int <- out_list$pls_int
 
   out <- purrr::map2(time_df$start_date, time_df$end_date,
-                     daterange_calcexp, aerial_ground, buffer_area, chemicals,
-                     clean_pur_df, exp, location, pls, pls_percents, pur_filt,
-                     pur_out, radius)
+                     daterange_calcexp, aerial_ground, chemicals,
+                     clean_pur_df, location, pls_percents, pur_filt,
+                     radius)
 
   for (i in 1:length(out)) {
     exp_row <- out[[i]]$row_out[[1]]
