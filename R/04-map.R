@@ -181,6 +181,8 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'
 #' @examples
 #' \dontrun{
+#' tulare_list <- pull_clean_pur(2010, "tulare") %>% map_county_application()
+#'
 #' # plot all active ingredients
 #' pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
 #' fresno_list <- map_county_application(pur_df,
@@ -331,10 +333,10 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
     pur_df3 <- pur_df2 %>%
       dplyr::mutate(category = as.character(cut(pur_df2$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "Missing", category))
+                    category = ifelse(is.na(category), "None recorded", category))
 
-    if ("Missing" %in% unique(pur_df3$category)) {
-      pur_df3$category <- factor(pur_df3$category, levels = c(labels, "Missing"))
+    if ("None recorded" %in% unique(pur_df3$category)) {
+      pur_df3$category <- factor(pur_df3$category, levels = c(labels, "None recorded"))
     } else {
       pur_df3$category <- factor(pur_df3$category, levels = labels)
     }
@@ -432,15 +434,29 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' @examples
 #' \dontrun{
-#' maps <- map_exposure(exposure_list)
-#' length(maps)
+#' tulare_list <- pull_clean_pur(2010, "tulare") %>%
+#'    calculate_exposure(location = "-119.3473, 36.2077",
+#'                       radius = 3500) %>%
+#'    map_exposure()
+#' names(tulare_list)
+#' tulare_list$maps
+#' tulare_list$pls_data
+#' tulare_list$exposure
+#' tulare_list$cutoff_values
+#'
+#' # return one plot, pls_data data frame, exposure row, and cutoff_values
+#' data frame for each exposure combination
+#'
+#' # scale colors based on buffer or on county
+#'
+#'
 #' }
 #'
 map_exposure <- function(exposure_list, color_by = "percentile",
+                         buffer_or_county = "county",
                          percentile = c(0.25, 0.5, 0.75),
                          fill_option = "viridis", alpha = 0.7,
-                         buffer_or_county = "county",
-                         pls_labels = TRUE,
+                         pls_labels = FALSE,
                          pls_labels_size = 3) {
 
   buffer_df <- exposure_list$buffer_plot_df
@@ -480,20 +496,31 @@ map_exposure <- function(exposure_list, color_by = "percentile",
   suppressMessages(suppressWarnings(
     out_maps <- purrr::pmap(pls_data, plot_pls, gradient, location_longitude,
                             location_latitude, buffer_df, buffer2, buffer,
-                            percentile, buffer_or_county, alpha, clean_pur,
-                            pls_labels, pls_labels_size, percentile)
+                            buffer_or_county, alpha, clean_pur,
+                            pls_labels, pls_labels_size, percentile, color_by)
     ## probs!!!
   ))
 
   # reformat list
   plots <- list()
   dfs <- list()
+  cutoff_values <- list()
+  exposures <- list()
   for (i in 1:length(out_maps)) {
-    plots[[i]] <- out_maps[[i]][[1]]
-    dfs[[i]] <- out_maps[[i]][[2]]
+    plots[[i]] <- out_maps[[i]]$plot
+    dfs[[i]] <- out_maps[[i]]$data
+    cutoff_values[[i]] <- out_maps[[i]]$cutoff_values
+    exposures[[i]] <- exposure_list$exposure[i,]
   }
 
-  out_maps_list <- list(plots = plots, data = dfs)
+  if (color_by == "amount") {
+    out_maps_list <- list(maps = plots, pls_data = dfs,
+                          exposure = exposures)
+  } else if (color_by == "percentile") {
+    out_maps_list <- list(maps = plots, pls_data = dfs,
+                          exposure = exposures,
+                          cutoff_values = cutoff_values)
+  }
 
   # need to think about a better way to return this data.
   # want to incorporate $exposure - explains # of plots (one for each exposure combination)

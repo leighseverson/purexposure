@@ -31,7 +31,8 @@ Imports:
     viridis,
     colormap,
     grDevices,
-    methods
+    methods,
+    zoo
 RoxygenNote: 6.0.1
 Suggests: 
     testthat,

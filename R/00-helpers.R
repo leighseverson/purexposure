@@ -794,7 +794,7 @@ plot_pls <- function(start_date, end_date, aerial_ground,
                      chemicals, data_pls, gradient, location_longitude,
                      location_latitude, buffer_df, buffer2, buffer,
                      buffer_or_county, alpha, clean_pur, pls_labels,
-                     pls_labels_size, percentile) {
+                     pls_labels_size, percentile, color_by) {
 
   pls_df <- buffer_df %>%
     dplyr::right_join(data_pls, by = "pls")
@@ -847,10 +847,6 @@ plot_pls <- function(start_date, end_date, aerial_ground,
 
   section_data <- rbind(out_int, full_pls_df)
 
-  cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
-                                  start_date, end_date, aerial_ground,
-                                  chemicals, clean_pur, s_t, percentile)
-
   plot <- section_data %>%
     ggplot2::ggplot() +
     ggplot2::theme_void()
@@ -864,17 +860,32 @@ plot_pls <- function(start_date, end_date, aerial_ground,
 
   } else if (color_by == "percentile") {
 
+    cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
+                                    start_date, end_date, aerial_ground,
+                                    chemicals, clean_pur, s_t, percentile)
+
     section_data2 <- cutpoint_list$df
 
     categories <- cutpoint_list$categories
-    n_cols <- as.integer(length(gradient)/4)
-    for (i in 1:length(categories)) {
+
+    if ("None recorded" %in% categories) {
+      n_cols <-  as.integer(length(gradient)/(length(categories)-1))
+      end_i <- length(categories)-1
+    } else {
+      n_cols <- as.integer(length(gradient)/length(categories))
+      end_i <- length(categories)
+    }
+    for (i in 1:end_i) {
       col_vec <- gradient[n_cols*i]
       if (i == 1) {
         out <- col_vec
       } else {
         out <- c(out, col_vec)
       }
+    }
+
+    if ("None recorded" %in% categories) {
+      out <- c(out, "#FFFFFF")
     }
 
     names(out) <- categories
@@ -904,14 +915,21 @@ plot_pls <- function(start_date, end_date, aerial_ground,
   }
 
   data_pls <- data_pls %>%
-    dplyr::mutate(start_date = start_date,
-                  end_date = end_date,
+    dplyr::mutate(start_date = zoo::as.Date(start_date),
+                  end_date = zoo::as.Date(end_date),
                   chemicals = chemicals, aerial_ground = aerial_ground) %>%
     dplyr::select(pls, percent, kg, kg_intersection, start_date, end_date,
                   chemicals, aerial_ground, none_recorded, location, radius,
                   area)
 
-  return(list(plot = plot, data = data_pls))
+  if (color_by == "amount") {
+    return(list(plot = plot, data = data_pls))
+  } else if (color_by == "percentile") {
+    return(list(plot = plot, data = data_pls, cutoff_values =
+                  cutpoint_list$cutoff_values))
+  }
+
+
 
 }
 
@@ -947,10 +965,10 @@ find_cutpoints <- function(section_data, buffer_or_county,
 
     df_out <- section_data %>%
       dplyr::mutate(category = as.character(cut(section_data$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "Missing", category))
+                    category = ifelse(is.na(category), "None recorded", category))
 
-    if ("Missing" %in% unique(df_out$category)) {
-      df_out$category <- factor(df_out$category, levels = c(labels, "Missing"))
+    if ("None recorded" %in% unique(df_out$category)) {
+      df_out$category <- factor(df_out$category, levels = c(labels, "None recorded"))
     } else {
       df_out$category <- factor(df_out$category, levels = labels)
     }
@@ -1024,11 +1042,11 @@ find_cutpoints <- function(section_data, buffer_or_county,
 
     all_pls_out <- all_pls %>%
       dplyr::mutate(category = as.character(cut(all_pls$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "Missing", category))
+                    category = ifelse(is.na(category), "None recorded", category))
 
     df_out2 <- section_data %>%
       dplyr::mutate(category = as.character(cut(section_data$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "Missing", category))
+                    category = ifelse(is.na(category), "None recorded", category))
 
     buffer_pls <- df_out2 %>%
       dplyr::filter(source == "buffer") %>%
@@ -1036,8 +1054,8 @@ find_cutpoints <- function(section_data, buffer_or_county,
       dplyr::full_join(section_data, c("kg", "source", "group")) %>%
       dplyr::select(long, lat, group, kg, category)
 
-    if ("Missing" %in% unique(buffer_pls$category)) {
-      buffer_pls$category <- factor(buffer_pls$category, levels = c(labels, "Missing"))
+    if ("None recorded" %in% unique(buffer_pls$category)) {
+      buffer_pls$category <- factor(buffer_pls$category, levels = c(labels, "None recorded"))
     } else {
       buffer_pls$category <- factor(buffer_pls$category, levels = labels)
     }
@@ -1046,7 +1064,15 @@ find_cutpoints <- function(section_data, buffer_or_county,
 
   }
 
-  out <- list(df = df_out, categories = labels)
+  if ("None recorded" %in% unique(df_out$category)) {
+    labels <- c(labels, "None recorded")
+  }
+
+  percents <- sub("%", "", colnames(perc)) %>% as.numeric() / 100
+  cutoff <- perc %>% tidyr::gather("percentile", "kg") %>%
+    dplyr::mutate(percentile = percents)
+
+  out <- list(df = df_out, categories = labels, cutoff_values = cutoff)
 
   return(out)
 
