@@ -500,7 +500,7 @@ pur_out_df <- function(pur_filt, start_date, end_date, ...) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @importFrom rlang :=
-exp_df <- function(clean_pur_df, pls_percents, pls, pur_out, location,
+exp_df <- function(clean_pur_df, pls_percents, pur_out, location,
                    start_date, end_date, radius, buffer_area,
                    mtrs_mtr, section_township) {
 
@@ -682,10 +682,10 @@ row_out_df <- function(start_date, end_date, location, radius,
 #' contains the \code{exposure} data frame for the date range, and
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
 daterange_calcexp <- function(start_date, end_date, aerial_ground,
-                              buffer_area, chemicals,
+                              chemicals,
                               clean_pur_df,
-                              exp, location, pls, pls_percents,
-                              pur_filt, pur_out, radius) {
+                              location, pls_percents,
+                              pur_filt, radius) {
 
   if (chemicals == "all") {
     if ("section" %in% colnames(pur_filt)) {
@@ -727,11 +727,11 @@ daterange_calcexp <- function(start_date, end_date, aerial_ground,
   buffer_area <- pi * (radius^2)
 
   if ("section" %in% colnames(pur_filt)) {
-    exp <- exp_df(clean_pur_df, pls_percents, pls, pur_out, location, start_date,
+    exp <- exp_df(clean_pur_df, pls_percents, pur_out, location, start_date,
                   end_date, radius, buffer_area,
                   MTRS, section)
   } else {
-    exp <- exp_df(clean_pur_df, pls_percents, pls, pur_out, location, start_date,
+    exp <- exp_df(clean_pur_df, pls_percents, pur_out, location, start_date,
                   end_date, radius, buffer_area,
                   MTR, township)
   }
@@ -790,8 +790,9 @@ gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL)
 }
 
 #' helper function for map_exposure()
-plot_pls <- function(start_date, end_date, aerial_ground,
-                     chemicals, data_pls, gradient, location_longitude,
+plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
+                     none_recorded, data_pls,
+                     gradient, location_longitude,
                      location_latitude, buffer_df, buffer2, buffer,
                      buffer_or_county, alpha, clean_pur, pls_labels,
                      pls_labels_size, percentile, color_by) {
@@ -809,124 +810,238 @@ plot_pls <- function(start_date, end_date, aerial_ground,
 
   legend_label <- paste0("Applied Pesticides\n(kg/", s_t, ")")
 
-  full <- dplyr::filter(data_pls, percent > 0.999)
-  full_pls_df <- buffer_df %>%
-    dplyr::right_join(full, by = "pls") %>%
-    dplyr::select(long, lat, group, kg_intersection) %>%
-    dplyr::rename(kg = kg_intersection) %>%
-    unique()
+  if (!none_recorded) {
 
-  partial <- dplyr::filter(data_pls, percent <= 0.999)
-  partial_pls_df <- buffer_df %>%
-    dplyr::right_join(partial, by = "pls")
+    full <- dplyr::filter(data_pls, percent > 0.999)
+    full_pls_df <- buffer_df %>%
+      dplyr::right_join(full, by = "pls") %>%
+      dplyr::select(long, lat, group, kg_intersection) %>%
+      dplyr::rename(kg = kg_intersection) %>%
+      unique()
 
-  pls_partials <- unique(partial_pls_df$pls)
+    partial <- dplyr::filter(data_pls, percent <= 0.999)
+    partial_pls_df <- buffer_df %>%
+      dplyr::right_join(partial, by = "pls")
 
-  for (i in 1:length(pls_partials)) {
+    pls_partials <- unique(partial_pls_df$pls)
 
-    df2 <- dplyr::filter(partial_pls_df, pls == pls_partials[i])
+    if (length(pls_partials) != 0) {
+      for (i in 1:length(pls_partials)) {
 
-    pls <- dplyr::select(df2, long, lat)
-    pls <- pls[grDevices::chull(pls), ]
-    pls <- methods::as(pls, "gpc.poly")
+        df2 <- dplyr::filter(partial_pls_df, pls == pls_partials[i])
 
-    intersection <- raster::intersect(pls, buffer)
+        pls <- dplyr::select(df2, long, lat)
+        pls <- pls[grDevices::chull(pls), ]
+        pls <- methods::as(pls, "gpc.poly")
 
-    int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
-      dplyr::rename(long = x,
-                    lat = y) %>%
-      dplyr::mutate(group = paste0("int", i),
-                    kg = unique(df2$kg_intersection))
+        intersection <- raster::intersect(pls, buffer)
 
-    if (i == 1) {
-      out_int <- int_df
-    } else {
-      out_int <- rbind(out_int, int_df)
-    }
-  }
+        int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
+          dplyr::rename(long = x,
+                        lat = y) %>%
+          dplyr::mutate(group = paste0("int", i),
+                        kg = unique(df2$kg_intersection))
 
-  section_data <- rbind(out_int, full_pls_df)
-
-  plot <- section_data %>%
-    ggplot2::ggplot() +
-    ggplot2::theme_void()
-
-  if (color_by == "amount") {
-
-    plot <- plot +
-      geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
-                   color = "black") +
-      scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label)
-
-  } else if (color_by == "percentile") {
-
-    cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
-                                    start_date, end_date, aerial_ground,
-                                    chemicals, clean_pur, s_t, percentile)
-
-    section_data2 <- cutpoint_list$df
-
-    categories <- cutpoint_list$categories
-
-    if ("None recorded" %in% categories) {
-      n_cols <-  as.integer(length(gradient)/(length(categories)-1))
-      end_i <- length(categories)-1
-    } else {
-      n_cols <- as.integer(length(gradient)/length(categories))
-      end_i <- length(categories)
-    }
-    for (i in 1:end_i) {
-      col_vec <- gradient[n_cols*i]
-      if (i == 1) {
-        out <- col_vec
-      } else {
-        out <- c(out, col_vec)
+        if (i == 1) {
+          out_int <- int_df
+        } else {
+          out_int <- rbind(out_int, int_df)
+        }
       }
+
+      if (nrow(full_pls_df) != 0) {
+
+        section_data <- rbind(out_int, full_pls_df)
+
+      } else {
+
+        section_data <- out_int
+
+      }
+
+    } else if (nrow(full_pls_df) != 0) {
+
+      section_data <- full_pls_df
+
     }
 
-    if ("None recorded" %in% categories) {
-      out <- c(out, "#FFFFFF")
+    plot <- section_data %>%
+      ggplot2::ggplot() +
+      ggplot2::theme_void()
+
+    if (color_by == "amount") {
+
+      if (buffer_or_county == "buffer") {
+
+        plot <- plot +
+          geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
+                       color = "black") +
+          scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label,
+                                na.value = "#FFFFFF")
+
+      } else {
+
+        ##
+
+        if (!is.na(aerial_ground)) {
+          clean_pur <- clean_pur %>%
+            dplyr::filter(aerial_ground == aerial_ground)
+        }
+
+        if (chemicals != "all") {
+          if ("chemical_class" %in% colnames(clean_pur)) {
+            clean_pur <- clean_pur %>%
+              dplyr::filter(chemical_class == chemicals)
+          }
+        }
+
+        if (s_t == "section") {
+
+          clean_pur2 <- clean_pur %>%
+            dplyr::filter(date >= lubridate::ymd(start_date) &
+                            date <= lubridate::ymd(end_date)) %>%
+            dplyr::group_by(section) %>%
+            dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE))
+
+        } else if (s_t == "township") {
+
+          clean_pur2 <- clean_pur %>%
+            dplyr::filter(date >= lubridate::ymd(start_date) &
+                            date <= lubridate::ymd(end_date)) %>%
+            dplyr::group_by(township) %>%
+            dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE))
+
+        }
+
+        clean_pur3 <- clean_pur2 %>%
+          dplyr::mutate(source = "county")
+
+        limits <- c(min(clean_pur3$kg, na.rm = TRUE),
+                    max(clean_pur3$kg, na.rm = TRUE))
+
+        ##
+        plot <- plot +
+          geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
+                       color = "black") +
+          scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label,
+                                limits = limits, na.value = "#FFFFFF")
+      }
+
+
+
+    } else if (color_by == "percentile") {
+
+      cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
+                                      start_date, end_date, aerial_ground,
+                                      chemicals, clean_pur, s_t, percentile)
+
+      cutoff_values <- cutpoint_list$cutoff_values
+
+      section_data2 <- cutpoint_list$df
+
+      categories <- cutpoint_list$categories
+
+      if ("None recorded" %in% categories) {
+        n_cols <-  as.integer(length(gradient)/(length(categories)-1))
+        end_i <- length(categories)-1
+      } else {
+        n_cols <- as.integer(length(gradient)/length(categories))
+        end_i <- length(categories)
+      }
+      for (i in 1:end_i) {
+        col_vec <- gradient[n_cols*i]
+        if (i == 1) {
+          out <- col_vec
+        } else {
+          out <- c(out, col_vec)
+        }
+      }
+
+      if ("None recorded" %in% categories) {
+        out <- c(out, "#FFFFFF")
+      }
+
+      names(out) <- categories
+
+      plot <- plot +
+        ggplot2::geom_polygon(data = section_data2,
+                              ggplot2::aes(x = long, y = lat, group = group,
+                                           fill = category), color = "black") +
+        ggplot2::scale_fill_manual(values = out, name = legend_label)
+
     }
 
-    names(out) <- categories
+    plot <- plot + ggplot2::geom_polygon(data = buffer_df,
+                                         ggplot2::aes(x = long, y = lat, group = group),
+                                         color ="black", fill = NA) +
+      ggplot2::geom_point(x = location_longitude, y = location_latitude, size = 2)
 
-    plot <- plot +
-      ggplot2::geom_polygon(data = section_data2,
-                            ggplot2::aes(x = long, y = lat, group = group,
-                                         fill = category), color = "black") +
-      ggplot2::scale_fill_manual(values = out, name = legend_label)
+    if (pls_labels) {
+
+      df_all <- dplyr::select(pls_df, pls, DDLONG, DDLAT) %>% unique()
+
+      plot <- plot +
+        ggplot2::geom_text(data = df_all, ggplot2::aes(x = DDLONG, y = DDLAT,
+                                                       label = pls),
+                           size = pls_labels_size, fontface = "bold")
+
+    }
+
+    data_pls <- data_pls %>%
+      dplyr::mutate(start_date = zoo::as.Date(start_date),
+                    end_date = zoo::as.Date(end_date),
+                    chemicals = chemicals, aerial_ground = aerial_ground) %>%
+      dplyr::select(pls, percent, kg, kg_intersection, start_date, end_date,
+                    chemicals, aerial_ground, none_recorded, location, radius,
+                    area)
+
+  } else {
+
+    missing_buffer_df <- buffer_df %>% dplyr::mutate(perc_fill = "None recorded",
+                                                     scale_fill = "0")
+
+    if (color_by == "percentile") {
+
+      missing_plot <- ggplot(missing_buffer_df) +
+        geom_polygon(aes(x = long, y = lat, group = group, fill = perc_fill), color = "black") +
+        geom_point(x = location_longitude, y = location_latitude, color = "black",
+                   size = 2) +
+        theme_void() +
+        scale_fill_manual(name = legend_label, values = c("None recorded" = NA))
+
+    } else if (color_by == "amount") {
+
+      missing_plot <- ggplot(missing_buffer_df) +
+        geom_polygon(aes(x = long, y = lat, group = group, fill = scale_fill), color = "black") +
+        geom_point(x = location_longitude, y = location_latitude, color = "black",
+                   size = 2) +
+        theme_void() +
+        scale_fill_manual(name = legend_label, values = c("0" = NA))
+
+    }
+
+    plot <- missing_plot
+    start_date <- zoo::as.Date(start_date)
+    end_date <- zoo::as.Date(end_date)
+    data_pls <- data.frame(pls = "ALL", percent = NA,
+                           kg = 0, kg_intersection = NA,
+                           start_date = start_date,
+                           end_date = end_date,
+                           chemicals = NA,
+                           aerial_ground = NA,
+                           none_recorded = TRUE,
+                           location = unique(data_pls$location),
+                           radius = unique(data_pls$radius),
+                           area = unique(data_pls$area))
+
+    cutoff_values <- data.frame(percentile = percentile, kg = NA)
 
   }
-
-  plot <- plot + ggplot2::geom_polygon(data = buffer_df,
-                                       ggplot2::aes(x = long, y = lat, group = group),
-                                       color ="black", fill = NA) +
-    ggplot2::geom_point(x = location_longitude, y = location_latitude, size = 2)
-
-  if (pls_labels) {
-
-    df_all <- dplyr::select(pls_df, pls, DDLONG, DDLAT) %>% unique()
-
-    plot <- plot +
-      ggplot2::geom_text(data = df_all, ggplot2::aes(x = DDLONG, y = DDLAT,
-                                                     label = pls),
-                         size = pls_labels_size, fontface = "bold")
-
-  }
-
-  data_pls <- data_pls %>%
-    dplyr::mutate(start_date = zoo::as.Date(start_date),
-                  end_date = zoo::as.Date(end_date),
-                  chemicals = chemicals, aerial_ground = aerial_ground) %>%
-    dplyr::select(pls, percent, kg, kg_intersection, start_date, end_date,
-                  chemicals, aerial_ground, none_recorded, location, radius,
-                  area)
 
   if (color_by == "amount") {
     return(list(plot = plot, data = data_pls))
   } else if (color_by == "percentile") {
-    return(list(plot = plot, data = data_pls, cutoff_values =
-                  cutpoint_list$cutoff_values))
+    return(list(plot = plot, data = data_pls, cutoff_values = cutoff_values))
   }
 
 

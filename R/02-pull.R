@@ -360,7 +360,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
-                           aerial_ground = FALSE, verbose = TRUE,
+                           aerial_ground = TRUE, verbose = TRUE,
                            download_progress = FALSE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,

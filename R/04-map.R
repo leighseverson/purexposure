@@ -432,6 +432,8 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' clean_pur_df included in exposure_list.
 #'
+#' - returning plots for combinations for which exposure was recorded...
+#'
 #' @examples
 #' \dontrun{
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>%
@@ -447,17 +449,63 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' # return one plot, pls_data data frame, exposure row, and cutoff_values
 #' data frame for each exposure combination
 #'
-#' # scale colors based on buffer or on county
+#' dalton_list <- pull_clean_pur(2000, "modoc") %>%
+#'     calculate_exposure(location = "-121.4182, 41.9370",
+#'                        radius = 4000,
+#'                        time_period = "6 months",
+#'                        aerial_ground = TRUE) %>%
+#'     map_exposure(fill_option = "plasma")
+#' do.call("rbind", dalton_list$exposure)
+#' # one map for each exposure value (unique combination of chemicals,
+#' dates, and aerial/ground application)
+#' dalton_list$maps[[1]]
+#' dalton_list$maps[[2]]
+#' dalton_list$maps[[3]]
+#' dalton_list$maps[[4]]
+#' dalton_list$maps[[5]]
+#' dalton_list$maps[[6]]
 #'
+#' # exposure to a particular active ingredient
+#' # plot amounts instead of percentile categories
+#' chemical_df <- find_chemical_codes(2009, "metam-sodium") %>%
+#'      dplyr::rename(chemical_class = chemical)
 #'
+#' santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
+#'                               chemicals = chemical_df$chemname,
+#'                               sum_application = TRUE,
+#'                               sum = "chemical_class",
+#'                               chemical_class = chemical_df) %>%
+#'      calculate_exposure(location = "-119.6122, 34.90635",
+#'                         radius = 3000,
+#'                         time_period = "1 year",
+#'                         chemicals = "chemical_class") %>%
+#'      map_exposure("amount")
+#' do.call("rbind", santa_maria$exposure)
+#' santa_maria$maps[[1]]
+#' santa_maria$maps[[2]]
+#' santa_maria$maps[[3]]
+#'
+#' # scale colors based on buffer or county
+#' turk <- pull_clean_pur(1996, "fresno") %>%
+#'      dplyr::filter(chemname == "PHOSPHORIC ACID") %>%
+#'      calculate_exposure(location = "-120.218404, 36.1806",
+#'                         radius = 1500)
+#'
+#' map_exposure(turk, buffer_or_county = "county")$maps
+#' map_exposure(turk, buffer_or_county = "buffer")$maps
+#'
+#' map_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+#' map_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
 #'
-map_exposure <- function(exposure_list, color_by = "percentile",
+map_exposure <- function(exposure_list,
+                         color_by = "percentile",
                          buffer_or_county = "county",
                          percentile = c(0.25, 0.5, 0.75),
-                         fill_option = "viridis", alpha = 0.7,
+                         fill_option = "viridis",
+                         alpha = 0.7,
                          pls_labels = FALSE,
-                         pls_labels_size = 3) {
+                         pls_labels_size = 4) {
 
   buffer_df <- exposure_list$buffer_plot_df
 
@@ -466,6 +514,7 @@ map_exposure <- function(exposure_list, color_by = "percentile",
   pls_data <- exposure_list$meta_data %>%
     dplyr::group_by(start_date, end_date, aerial_ground, chemicals) %>%
     tidyr::nest()
+
   # each $data row is input into function below to return a plot.
 
   colormaps_vec <- unlist(colormap::colormaps)
@@ -476,7 +525,8 @@ map_exposure <- function(exposure_list, color_by = "percentile",
                 "colormap package."))
   }
 
-  gradient <- colormap::colormap(fill_option, nshades = 100, alpha = alpha)
+  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- c("#FFFFFF", gradient)
 
   location_longitude <- unique(exposure_list$exposure$longitude)
   location_latitude <- unique(exposure_list$exposure$latitude)
@@ -491,15 +541,38 @@ map_exposure <- function(exposure_list, color_by = "percentile",
   buffer <- buffer[grDevices::chull(buffer), ]
   buffer <- methods::as(buffer, "gpc.poly")
 
-  pls_data <- pls_data %>% dplyr::rename(data_pls = data)
+  # want pls_data in same order as exposure_list$exposure
 
-  suppressMessages(suppressWarnings(
-    out_maps <- purrr::pmap(pls_data, plot_pls, gradient, location_longitude,
-                            location_latitude, buffer_df, buffer2, buffer,
-                            buffer_or_county, alpha, clean_pur,
-                            pls_labels, pls_labels_size, percentile, color_by)
-    ## probs!!!
-  ))
+  pls_data <- exposure_list$exposure %>%
+    dplyr::select(start_date, end_date, chemicals, aerial_ground) %>%
+    dplyr::full_join(pls_data, by = c("start_date", "end_date", "aerial_ground",
+                                      "chemicals")) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(data_pls = data) %>%
+    dplyr::mutate(none_recorded = NA)
+
+  for (i in 1:nrow(pls_data)) {
+    data_pls_df <- pls_data$data_pls[[i]]
+    if (all(data_pls_df$none_recorded == TRUE)) {
+      pls_data$none_recorded[i] <- TRUE
+    } else {
+      pls_data$none_recorded[i] <- FALSE
+    }
+
+  }
+
+  pls_data <- pls_data %>% dplyr::select(1:4, 6, 5)
+
+  out_maps <- list()
+  for (i in 1:nrow(pls_data)) {
+    map <- plot_pls(pls_data$start_date[1], pls_data$end_date[1], pls_data$chemicals[1],
+                    pls_data$aerial_ground[1], pls_data$none_recorded[1],
+                    pls_data$data_pls[[1]], gradient, location_longitude,
+                    location_latitude, buffer_df, buffer2, buffer,
+                    buffer_or_county, alpha, clean_pur,
+                    pls_labels, pls_labels_size, percentile, color_by)
+    out_maps[[i]] <- map
+  }
 
   # reformat list
   plots <- list()
@@ -511,6 +584,13 @@ map_exposure <- function(exposure_list, color_by = "percentile",
     dfs[[i]] <- out_maps[[i]]$data
     cutoff_values[[i]] <- out_maps[[i]]$cutoff_values
     exposures[[i]] <- exposure_list$exposure[i,]
+  }
+
+  for (i in 1:length(exposures)) {
+    zero <- exposures[[i]]$exposure == 0
+    if (zero) {
+      exposures[[i]]$chemicals <- NA
+    }
   }
 
   if (color_by == "amount") {
