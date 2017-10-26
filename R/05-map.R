@@ -1,6 +1,6 @@
 #' Map a county's location in California
 #'
-#' \code{map_counties} returns one or multiple plots with county
+#' \code{map_county_locations} returns one or multiple plots with county
 #' locations in California given either a vector of county names or codes,
 #' or a PUR data frame with a \code{county_cd}, \code{county_name}, or
 #' \code{county_code} column (A data frame returned from either
@@ -26,12 +26,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' map_counties("fresno")
+#' map_county_locations("fresno")
 #'
 #' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"), verbose = FALSE)
-#' map_counties(pur_df)
+#' map_county_locations(pur_df)
 #'
-#' plot_list <- map_counties(c("san bernardino", "ventura"), one_plot = TRUE)
+#' plot_list <- map_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
 #' names(plot_list)
 #' plot_list[[1]]
 #' plot_list[[2]]
@@ -40,8 +40,8 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @export
-map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
-                         alpha = 0.5) {
+map_county_locations <- function(counties_or_df, one_plot = TRUE,
+                                 fill_color = "red", alpha = 0.5) {
 
   ca_shp <- purexposure::california_shp
   ca_df <- spdf_to_df(ca_shp)
