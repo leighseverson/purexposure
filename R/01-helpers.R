@@ -11,7 +11,7 @@
 #' @param year A four digit year.
 #'
 #' @return A data frame of raw PUR data for a single county and year.
-read_in_counties <- function(code_or_file, type, year) {
+help_read_in_counties <- function(code_or_file, type, year) {
 
   sm_year <- substr(year, 3, 4)
 
@@ -36,7 +36,7 @@ read_in_counties <- function(code_or_file, type, year) {
 
 #' Find California county code or name
 #'
-#' Given a county, \code{single_county_code} returns either the PUR
+#' Given a county, \code{help_find_code} returns either the PUR
 #' county code or name.
 #'
 #' This is a helper function for \code{find_counties}.
@@ -53,10 +53,10 @@ read_in_counties <- function(code_or_file, type, year) {
 #'   name.
 #'
 #' @examples
-#' single_county_code("01", find = "names")
-#' single_county_code("contra costa", find = "codes")
+#' help_find_code("01", find = "names")
+#' help_find_code("contra costa", find = "codes")
 #' @importFrom magrittr %>%
-single_county_code <- function(county, find = "codes") {
+help_find_code <- function(county, find = "codes") {
 
   code_df <- purexposure::county_codes
 
@@ -113,77 +113,9 @@ single_county_code <- function(county, find = "codes") {
 
 }
 
-#' Plot data frame spatial objects.
-#'
-#' \code{df_plot} plots a data frame spatial object. (A
-#' SpatialPolygonsDataFrame that has been "tidied" using the broom package.)
-#' Meant to be analogous to the ease of using plot() to quickly view a
-#' SpatialPolygonDataFrame object.
-#'
-#' @param df A data frame returned from the \code{spdf_to_df} function.
-#'
-#' @return A ggplot2 plot of the county.
-#'
-#' @examples
-#' \dontrun{
-#' shp <- pull_spdf("san diego", "township")
-#' df <- spdf_to_df(shp)
-#' df_plot(df)
-#' }
-#' @export
-df_plot <- function(df) {
-
-  plot <- ggplot2::ggplot(data = df, ggplot2::aes(x = long, y = lat,
-                                                  group = group)) +
-    ggplot2::geom_polygon(color = "black", fill = NA) +
-    ggplot2::theme_void()
-
-  return(plot)
-
-}
-
-#' Convert county SpatialPolygonsDataFrame to a tidy data frame.
-#'
-#' \code{spdf_to_df} converts a SpatialPolygonsDataFrame object returned from
-#' the \code{pull_spdf} function to a data frame.
-#'
-#' @param spdf A SpatialPolygonsDataFrame object returned from
-#' the \code{pull_spdf} function.
-#'
-#' @return A data frame with 24 columns if the \code{spdf} object is on the
-#' section level and 23 columns if the \code{spdf} object is on the township
-#' level.
-#'
-#' @examples
-#' \dontrun{
-#' df <- spdf_to_df(pull_spdf("fresno"))
-#' df2 <- spdf_to_df(pull_spdf("sonoma"))
-#'
-#' # use df_plot() function to easily plot the output data frames:
-#' df_plot(df)
-#' df_plot(df2)
-#' }
-#' @importFrom magrittr %>%
-#' @export
-spdf_to_df <- function(spdf) {
-
-  df <- suppressMessages(sp::merge(broom::tidy(spdf), as.data.frame(spdf),
-                                   by.x = "id", by.y = 0))
-
-  if ("MTRS" %in% colnames(df)) {
-    df <- df %>% dplyr::mutate(MTRS = as.character(MTRS))
-  }
-  if ("MTR" %in% colnames(df)) {
-    df <- df %>% dplyr::mutate(MTR = as.character(MTR))
-  }
-
-  return(df)
-
-}
-
 #' Sum application
 #'
-#' \code{sum_application_by} sums application of a PUR dataset by chemicals,
+#' \code{help_sum_application} sums application of a PUR dataset by chemicals,
 #' PLS unit, and aerial/ground application.
 #'
 #' This is a helper function for \code{pull_clean_pur}.
@@ -201,9 +133,9 @@ spdf_to_df <- function(spdf) {
 #' variables supplied to the \code{...} argument.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-sum_application_by <- function(df, sum, unit, aerial_ground,
-                               section_townships, chemical_class = NULL,
-                               ...) {
+help_sum_application <- function(df, sum, unit, aerial_ground,
+                                 section_townships, chemical_class = NULL,
+                                 ...) {
 
   group_by_vars <- rlang::quos(...)
 
@@ -241,7 +173,7 @@ sum_application_by <- function(df, sum, unit, aerial_ground,
                   section, township, county_name, county_code,
                   date, aerial_ground, use_no, outlier)
 
-  cols_to_remove <- purrr::map_dfr(colnames(df), remove_cols, df = df) %>%
+  cols_to_remove <- purrr::map_dfr(colnames(df), help_remove_cols, df = df) %>%
     dplyr::filter(all_missing == T) %>%
     dplyr::select(col) %>%
     tibble_to_vector()
@@ -256,7 +188,7 @@ sum_application_by <- function(df, sum, unit, aerial_ground,
 
 #' Remove columns with all missing values
 #'
-#' Given a quoted column name and its data frame, \code{remove_cols} determines
+#' Given a quoted column name and its data frame, \code{help_remove_cols} determines
 #' if that column has all missing values or not.
 #'
 #' This is a helper function for \code{sum_application}.
@@ -266,7 +198,7 @@ sum_application_by <- function(df, sum, unit, aerial_ground,
 #'
 #' @return A data frame with two columns: \code{col} gives the column name, and
 #' \code{all_missing} is a logical value.
-remove_cols <- function(col_quote, df) {
+help_remove_cols <- function(col_quote, df) {
 
   col_name <- rlang::quo_name(col_quote)
   vals <- df %>% dplyr::select(!!col_name) %>% tibble_to_vector()
@@ -277,55 +209,9 @@ remove_cols <- function(col_quote, df) {
 
 }
 
-#' Calculate euclidean distance between two points.
-#'
-#' \code{euc_distance} calculates the straight-line distance between
-#' two points.
-#'
-#' This is a helper function for \code{calculate_exposure}.
-#'
-#' @param long Longitude (x) of second point
-#' @param lat Latitude (y) of second point
-#' @param origin_long Longitude (x) of first point
-#' @param origin_lat Latitude (y) of first point
-#'
-#' @return A data frame with one row and three columns: \code{long} and
-#' \code{lat} give the second point's coordinates, and \code{dist} gives the
-#' euclidian distance from these coordinates from the origin.
-euc_distance <- function(long, lat, origin_long, origin_lat) {
-
-  x <- abs(lat - origin_lat)
-  y <- abs(long - origin_long)
-  dist <- sqrt((x^2) + (y^2))
-  out <- data.frame(long = long, lat = lat, dist = dist)
-
-  return(out)
-
-}
-
-#' Return a character vector from a tibble with one column.
-#'
-#' \code{tibble_to_vector} takes a tibble with one column and returns the
-#' values in that column as a character vector.
-#'
-#' This is a helper function for \code{pull_raw_pur}, \code{pull_clean_pur},
-#' and \code{pur_filt_df}.
-#'
-#' @param tib A tibble with only one column.
-#'
-#' @return A character vector.
-#' @importFrom magrittr %>%
-tibble_to_vector <- function(tib) {
-
-  vec <- tib %>% dplyr::pull(1) %>% as.character()
-
-  return(vec)
-
-}
-
 #' Find PLS units intersecting with a buffer.
 #'
-#' \code{pur_filt_df} filters a SpatialPolygonsDataFrame to include only PLS
+#' \code{help_filter_pls} filters a SpatialPolygonsDataFrame to include only PLS
 #' units intersecting with a buffer, and filters the data frame returned from
 #' \code{pull_clean_pur} to include only those sections or townships.
 #'
@@ -352,7 +238,7 @@ tibble_to_vector <- function(tib) {
 #' }
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
-pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
+help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
                         clean_pur_df) {
 
   pls_var <- rlang::enquo(pls)
@@ -447,10 +333,10 @@ pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
 
 #' Find summed applied active ingredients
 #'
-#' \code{pur_out_df} finds the summed amount of applied active ingredients by
+#' \code{help_sum_ai} finds the summed amount of applied active ingredients by
 #' section or township, chemical class, and aerial/ground application.
 #'
-#' This is a helper function for \code{daterange_calcexp}.
+#' This is a helper function for \code{help_calculate_exposure}.
 #'
 #' @param ... A list of variables to group by. Options include \code{section},
 #' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted
@@ -462,7 +348,7 @@ pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
 #' depending on the grouping variables.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-pur_out_df <- function(pur_filt, start_date, end_date, ...) {
+help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 
   group_by <- rlang::quos(...)
 
@@ -476,12 +362,12 @@ pur_out_df <- function(pur_filt, start_date, end_date, ...) {
 
 }
 
-#' Return a the \code{meta_data} data frame
+#' Return a \code{meta_data} data frame
 #'
-#' \code{exp_df} returns a data frame to be output as the \code{meta_data}
+#' \code{help_write_md} returns a data frame to be output as the \code{meta_data}
 #' element in the list returned from \code{calculate_exposure}.
 #'
-#' This is a helper function for \code{daterange_calcexp}.
+#' This is a helper function for \code{help_calculate_exposure}.
 #'
 #' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted
 #' @param section_township Either \code{section} or \code{township}. Not quoted
@@ -499,7 +385,7 @@ pur_out_df <- function(pur_filt, start_date, end_date, ...) {
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @importFrom rlang :=
-exp_df <- function(clean_pur_df, pls_percents, pur_out, location,
+help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                    start_date, end_date, radius, buffer_area,
                    mtrs_mtr, section_township) {
 
@@ -580,11 +466,11 @@ exp_df <- function(clean_pur_df, pls_percents, pur_out, location,
 
 #' Return a single exposure value for each combination of conditions.
 #'
-#' \code{exp_out_val} returns a data frame with exposure values (kg/m^2) by
+#' \code{help_calc_exp} returns a data frame with exposure values (kg/m^2) by
 #' chemicals (including \code{chemicals = "all"}) or by chemicals and aerial/ground
 #' application.
 #'
-#' This is a helper function for \code{daterange_calcexp}.
+#' This is a helper function for \code{help_calculate_exposure}.
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #' quoted
@@ -595,7 +481,7 @@ exp_df <- function(clean_pur_df, pls_percents, pur_out, location,
 #' relevant condition.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-exp_out_val <- function(exp, buffer_area, ...) {
+help_calc_exp <- function(exp, buffer_area, ...) {
 
   group_by_vars <- rlang::quos(...)
 
@@ -609,28 +495,28 @@ exp_out_val <- function(exp, buffer_area, ...) {
 
 #' Return a data frame with exposure values and other related data.
 #'
-#' For a single date range, \code{row_out_df} returns a data frame with exposure
-#' values calculated from \code{exp_out_val} as well as other relevant data.
-#' This one row data frame is combined with data frames for other date ranges and
-#' then returned as the \code{exposure} element from a \code{calculate_exposure}
-#' list.
+#' For a single date range, \code{help_return_exposure} returns a data frame with
+#' exposure values calculated from \code{help_calc_exp} as well as other relevant
+#' data. This one row data frame is combined with data frames for other date
+#' ranges and then returned as the \code{exposure} element from a
+#' \code{calculate_exposure} list.
 #'
-#' This is a helper function for \code{daterange_calcexp}.
+#' This is a helper function for \code{help_calculate_exposure}.
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #'   quoted.
-#' @inheritParams exp_df
+#' @inheritParams help_write_md
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
-row_out_df <- function(start_date, end_date, location, radius,
-                       exp, buffer_area, ...) {
+help_return_exposure <- function(start_date, end_date, location, radius,
+                                 exp, buffer_area, ...) {
 
   vars <- rlang::quos(...)
 
-  row_out_0 <- exp_out_val(exp, buffer_area, !!!vars)
+  row_out_0 <- help_calc_exp(exp, buffer_area, !!!vars)
 
   if ("aerial_ground" %in% colnames(row_out_0)) {
 
@@ -661,7 +547,7 @@ row_out_df <- function(start_date, end_date, location, radius,
 
 #' Return exposure data for a single start and end date
 #'
-#' For a single date range, \code{daterange_calcexp} returns the
+#' For a single date range, \code{help_calculate_exposure} returns the
 #' \code{exposure} and \code{meta_data} data frames to be output in the
 #' \code{calculate_exposure} list as a nested data frame.
 #'
@@ -669,7 +555,7 @@ row_out_df <- function(start_date, end_date, location, radius,
 #'
 #' @param start_date A date, "yyyy-mm-dd"
 #' @param end_date A date, "yyyy-mm-dd"
-#' @inheritParams exp_df A data frame
+#' @inheritParams help_write_md A data frame
 #' @inheritParams pur_out_df A data frame
 #' @inheritParams row_out_df A data frame
 #' @inheritParams exp_out_val An exposure value
@@ -681,7 +567,7 @@ row_out_df <- function(start_date, end_date, location, radius,
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
 #'
 #' @importFrom dplyr %>%
-daterange_calcexp <- function(start_date, end_date, aerial_ground,
+help_calculate_exposure <- function(start_date, end_date, aerial_ground,
                               chemicals,
                               clean_pur_df,
                               location, pls_percents,
@@ -690,35 +576,35 @@ daterange_calcexp <- function(start_date, end_date, aerial_ground,
   if (chemicals == "all") {
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               section, aerial_ground)
       } else {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               section)
       }
     } else {
       if (aerial_ground) {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               township, aerial_ground)
       } else {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date, township)
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date, township)
       }
     }
   } else {
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               section, chemical_class, aerial_ground)
       } else {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               section, chemical_class)
       }
     } else {
       if (aerial_ground) {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               township, chemical_class, aerial_ground)
       } else {
-        pur_out <- pur_out_df(pur_filt, start_date, end_date,
+        pur_out <- help_sum_ai(pur_filt, start_date, end_date,
                               township, chemical_class)
       }
     }
@@ -727,20 +613,20 @@ daterange_calcexp <- function(start_date, end_date, aerial_ground,
   buffer_area <- pi * (radius^2)
 
   if ("section" %in% colnames(pur_filt)) {
-    exp <- exp_df(clean_pur_df, pls_percents, pur_out, location, start_date,
+    exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
                   end_date, radius, buffer_area,
                   MTRS, section)
   } else {
-    exp <- exp_df(clean_pur_df, pls_percents, pur_out, location, start_date,
+    exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
                   end_date, radius, buffer_area,
                   MTR, township)
   }
 
   if (aerial_ground) {
-    row_out <- row_out_df(start_date, end_date, location, radius, exp, buffer_area,
+    row_out <- help_return_exposure(start_date, end_date, location, radius, exp, buffer_area,
                           chemicals, aerial_ground)
   } else {
-    row_out <- row_out_df(start_date, end_date, location, radius, exp, buffer_area,
+    row_out <- help_return_exposure(start_date, end_date, location, radius, exp, buffer_area,
                           chemicals)
   }
 
@@ -752,52 +638,15 @@ daterange_calcexp <- function(start_date, end_date, aerial_ground,
 
 }
 
-#' Include alpha in ggplot2::scale_fill_gradientn()
-#'
-#' This function adds an `alpha` argument to scale_fill_gradientn() from the
-#' ggplot2 package.
-scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
-                                  na.value = "grey50", guide = "colourbar", colors,
-                                  alpha = NULL) {
-  colours <- if (missing(colours)) colors else colours
-
-  continuous_scale("fill", "gradientn",
-                   gradient_n_pal2(colours, values, space, alpha = alpha),
-                   na.value = na.value, guide = guide, ...)
-}
-
-#' Include alpha option in scales::gradient_n_pal()
-#'
-#' This function adds an "alpha" argument from gradient_n_pal() from the scales
-#' package.
-gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL) {
-  if (!identical(space, "Lab")) {
-    warning("Non Lab interpolation is deprecated", call. = FALSE)
-  }
-  ramp <- colour_ramp(colours, alpha = alpha)
-
-  function(x) {
-    if (length(x) == 0) return(character())
-
-    if (!is.null(values)) {
-      xs <- seq(0, 1, length.out = length(values))
-      f <- stats::approxfun(values, xs)
-      x <- f(x)
-    }
-
-    ramp(x)
-  }
-}
-
 #' Return a map for a given exposure estimate.
 #'
 #' For a unique combination of time periods, chemicals, and application methods,
-#' \code{plot_pls} returns a plot showing amounts of pesticides applied for PLS
+#' \code{help_map_exp} returns a plot showing amounts of pesticides applied for PLS
 #' units intersecting with the buffer.
 #'
 #' This is a helper function for \code{map_exposure}.
 #'
-#' @inheritParams exp_df
+#' @inheritParams help_write_md
 #' @param data_pls A data frame
 #' @param gradient A character vector of hex color codes
 #' @param location_longitude A numeric longitude value
@@ -822,7 +671,7 @@ gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL)
 #' }
 #'
 #' @importFrom dplyr %>%
-plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
+help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
                      none_recorded, data_pls,
                      gradient, location_longitude,
                      location_latitude, buffer_df, buffer2, buffer,
@@ -963,9 +812,10 @@ plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
 
     } else if (color_by == "percentile") {
 
-      cutpoint_list <- find_cutpoints(section_data, buffer_or_county = buffer_or_county,
-                                      start_date, end_date, aerial_ground,
-                                      chemicals, clean_pur, s_t, percentile)
+      cutpoint_list <- help_categorize(section_data,
+                                       buffer_or_county = buffer_or_county,
+                                       start_date, end_date, aerial_ground,
+                                       chemicals, clean_pur, s_t, percentile)
 
       cutoff_values <- cutpoint_list$cutoff_values
 
@@ -1083,14 +933,14 @@ plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
 #' Categorize a continuous scale by percentile cutpoints
 #'
 #' Given a data frame with a column with a continuous numeric variable,
-#' \code{find_cutpoints} returns the data frame with a new column categorizing
+#' \code{help_categorize} returns the data frame with a new column categorizing
 #' that continuous variable by percentile cutpoints.
 #'
-#' This is a helper function for \code{plot_pls}.
+#' This is a helper function for \code{help_map_exp}.
 #'
 #' @param section_data A data frame with a continuous numeric variable ("kg")
 #' @param buffer_or_county Should cutpoints be determined by "county" or "buffer"?
-#' @inheritParams exp_df
+#' @inheritParams help_write_md
 #' @param clean_pur A \code{pull_clean_pur} data frame
 #' @param s_t "section" or "township"
 #' @param percentile A numeric vector in (0, 1).
@@ -1099,7 +949,7 @@ plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
 #' named \code{category}.
 #'
 #' @importFrom dplyr %>%
-find_cutpoints <- function(section_data, buffer_or_county,
+help_categorize <- function(section_data, buffer_or_county,
                            start_date = NULL, end_date = NULL,
                            aerial_ground = NULL, chemicals = NULL,
                            clean_pur = NULL, s_t = NULL, percentile) {

@@ -315,9 +315,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                                    date <= lubridate::ymd(max(time_df$end_date)))
 
   if ("section" %in% colnames(clean_pur_df)) {
-    out_list <- pur_filt_df(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
+    out_list <- help_filter_df(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
   } else {
-    out_list <- pur_filt_df(MTR, "MTR", which_pls, shp, buffer, df, clean_pur_df)
+    out_list <- help_filter_df(MTR, "MTR", which_pls, shp, buffer, df, clean_pur_df)
   }
 
   pur_filt <- out_list$pur_filt
@@ -326,7 +326,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   pls_int <- out_list$pls_int
 
   out <- purrr::map2(time_df$start_date, time_df$end_date,
-                     daterange_calcexp, aerial_ground, chemicals,
+                     help_calculate_exposure, aerial_ground, chemicals,
                      clean_pur_df, location, pls_percents, pur_filt,
                      radius)
 

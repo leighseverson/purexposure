@@ -52,7 +52,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 
     codes <- find_counties(counties[[1]])
 
-    counties_in_year <- purrr::map_dfr(codes, read_in_counties, type = "codes",
+    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
                                        year = year) %>%
       dplyr::arrange(applic_dt, county_cd)
 
@@ -60,7 +60,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 
     files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
 
-    counties_in_year <- purrr::map_dfr(files, read_in_counties, type = "files",
+    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
                                        year = year) %>%
       dplyr::arrange(applic_dt, county_cd)
 
@@ -531,13 +531,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     if (sum == "all") {
       if (unit == "section") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "all", "section", TRUE,
+          out <- help_sum_application(out, "all", "section", TRUE,
                                     section_townships,
                                     chem_code,
                                     chemname, section, county_name, county_code,
                                     date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "all", "section", FALSE,
+          out <- help_sum_application(out, "all", "section", FALSE,
                                     section_townships,
                                     chem_code,
                                     chemname, section, county_name, county_code,
@@ -545,13 +545,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
         }
       } else if (unit == "township") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "all", "township", TRUE,
+          out <- help_sum_application(out, "all", "township", TRUE,
                                     section_townships,
                                     chem_code,
                                     chemname, township, county_name, county_code,
                                     date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "all", "township", FALSE,
+          out <- help_sum_application(out, "all", "township", FALSE,
                                     section_townships,
                                     chem_code,
                                     chemname, township, county_name, county_code,
@@ -588,13 +588,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
       if (unit == "section") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "chemical_class", "section", TRUE,
+          out <- help_sum_application(out, "chemical_class", "section", TRUE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, section, county_name,
                                     county_code, date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "chemical_class", "section", FALSE,
+          out <- help_sum_application(out, "chemical_class", "section", FALSE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, section, county_name,
@@ -602,13 +602,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
         }
       } else if (unit == "township") {
         if (aerial_ground) {
-          out <- sum_application_by(out, "chemical_class", "township", TRUE,
+          out <- help_sum_application(out, "chemical_class", "township", TRUE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, township, county_name,
                                     county_code, date, aerial_ground)
         } else {
-          out <- sum_application_by(out, "chemical_class", "township", FALSE,
+          out <- help_sum_application(out, "chemical_class", "township", FALSE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, township, county_name,

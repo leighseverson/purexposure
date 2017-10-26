@@ -312,7 +312,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   if (color_by == "percentile") {
 
-    cutpoints_list <- find_cutpoints(section_data = pur_df2, buffer_or_county = "buffer",
+    cutpoints_list <- help_categorize(section_data = pur_df2, buffer_or_county = "buffer",
                                      percentile = percentile) # find cutpoints based on
                                                               # given data frame
     pur_df3 <- cutpoints_list$df
@@ -585,12 +585,13 @@ map_exposure <- function(exposure_list,  color_by = "amount",
 
   out_maps <- list()
   for (i in 1:nrow(pls_data)) {
-    map <- plot_pls(pls_data$start_date[1], pls_data$end_date[1], pls_data$chemicals[1],
-                    pls_data$aerial_ground[1], pls_data$none_recorded[1],
-                    pls_data$data_pls[[1]], gradient, location_longitude,
-                    location_latitude, buffer_df, buffer2, buffer,
-                    buffer_or_county, alpha, clean_pur,
-                    pls_labels, pls_labels_size, percentile, color_by)
+    map <- help_map_exp(pls_data$start_date[1], pls_data$end_date[1],
+                        pls_data$chemicals[1], pls_data$aerial_ground[1],
+                        pls_data$none_recorded[1], pls_data$data_pls[[1]],
+                        gradient, location_longitude, location_latitude,
+                        buffer_df, buffer2, buffer, buffer_or_county, alpha,
+                        clean_pur, pls_labels, pls_labels_size, percentile,
+                        color_by)
     out_maps[[i]] <- map
   }
 
