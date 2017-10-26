@@ -783,9 +783,9 @@ pull_product_table <- function(year, download_progress = FALSE) {
     quiet <- TRUE
   }
 
+  setwd(dir)
   download.file(url, destfile = file, mode = "wb", quiet = quiet)
   unzip(file, exdir = dir)
-  setwd(dir)
 
   suppressWarnings(suppressMessages(
     product_file <- readr::read_csv("product.txt") %>%
