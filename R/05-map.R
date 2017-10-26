@@ -37,7 +37,7 @@
 #' plot_list[[2]]
 #' }
 #'
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @export
 map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
@@ -217,7 +217,7 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #' op_yuba$map
 #' }
 #'
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @importFrom rlang :=
 #' @export
@@ -521,7 +521,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' map_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
 #' map_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 map_exposure <- function(exposure_list,  color_by = "amount",
                          buffer_or_county = "county",
                          percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",

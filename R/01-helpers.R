@@ -113,7 +113,7 @@ help_find_code <- function(county, find = "codes") {
 
 }
 
-#' Sum application
+#' Sum application by section, township, chemical, and method of application
 #'
 #' \code{help_sum_application} sums application of a PUR dataset by chemicals,
 #' PLS unit, and aerial/ground application.
@@ -195,6 +195,8 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
 #'
 #' @return A data frame with two columns: \code{col} gives the column name, and
 #' \code{all_missing} is a logical value.
+#' @importFrom magrittr %>%
+#' @importFrom rlang !!
 help_remove_cols <- function(col_quote, df) {
 
   col_name <- rlang::quo_name(col_quote)
@@ -554,24 +556,22 @@ help_return_exposure <- function(start_date, end_date, location, radius,
 #'
 #' @importFrom magrittr %>%
 help_calculate_exposure <- function(start_date, end_date, aerial_ground,
-                              chemicals,
-                              clean_pur_df,
-                              location, pls_percents,
-                              pur_filt, radius) {
+                                    chemicals, clean_pur_df, location,
+                                    pls_percents, pur_filt, radius) {
 
   if (chemicals == "all") {
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              section, aerial_ground)
+                               section, aerial_ground)
       } else {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              section)
+                               section)
       }
     } else {
       if (aerial_ground) {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              township, aerial_ground)
+                               township, aerial_ground)
       } else {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date, township)
       }
@@ -580,18 +580,18 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
     if ("section" %in% colnames(pur_filt)) {
       if (aerial_ground) {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              section, chemical_class, aerial_ground)
+                               section, chemical_class, aerial_ground)
       } else {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              section, chemical_class)
+                               section, chemical_class)
       }
     } else {
       if (aerial_ground) {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              township, chemical_class, aerial_ground)
+                               township, chemical_class, aerial_ground)
       } else {
         pur_out <- help_sum_ai(pur_filt, start_date, end_date,
-                              township, chemical_class)
+                               township, chemical_class)
       }
     }
   }
@@ -600,20 +600,21 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 
   if ("section" %in% colnames(pur_filt)) {
     exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
-                  end_date, radius, buffer_area,
-                  MTRS, section)
+                         end_date, radius, buffer_area,
+                         MTRS, section)
   } else {
     exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
-                  end_date, radius, buffer_area,
-                  MTR, township)
+                         end_date, radius, buffer_area,
+                         MTR, township)
   }
 
   if (aerial_ground) {
-    row_out <- help_return_exposure(start_date, end_date, location, radius, exp, buffer_area,
-                          chemicals, aerial_ground)
+    row_out <- help_return_exposure(start_date, end_date, location, radius, exp,
+                                    buffer_area,
+                                    chemicals, aerial_ground)
   } else {
-    row_out <- help_return_exposure(start_date, end_date, location, radius, exp, buffer_area,
-                          chemicals)
+    row_out <- help_return_exposure(start_date, end_date, location, radius, exp,
+                                    buffer_area, chemicals)
   }
 
   nested_df <- list(row_out = list(row_out), meta_data = list(exp))
@@ -652,7 +653,7 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 #'   \code{color_by = "percentile"}}
 #' }
 #'
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
                      none_recorded, data_pls,
                      gradient, location_longitude,
@@ -929,7 +930,7 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 #' @return The input \code{section_data} data frame with an additional column
 #' named \code{category}.
 #'
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 help_categorize <- function(section_data, buffer_or_county,
                            start_date = NULL, end_date = NULL,
                            aerial_ground = NULL, chemicals = NULL,
