@@ -81,6 +81,7 @@ spdf_to_df <- function(spdf) {
 #' @return A data frame with one row and three columns: \code{long} and
 #' \code{lat} give the second point's coordinates, and \code{dist} gives the
 #' euclidian distance from these coordinates from the origin.
+#' @export
 euc_distance <- function(long, lat, origin_long, origin_lat) {
 
   x <- abs(lat - origin_lat)
@@ -104,6 +105,7 @@ euc_distance <- function(long, lat, origin_long, origin_lat) {
 #'
 #' @return A character vector.
 #' @importFrom magrittr %>%
+#' @export
 tibble_to_vector <- function(tib) {
 
   vec <- tib %>% dplyr::pull(1) %>% as.character()
@@ -116,25 +118,27 @@ tibble_to_vector <- function(tib) {
 #'
 #' This function adds an `alpha` argument to scale_fill_gradientn() from the
 #' ggplot2 package.
+#' @export
 scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
                                   na.value = "grey50", guide = "colourbar", colors,
                                   alpha = NULL) {
   colours <- if (missing(colours)) colors else colours
 
-  continuous_scale("fill", "gradientn",
-                   gradient_n_pal2(colours, values, space, alpha = alpha),
-                   na.value = na.value, guide = guide, ...)
+  ggplot2::continuous_scale("fill", "gradientn",
+                            gradient_n_pal2(colours, values, space, alpha = alpha),
+                            na.value = na.value, guide = guide, ...)
 }
 
 #' Include alpha option in scales::gradient_n_pal()
 #'
 #' This function adds an "alpha" argument from gradient_n_pal() from the scales
 #' package.
+#' @export
 gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL) {
   if (!identical(space, "Lab")) {
     warning("Non Lab interpolation is deprecated", call. = FALSE)
   }
-  ramp <- colour_ramp(colours, alpha = alpha)
+  ramp <- scales::colour_ramp(colours, alpha = alpha)
 
   function(x) {
     if (length(x) == 0) return(character())

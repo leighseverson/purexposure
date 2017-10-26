@@ -8,7 +8,7 @@
 #' @param code_or_file A PUR county code or a file name for a county's dataset.
 #' @param type Either "codes" or "files", specifying the type of argument supplied
 #' to \code{code_or_file}.
-#' @param year A four digit year.
+#' @inheritParams pull_pur_file
 #'
 #' @return A data frame of raw PUR data for a single county and year.
 help_read_in_counties <- function(code_or_file, type, year) {
@@ -120,12 +120,9 @@ help_find_code <- function(county, find = "codes") {
 #'
 #' This is a helper function for \code{pull_clean_pur}.
 #'
+#' @inheritParams pull_clean_pur
 #' @param df A data frame from \code{pull_clean_pur} before summing has taken
 #' place
-#' @param sum "all" or "chemical_class"
-#' @param unit either "section" or "township"
-#' @param aerial_ground TRUE / FALSE
-#' @param chemical_class A chemical_class data frame
 #' @param section_townships A section_townships data frame
 #' @param ... grouping variables
 #'
@@ -191,7 +188,7 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
 #' Given a quoted column name and its data frame, \code{help_remove_cols} determines
 #' if that column has all missing values or not.
 #'
-#' This is a helper function for \code{sum_application}.
+#' This is a helper function for \code{help_sum_application}.
 #'
 #' @param col_quote A quoted column name
 #' @param df A data frame
@@ -217,13 +214,13 @@ help_remove_cols <- function(col_quote, df) {
 #'
 #' This is a helper function for \code{calculate_exposure}.
 #'
+#' @inheritParams calculate_exposure
 #' @param pls Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted
 #' @param pls_quote Either \code{"MTRS"} or \code{"MTR"}
 #' @param which_pls A vector of character string PLS units
 #' @param shp A county's shapefile
 #' @param buffer A data frame with buffer coordinates
 #' @param df A data frame
-#' @param clean_pur_df A \code{pull_clean_pur} data frame
 #'
 #' @return A list with four elements:
 #' \describe{
@@ -340,9 +337,7 @@ help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
 #'
 #' @param ... A list of variables to group by. Options include \code{section},
 #' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted
-#' @param pur_filt A data frame
-#' @param start_date A date
-#' @param end_date A date
+#' @inheritParams help_calculate_exposure
 #'
 #' @return A data frame a \code{kg} column and one to three additional columns,
 #' depending on the grouping variables.
@@ -369,15 +364,10 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 #'
 #' This is a helper function for \code{help_calculate_exposure}.
 #'
+#' @inheritParams help_calculate_exposure
 #' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted
 #' @param section_township Either \code{section} or \code{township}. Not quoted
-#' @param clean_pur_df A data frame
-#' @param pls_percents A data frame with PLS ids and percent intersections
 #' @param pur_out A data frame
-#' @param location A string giving the exposure estimate location
-#' @param start_date A date
-#' @param end_date A date
-#' @param radius A numeric value
 #' @param buffer_area A numeric value
 #'
 #' @return A data frame with the twelve columns in the
@@ -475,8 +465,8 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #' quoted
 #' @param exp A data frame
-#' @param buffer_area A numeric value
-#'
+#' @inheritParams help_calculate_exposure
+#
 #' @return A data frame with exposure values in kg/m^2 at a location for each
 #' relevant condition.
 #' @importFrom magrittr %>%
@@ -505,7 +495,8 @@ help_calc_exp <- function(exp, buffer_area, ...) {
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #'   quoted.
-#' @inheritParams help_write_md
+#' @inheritParams help_calculate_exposure
+#' @inheritParams help_calc_exp
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
@@ -553,20 +544,15 @@ help_return_exposure <- function(start_date, end_date, location, radius,
 #'
 #' This is a helper function for \code{calculate_exposure}.
 #'
-#' @param start_date A date, "yyyy-mm-dd"
-#' @param end_date A date, "yyyy-mm-dd"
-#' @inheritParams help_write_md A data frame
-#' @inheritParams pur_out_df A data frame
-#' @inheritParams row_out_df A data frame
-#' @inheritParams exp_out_val An exposure value
-#' @param chemicals Either "all" or "chemical_class"
-#' @param aerial_ground TRUE / FALSE
+#' @inheritParams calculate_exposure
+#' @param pls_percents A data frame
+#' @param pur_filt A data frame
 #'
 #' @return A nested data frame with two columns: The \code{row_out} column
 #' contains the \code{exposure} data frame for the date range, and
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
 #'
-#' @importFrom dplyr %>%
+#' @importFrom magrittr %>%
 help_calculate_exposure <- function(start_date, end_date, aerial_ground,
                               chemicals,
                               clean_pur_df,
@@ -646,7 +632,8 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 #'
 #' This is a helper function for \code{map_exposure}.
 #'
-#' @inheritParams help_write_md
+#' @inheritParams map_exposure
+#' @inheritParams calculate_exposure
 #' @param data_pls A data frame
 #' @param gradient A character vector of hex color codes
 #' @param location_longitude A numeric longitude value
@@ -655,19 +642,14 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 #' @param buffer_df A data frame
 #' @param buffer2 A data frame
 #' @param buffer A gpc.poly object
-#' @param alpha A number in [0,1]
 #' @param clean_pur A \code{clean_pur_df} data frame
-#' @param pls_labels TRUE / FALSE
-#' @param pls_labels_size A number
-#' @param percentile A numeric vector
-#' @param color_by "amount" or "percentile"
 #'
 #' @return A list with three elements:
 #' \describe{
 #'   \item{plot}{An exposure plot}
-#'   \item{data}{A data frame with information about each PLS unit}{
+#'   \item{data}{A data frame with information about each PLS unit}
 #'   \item{cutoff_values}{A data frame with cutoff values returned if
-#'   \code{color_by = "percentile"}
+#'   \code{color_by = "percentile"}}
 #' }
 #'
 #' @importFrom dplyr %>%
@@ -938,12 +920,11 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 #'
 #' This is a helper function for \code{help_map_exp}.
 #'
-#' @param section_data A data frame with a continuous numeric variable ("kg")
+#' @inheritParams help_map_exp
+#' @param section_data A data frame with a continuous numeric variable named "kg"
 #' @param buffer_or_county Should cutpoints be determined by "county" or "buffer"?
-#' @inheritParams help_write_md
 #' @param clean_pur A \code{pull_clean_pur} data frame
 #' @param s_t "section" or "township"
-#' @param percentile A numeric vector in (0, 1).
 #'
 #' @return The input \code{section_data} data frame with an additional column
 #' named \code{category}.
