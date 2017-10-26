@@ -331,13 +331,13 @@ tibble_to_vector <- function(tib) {
 #'
 #' This is a helper function for \code{calculate_exposure}.
 #'
-#' @param pls Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted.
+#' @param pls Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted
 #' @param pls_quote Either \code{"MTRS"} or \code{"MTR"}
 #' @param which_pls A vector of character string PLS units
-#' @param shp A county's shapefile.
-#' @param buffer A data frame with buffer coordinates.
-#' @param df
-#' @param clean_pur_df
+#' @param shp A county's shapefile
+#' @param buffer A data frame with buffer coordinates
+#' @param df A data frame
+#' @param clean_pur_df A \code{pull_clean_pur} data frame
 #'
 #' @return A list with four elements:
 #' \describe{
@@ -453,10 +453,10 @@ pur_filt_df <- function(pls, pls_quote, which_pls, shp, buffer, df,
 #' This is a helper function for \code{daterange_calcexp}.
 #'
 #' @param ... A list of variables to group by. Options include \code{section},
-#' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted.
-#' @param pur_filt
-#' @param start_date
-#' @param end_date
+#' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted
+#' @param pur_filt A data frame
+#' @param start_date A date
+#' @param end_date A date
 #'
 #' @return A data frame a \code{kg} column and one to three additional columns,
 #' depending on the grouping variables.
@@ -483,17 +483,16 @@ pur_out_df <- function(pur_filt, start_date, end_date, ...) {
 #'
 #' This is a helper function for \code{daterange_calcexp}.
 #'
-#' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted.
-#' @param section_township Either \code{section} or \code{township}. Not quoted.
-#' @param clean_pur_df,
-#' @param pls_percents
-#' @param pls
-#' @param pur_out
-#' @param location
-#' @param start_date
-#' @param end_date
-#' @param radius
-#' @param buffer_area
+#' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted
+#' @param section_township Either \code{section} or \code{township}. Not quoted
+#' @param clean_pur_df A data frame
+#' @param pls_percents A data frame with PLS ids and percent intersections
+#' @param pur_out A data frame
+#' @param location A string giving the exposure estimate location
+#' @param start_date A date
+#' @param end_date A date
+#' @param radius A numeric value
+#' @param buffer_area A numeric value
 #'
 #' @return A data frame with the twelve columns in the
 #' \code{calculate_exposure$meta_data} data frame.
@@ -588,9 +587,9 @@ exp_df <- function(clean_pur_df, pls_percents, pur_out, location,
 #' This is a helper function for \code{daterange_calcexp}.
 #'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
-#' quoted.
-#' @param exp exp data frame
-#' @param buffer_area numeric value
+#' quoted
+#' @param exp A data frame
+#' @param buffer_area A numeric value
 #'
 #' @return A data frame with exposure values in kg/m^2 at a location for each
 #' relevant condition.
@@ -616,12 +615,11 @@ exp_out_val <- function(exp, buffer_area, ...) {
 #' then returned as the \code{exposure} element from a \code{calculate_exposure}
 #' list.
 #'
+#' This is a helper function for \code{daterange_calcexp}.
+#'
 #' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 #'   quoted.
-#' @param start_date
-#' @param end_date
-#' @param location
-#' @param radius
+#' @inheritParams exp_df
 #'
 #' @return A data frame with one row and the columns found in the
 #' \code{calculate_exposure$exposure} data frame.
@@ -671,16 +669,18 @@ row_out_df <- function(start_date, end_date, location, radius,
 #'
 #' @param start_date A date, "yyyy-mm-dd"
 #' @param end_date A date, "yyyy-mm-dd"
-#' @inheritParams exp_df
-#' @inheritParams pur_out_df
-#' @inheritParams row_out_df
-#' @inheritParams exp_out_val
-#' @param chemicals
-#' @param aerial_ground
+#' @inheritParams exp_df A data frame
+#' @inheritParams pur_out_df A data frame
+#' @inheritParams row_out_df A data frame
+#' @inheritParams exp_out_val An exposure value
+#' @param chemicals Either "all" or "chemical_class"
+#' @param aerial_ground TRUE / FALSE
 #'
 #' @return A nested data frame with two columns: The \code{row_out} column
 #' contains the \code{exposure} data frame for the date range, and
 #' \code{meta_data} contains the \code{meta_data} data frame for the date range.
+#'
+#' @importFrom dplyr %>%
 daterange_calcexp <- function(start_date, end_date, aerial_ground,
                               chemicals,
                               clean_pur_df,
@@ -789,7 +789,39 @@ gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL)
   }
 }
 
-#' helper function for map_exposure()
+#' Return a map for a given exposure estimate.
+#'
+#' For a unique combination of time periods, chemicals, and application methods,
+#' \code{plot_pls} returns a plot showing amounts of pesticides applied for PLS
+#' units intersecting with the buffer.
+#'
+#' This is a helper function for \code{map_exposure}.
+#'
+#' @inheritParams exp_df
+#' @param data_pls A data frame
+#' @param gradient A character vector of hex color codes
+#' @param location_longitude A numeric longitude value
+#' @param location_latitude A numeric latitude value
+#' @param buffer_or_county "buffer" or "county"
+#' @param buffer_df A data frame
+#' @param buffer2 A data frame
+#' @param buffer A gpc.poly object
+#' @param alpha A number in [0,1]
+#' @param clean_pur A \code{clean_pur_df} data frame
+#' @param pls_labels TRUE / FALSE
+#' @param pls_labels_size A number
+#' @param percentile A numeric vector
+#' @param color_by "amount" or "percentile"
+#'
+#' @return A list with three elements:
+#' \describe{
+#'   \item{plot}{An exposure plot}
+#'   \item{data}{A data frame with information about each PLS unit}{
+#'   \item{cutoff_values}{A data frame with cutoff values returned if
+#'   \code{color_by = "percentile"}
+#' }
+#'
+#' @importFrom dplyr %>%
 plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
                      none_recorded, data_pls,
                      gradient, location_longitude,
@@ -1048,13 +1080,32 @@ plot_pls <- function(start_date, end_date, chemicals, aerial_ground,
 
 }
 
-
-#' helper function for plot_pls()
+#' Categorize a continuous scale by percentile cutpoints
+#'
+#' Given a data frame with a column with a continuous numeric variable,
+#' \code{find_cutpoints} returns the data frame with a new column categorizing
+#' that continuous variable by percentile cutpoints.
+#'
+#' This is a helper function for \code{plot_pls}.
+#'
+#' @param section_data A data frame with a continuous numeric variable ("kg")
+#' @param buffer_or_county Should cutpoints be determined by "county" or "buffer"?
+#' @inheritParams exp_df
+#' @param clean_pur A \code{pull_clean_pur} data frame
+#' @param s_t "section" or "township"
+#' @param percentile A numeric vector in (0, 1).
+#'
+#' @return The input \code{section_data} data frame with an additional column
+#' named \code{category}.
+#'
+#' @importFrom dplyr %>%
 find_cutpoints <- function(section_data, buffer_or_county,
-                           start_date, end_date, aerial_ground,
-                           chemicals, clean_pur, s_t, percentile) {
+                           start_date = NULL, end_date = NULL,
+                           aerial_ground = NULL, chemicals = NULL,
+                           clean_pur = NULL, s_t = NULL, percentile) {
 
   if (buffer_or_county == "buffer") {
+
     perc <- as.data.frame(t(quantile(unique(section_data$kg),
                                      probs = percentile, na.rm = TRUE)))
     vec <- 0

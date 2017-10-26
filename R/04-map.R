@@ -17,9 +17,9 @@
 #'   like separate plots returned in a list (FALSE). The default is TRUE
 #' @param fill_color A character string giving either a ggplot2 color or a
 #'   hex color code ("#0000FF", for example). The default is "red".
-#' @param transparency A numeric value in [0,1]. Corresponds to the
-#'   \code{ggplot2::alpha} transparency argument. Numbers closer to 0 will result
-#'   in more transparency. The default is 0.5.
+#' @param alpha A number in [0,1] specifying the transparency of the fill
+#'   color. Numbers closer to 0 will result in more transparency. The default is
+#'   0.5.
 #'
 #' @return A ggplot or a list of ggplots of Califnornia with shaded-in counties.
 #' List element names correspond to county names.
@@ -41,7 +41,7 @@
 #' @importFrom rlang !!
 #' @export
 map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
-                         transparency = 0.5) {
+                         alpha = 0.5) {
 
   ca_shp <- purexposure::california_shp
   ca_df <- spdf_to_df(ca_shp)
@@ -85,7 +85,7 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
   plot <- ca + ggplot2::geom_polygon(data = county_dfs[[1]],
                                      ggplot2::aes(x = long, y = lat, group = group),
                                      color = "transparent", fill = fill_color, alpha =
-                                       transparency)
+                                       alpha)
 
   if (!one_plot) {
 
@@ -96,7 +96,7 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
         out[[i]] <- ca + ggplot2::geom_polygon(data = county_dfs[[i]],
                                                ggplot2::aes(x = long, y = lat, group = group),
                                                color = "transparent", fill = fill_color, alpha =
-                                                 transparency)
+                                                 alpha)
       }
       names(out) <- counties
     } else {
@@ -110,7 +110,7 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
         plot <- plot + ggplot2::geom_polygon(data = county_dfs[[i]],
                                            ggplot2::aes(x = long, y = lat, group = group),
                                            color = "transparent", fill = fill_color, alpha =
-                                             transparency)
+                                             alpha)
         out <- plot
 
       }
@@ -143,14 +143,15 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'   \code{township} column, the \code{pls} argument specifies which pls unit
 #'   you would like to plot application for. If you pulled data specifying
 #'   \code{unit = "township"}, application will be plotted by township.
-#' @param color_by Either "amount" or "percentile" (the default). Specifies
+#' @param color_by Either "amount" (the default) or "percentile". Specifies
 #'   whether you would like application amounts to be colored according to
 #'   amount, resulting in a gradient legend, or by the percentile that they fall
 #'   into for the given dataset and date range. You can specify percentile
 #'   cutpoints with the \code{percentile} argument.
-#' @param percentile A numeric vector in (0, 1) specifying percentile cutpoints.
-#'   The default is \code{c(0.25, 0.5, 0.75)}, which results in four categories:
-#'   < 25th percentile, >= 25th to < 50th, >= 50th to < 75th, and >= 75th.
+#' @param percentile A numeric vector in (0, 1) specifying percentile cutpoints
+#'   if \code{color_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+#'   which results in four categories: < 25th percentile, >= 25th to < 50th,
+#'   >= 50th to < 75th, and >= 75th.
 #' @param start_date Optional. "yyyy-mm-dd" giving a starting date for the date
 #'   range that you would like to map application for. The default is to plot
 #'   application for the entire date range in your \code{clean_pur_df} data frame.
@@ -162,15 +163,18 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'   the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 #'   a specific active ingredient present in the \code{chemname} column of the
 #'   \code{clean_pur_df} data frame.
-#' @param fill_option An argument passed on to the \code{option} argument of
-#'   \code{scale_fill_viridis}. Either "viridis", "inferno", "magma", or
-#'   "plasma". The default is "viridis".
+#' @param fill_option A palette from the colormap package. The default is
+#'   "viridis". See colormap palette options by visiting
+#'   \url{https://bhaskarvk.github.io/colormap/} or by running
+#'   \code{colormap::colormaps}.
 #' @param crop TRUE / FALSE for whether you would like your plot zoomed in on
 #'   sections or townships with recorded application data.
+#' @param alpha A number in [0,1] specifying the transperency of fill colors.
+#'   Numbers closer to 0 will result in more transparency. The default is 1.
 #'
 #' @return A list with three elements:
 #' \describe{
-#'   \item{plot}{A plot of the county with application summed by section or
+#'   \item{map}{A plot of the county with application summed by section or
 #'   township and colored by amount or by percentile.}
 #'   \item{data}{A data frame with the plotted application data.}
 #'   \item{cutoff_values}{A data frame with two columns: \code{percentile}
@@ -185,20 +189,19 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'
 #' # plot all active ingredients
 #' pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-#' fresno_list <- map_county_application(pur_df,
+#' fresno_list <- map_county_application(pur_df, color_by = "percentile",
 #'                                       percentile = c(0.2, 0.4, 0.6, 0.8))
-#' fresno_list$plot
+#' fresno_list$map
 #' head(fresno_list$data)
 #' fresno_list$cutoff_values
 #'
-#' # plot a specific active ingredient
+#' # map a specific active ingredient
 #' fresno_list2 <- map_county_application(pur_df, pls = "township",
-#'                                        color_by = "amount",
 #'                                        chemicals = "sulfur",
 #'                                        fill_option = "plasma")
-#' fresno_list2$plot
+#' fresno_list2$map
 #'
-#' # plot a chemical class
+#' # map a chemical class
 #' chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
 #'                                              "naled", "malathion",
 #'                                              "trichlorfon"),
@@ -210,8 +213,8 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #'                           verbose = F, sum_application = T,
 #'                           sum = "chemical_class",
 #'                           chemical_class = chemical_class_df) %>%
-#'    map_county_application(color_by = "amount")
-#' op_yuba$plot
+#'    map_county_application()
+#' op_yuba$map
 #' }
 #'
 #' @importFrom dplyr %>%
@@ -219,11 +222,12 @@ map_counties <- function(counties_or_df, one_plot = TRUE, fill_color = "red",
 #' @importFrom rlang :=
 #' @export
 map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
-                                   color_by = "percentile",
+                                   color_by = "amount",
                                    percentile = c(0.25, 0.5, 0.75),
                                    start_date = NULL, end_date = NULL,
                                    chemicals = "all", fill_option = "viridis",
-                                   crop = FALSE) {
+                                   crop = FALSE,
+                                   alpha = 1) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
@@ -308,38 +312,12 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   if (color_by == "percentile") {
 
-    perc <- as.data.frame(t(quantile(unique(pur_df2$kg),
-                                     probs = percentile, na.rm = TRUE)))
-    vec <- 0
-    for (i in 1:length(percentile)) {
-      vec <- c(vec, perc[, i])
-    }
-    vec <- c(vec, max(unique(pur_df2$kg), na.rm = TRUE))
-
-    perc_numbers <- as.character(percentile * 100)
-    first <- paste0("<=", perc_numbers[1], "th percentile")
-    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
-
-    for (i in 1:(length(perc_numbers) - 1)) {
-      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
-      if (i == 1) {
-        middle <- label
-      } else {
-        middle <- c(middle, label)
-      }
-    }
-
-    labels <- c(first, middle, last)
-
-    pur_df3 <- pur_df2 %>%
-      dplyr::mutate(category = as.character(cut(pur_df2$kg, vec, labels = labels)),
-                    category = ifelse(is.na(category), "None recorded", category))
-
-    if ("None recorded" %in% unique(pur_df3$category)) {
-      pur_df3$category <- factor(pur_df3$category, levels = c(labels, "None recorded"))
-    } else {
-      pur_df3$category <- factor(pur_df3$category, levels = labels)
-    }
+    cutpoints_list <- find_cutpoints(section_data = pur_df2, buffer_or_county = "buffer",
+                                     percentile = percentile) # find cutpoints based on
+                                                              # given data frame
+    pur_df3 <- cutpoints_list$df
+    labels <- cutpoints_list$categories
+    cutoff_values <- cutpoints_list$cutoff_values
 
     viridis_discrete <- TRUE
     fill_var <- "category"
@@ -370,16 +348,59 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   legend_label <- paste0("Applied Pesticides\n(kg/", section_township, ")")
 
+  colormaps_vec <- unlist(colormap::colormaps)
+  names(colormaps_vec) <- NULL
+
+  if (!fill_option %in% colormaps_vec) {
+    stop(paste0("The fill_option argument should be a color palette from the ",
+                "colormap package."))
+  }
+
+  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- c("#FFFFFF", gradient)
+
   plot <- ggmap::ggmap(location) +
     ggplot2::geom_polygon(data = county_df, ggplot2::aes(x = long, y = lat, group = group),
                           color = "black", fill = NA) +
     ggplot2::geom_polygon(data = pur_spatial, ggplot2::aes_string(x = "long", y = "lat", ## aes_string
-                                                        group = "group",
-                                                        fill = fill_var)) +
-    viridis::scale_fill_viridis(na.value = "white",
-                                name = legend_label,
-                                discrete = viridis_discrete,
-                                option = fill_option) + #### ooh maybe replace this w/ code below--- use any colormap color.
+                                                                  group = "group",
+                                                                  fill = fill_var))
+
+  if (color_by == "amount") {
+
+    plot <- plot +
+      scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label,
+                            na.value = "#FFFFFF")
+
+  } else if (color_by == "percentile") {
+
+    categories <- as.character(levels(pur_spatial$category))
+
+    if (!"None recorded" %in% categories) {
+      categories <- c(categories, "missing")
+    }
+
+    n_cols <- as.integer(length(gradient)/(length(categories)-1))
+    end_i <- length(categories) - 1
+
+    for (i in 1:end_i) {
+      col_vec <- gradient[n_cols*i]
+      if (i == 1) {
+        cols_out <- col_vec
+      } else {
+        cols_out <- c(cols_out, col_vec)
+      }
+    }
+
+    cols_out <- c(cols_out, "#FFFFFF")
+    names(cols_out) <- categories
+
+    plot <- plot  +
+      ggplot2::scale_fill_manual(values = cols_out, name = legend_label)
+
+  }
+
+  plot <- plot +
     ggplot2::theme_void() +
     ggplot2::coord_map(xlim = long_range, ylim = lat_range)
 
@@ -390,49 +411,52 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   }
 
   if (color_by == "percentile") {
-    percents <- sub("%", "", colnames(perc)) %>% as.numeric() / 100
-    perc <- perc %>% tidyr::gather("percentile", "kg") %>%
-      dplyr::mutate(percentile = percents)
-    out <- list(plot = plot, data = pur_df3, cutoff_values = perc)
+    out <- list(map = plot, data = pur_df3, cutoff_values = cutoff_values)
   } else {
-    out <- list(plot = plot, data = pur_df3)
+    out <- list(map = plot, data = pur_df3)
   }
 
   return(out)
 
 }
 
-
 #' Map exposure to applied pesticides by PLS unit and buffer.
 #'
-#' - list from calculate_exposure() for single location and radius
-#' - this function returns a plot for each date range, aerial/ground,
-#' and chemicals (if chemical_class was used in calculate_exposure()
-#' combination)
-#' - amounts of active ingredients are plotted based on the % intersection of the
-#' PLS unit with the buffer around a location (for time period, a/g, and chemicals)
-#' - ^ this function plots amount, not exposure. BUT it's relevant to exposure.
-#' it's how exposure was calculated.
+#' \code{map_exposure} returns a plot of pesticide application in the PLS units
+#' intersected by a buffer for each combination of time period, applied active
+#' ingredients, and applicaiton method relevant for the exposure values returned
+#' from \code{calculate_exposure}.
 #'
 #' @inheritParams map_county_application
-#' @param exposure_list A list returned from the calculate_exposure() function.
-#' @param alpha
-#' @param buffer_or_county legend scale based on buffer or on county/chemical_class?
-#'   In which context do you want PLS units to be filled?
-#' @param clean_pur_df
-#' @param county which county?
+#' @param exposure_list A list returned from \code{calculate_exposure}.
+#' @param buffer_or_county Either "county" (the default) or "buffer". Specifies
+#'   whether you would like colors to be scaled according to the limits
+#'   of application within the buffer, or in the county for the same time period,
+#'   chemicals, and method of application.
+#' @param pls_labels TRUE / FALSE for whether you would like sections or townships
+#'   to be labeled with their PLS ID. The default is \code{FALSE}.
+#' @param pls_labels_size A number specifying the size of PLS labels. The default
+#'   is 4.
+#' @param alpha A number in [0,1] specifying the transperency of fill colors.
+#'   Numbers closer to 0 will result in more transparency. The default is 0.7.
 #'
-#' $ list w/in out_list
-#' $ plot
-#' $ one-row data frame with location, longitude, latidue, exposure,
-#' radius, buffer_area, chemicals, start_date, end_date, aerial_ground
-#' - each one-row data frame and represents a unique exposure estimate for unique
-#' combination of column values
-#' - better way to organize this?
-#'
-#' clean_pur_df included in exposure_list.
-#'
-#' - returning plots for combinations for which exposure was recorded...
+#' @return A list with the following elements:
+#' \describe{
+#'   \item{maps}{A list of plots. One plot for each exposure value returned in
+#'   the \code{exposure} element of the \code{calculate_exposure} list.}
+#'   \item{pls_data}{A list of data frames with 12 columns: \code{pls}, giving
+#'   the PLS ID, \code{percent}, the % intersection of that PLS unit with the
+#'   buffer, \code{kg}, the amount of kg of pesticides applied in that PLS unit
+#'   for the relevant time period, chemicals, and application method,
+#'   \code{kg_intersection}, \code{kg} multiplied by \code{percent} (this is the
+#'   value that is plotted), \code{start_date}, \code{end_date}, \code{chemicals},
+#'   \code{aerial_ground}, which give the time period, chemicals, and application
+#'   method for each plot/exposure estiamte, \code{none_recorded}, \code{location},
+#'   \code{radius} (m), and \code{area} (m^2).}
+#'   \item{A list of data frames with two columns: \code{percentile} and
+#'   \code{kg} giving the cutoff values for each percentile. Only returned if
+#'   \code{color_by = "percentile"}.}
+#' }
 #'
 #' @examples
 #' \dontrun{
@@ -497,15 +521,11 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' map_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
 #' map_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
-#'
-map_exposure <- function(exposure_list,
-                         color_by = "percentile",
+#' @importFrom dplyr %>%
+map_exposure <- function(exposure_list,  color_by = "amount",
                          buffer_or_county = "county",
-                         percentile = c(0.25, 0.5, 0.75),
-                         fill_option = "viridis",
-                         alpha = 0.7,
-                         pls_labels = FALSE,
-                         pls_labels_size = 4) {
+                         percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
+                         alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
 
   buffer_df <- exposure_list$buffer_plot_df
 
