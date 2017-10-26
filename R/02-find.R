@@ -49,8 +49,6 @@ find_chemical_codes <- function(year, chemicals = "all") {
 
 }
 
-test <- find_product_name(2000, c("mosquito beater", "herbicide"))
-
 #' Find Pesticide Product names and registration numbers from PUR Product Lookup
 #' Tables.
 #'
