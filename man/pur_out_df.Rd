@@ -7,10 +7,14 @@
 pur_out_df(pur_filt, start_date, end_date, ...)
 }
 \arguments{
-\item{end_date}{}
+\item{pur_filt}{A data frame}
+
+\item{start_date}{A date}
+
+\item{end_date}{A date}
 
 \item{...}{A list of variables to group by. Options include \code{section},
-\code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted.}
+\code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted}
 }
 \value{
 A data frame a \code{kg} column and one to three additional columns,

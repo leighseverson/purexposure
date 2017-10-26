@@ -5,9 +5,9 @@
 \title{Map pesticide application by county}
 \usage{
 map_county_application(clean_pur_df, county = NULL, pls = NULL,
-  color_by = "percentile", percentile = c(0.25, 0.5, 0.75),
-  start_date = NULL, end_date = NULL, chemicals = "all",
-  fill_option = "viridis", crop = FALSE)
+  color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
+  end_date = NULL, chemicals = "all", fill_option = "viridis",
+  crop = FALSE, alpha = 1)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur}.}
@@ -24,15 +24,16 @@ county_codes dataset available with this package.}
 you would like to plot application for. If you pulled data specifying
 \code{unit = "township"}, application will be plotted by township.}
 
-\item{color_by}{Either "amount" or "percentile" (the default). Specifies
+\item{color_by}{Either "amount" (the default) or "percentile". Specifies
 whether you would like application amounts to be colored according to
 amount, resulting in a gradient legend, or by the percentile that they fall
 into for the given dataset and date range. You can specify percentile
 cutpoints with the \code{percentile} argument.}
 
-\item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints.
-The default is \code{c(0.25, 0.5, 0.75)}, which results in four categories:
-< 25th percentile, >= 25th to < 50th, >= 50th to < 75th, and >= 75th.}
+\item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.}
 
 \item{start_date}{Optional. "yyyy-mm-dd" giving a starting date for the date
 range that you would like to map application for. The default is to plot
@@ -48,17 +49,21 @@ the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 a specific active ingredient present in the \code{chemname} column of the
 \code{clean_pur_df} data frame.}
 
-\item{fill_option}{An argument passed on to the \code{option} argument of
-\code{scale_fill_viridis}. Either "viridis", "inferno", "magma", or
-"plasma". The default is "viridis".}
+\item{fill_option}{A palette from the colormap package. The default is
+"viridis". See colormap palette options by visiting
+\url{https://bhaskarvk.github.io/colormap/} or by running
+\code{colormap::colormaps}.}
 
 \item{crop}{TRUE / FALSE for whether you would like your plot zoomed in on
 sections or townships with recorded application data.}
+
+\item{alpha}{A number in [0,1] specifying the transperency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 1.}
 }
 \value{
 A list with three elements:
 \describe{
-  \item{plot}{A plot of the county with application summed by section or
+  \item{map}{A plot of the county with application summed by section or
   township and colored by amount or by percentile.}
   \item{data}{A data frame with the plotted application data.}
   \item{cutoff_values}{A data frame with two columns: \code{percentile}
@@ -76,22 +81,23 @@ percentile.
 }
 \examples{
 \dontrun{
+tulare_list <- pull_clean_pur(2010, "tulare") \%>\% map_county_application()
+
 # plot all active ingredients
 pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-fresno_list <- map_county_application(pur_df,
+fresno_list <- map_county_application(pur_df, color_by = "percentile",
                                       percentile = c(0.2, 0.4, 0.6, 0.8))
-fresno_list$plot
+fresno_list$map
 head(fresno_list$data)
 fresno_list$cutoff_values
 
-# plot a specific active ingredient
+# map a specific active ingredient
 fresno_list2 <- map_county_application(pur_df, pls = "township",
-                                       color_by = "amount",
                                        chemicals = "sulfur",
                                        fill_option = "plasma")
-fresno_list2$plot
+fresno_list2$map
 
-# plot a chemical class
+# map a chemical class
 chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
                                              "naled", "malathion",
                                              "trichlorfon"),
@@ -103,8 +109,8 @@ op_yuba <- pull_clean_pur(2010, "yuba",
                           verbose = F, sum_application = T,
                           sum = "chemical_class",
                           chemical_class = chemical_class_df) \%>\%
-   map_county_application(color_by = "amount")
-op_yuba$plot
+   map_county_application()
+op_yuba$map
 }
 
 }

@@ -453,7 +453,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'   \code{aerial_ground}, which give the time period, chemicals, and application
 #'   method for each plot/exposure estiamte, \code{none_recorded}, \code{location},
 #'   \code{radius} (m), and \code{area} (m^2).}
-#'   \item{A list of data frames with two columns: \code{percentile} and
+#'   \item{cutoff_values}{A list of data frames with two columns: \code{percentile} and
 #'   \code{kg} giving the cutoff values for each percentile. Only returned if
 #'   \code{color_by = "percentile"}.}
 #' }

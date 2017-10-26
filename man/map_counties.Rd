@@ -5,7 +5,7 @@
 \title{Map a county's location in California}
 \usage{
 map_counties(counties_or_df, one_plot = TRUE, fill_color = "red",
-  transparency = 0.5)
+  alpha = 0.5)
 }
 \arguments{
 \item{counties_or_df}{A character vector of county names or county codes.
@@ -22,9 +22,9 @@ like separate plots returned in a list (FALSE). The default is TRUE}
 \item{fill_color}{A character string giving either a ggplot2 color or a
 hex color code ("#0000FF", for example). The default is "red".}
 
-\item{transparency}{A numeric value in [0,1]. Corresponds to the
-\code{ggplot2::alpha} transparency argument. Numbers closer to 0 will result
-in more transparency. The default is 0.5.}
+\item{alpha}{A number in [0,1] specifying the transparency of the fill
+color. Numbers closer to 0 will result in more transparency. The default is
+0.5.}
 }
 \value{
 A ggplot or a list of ggplots of Califnornia with shaded-in counties.

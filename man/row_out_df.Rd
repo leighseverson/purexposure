@@ -7,7 +7,15 @@
 row_out_df(start_date, end_date, location, radius, exp, buffer_area, ...)
 }
 \arguments{
-\item{radius}{}
+\item{start_date}{A date}
+
+\item{end_date}{A date}
+
+\item{location}{A string giving the exposure estimate location}
+
+\item{radius}{A numeric value}
+
+\item{buffer_area}{A numeric value}
 
 \item{...}{Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
 quoted.}
@@ -22,4 +30,7 @@ values calculated from \code{exp_out_val} as well as other relevant data.
 This one row data frame is combined with data frames for other date ranges and
 then returned as the \code{exposure} element from a \code{calculate_exposure}
 list.
+}
+\details{
+This is a helper function for \code{daterange_calcexp}.
 }

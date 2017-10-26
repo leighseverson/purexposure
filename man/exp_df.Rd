@@ -4,15 +4,29 @@
 \alias{exp_df}
 \title{Return a the \code{meta_data} data frame}
 \usage{
-exp_df(clean_pur_df, pls_percents, pls, pur_out, location, start_date, end_date,
+exp_df(clean_pur_df, pls_percents, pur_out, location, start_date, end_date,
   radius, buffer_area, mtrs_mtr, section_township)
 }
 \arguments{
-\item{buffer_area}{}
+\item{clean_pur_df}{A data frame}
 
-\item{mtrs_mtr}{Either \code{MTRS} or \code{MTR}. Not quoted.}
+\item{pls_percents}{A data frame with PLS ids and percent intersections}
 
-\item{section_township}{Either \code{section} or \code{township}. Not quoted.}
+\item{pur_out}{A data frame}
+
+\item{location}{A string giving the exposure estimate location}
+
+\item{start_date}{A date}
+
+\item{end_date}{A date}
+
+\item{radius}{A numeric value}
+
+\item{buffer_area}{A numeric value}
+
+\item{mtrs_mtr}{Either \code{MTRS} or \code{MTR}. Not quoted}
+
+\item{section_township}{Either \code{section} or \code{township}. Not quoted}
 }
 \value{
 A data frame with the twelve columns in the

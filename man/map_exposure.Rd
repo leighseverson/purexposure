@@ -4,47 +4,130 @@
 \alias{map_exposure}
 \title{Map exposure to applied pesticides by PLS unit and buffer.}
 \usage{
-map_exposure(exposure_list, color_by = "percentile", percentile = c(0.25,
-  0.5, 0.75), fill_option, alpha, buffer_or_county, county = NULL)
+map_exposure(exposure_list, color_by = "amount",
+  buffer_or_county = "county", percentile = c(0.25, 0.5, 0.75),
+  fill_option = "viridis", alpha = 0.7, pls_labels = FALSE,
+  pls_labels_size = 4)
 }
 \arguments{
-\item{exposure_list}{A list returned from the calculate_exposure() function.}
+\item{exposure_list}{A list returned from \code{calculate_exposure}.}
 
-\item{color_by}{Either "amount" or "percentile" (the default). Specifies
+\item{color_by}{Either "amount" (the default) or "percentile". Specifies
 whether you would like application amounts to be colored according to
 amount, resulting in a gradient legend, or by the percentile that they fall
 into for the given dataset and date range. You can specify percentile
 cutpoints with the \code{percentile} argument.}
 
-\item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints.
-The default is \code{c(0.25, 0.5, 0.75)}, which results in four categories:
-< 25th percentile, >= 25th to < 50th, >= 50th to < 75th, and >= 75th.}
+\item{buffer_or_county}{Either "county" (the default) or "buffer". Specifies
+whether you would like colors to be scaled according to the limits
+of application within the buffer, or in the county for the same time period,
+chemicals, and method of application.}
 
-\item{fill_option}{An argument passed on to the \code{option} argument of
-\code{scale_fill_viridis}. Either "viridis", "inferno", "magma", or
-"plasma". The default is "viridis".}
+\item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.}
 
-\item{buffer_or_county}{legend scale based on buffer or on county/chemical_class?
-In which context do you want PLS units to be filled?}
+\item{fill_option}{A palette from the colormap package. The default is
+"viridis". See colormap palette options by visiting
+\url{https://bhaskarvk.github.io/colormap/} or by running
+\code{colormap::colormaps}.}
 
-\item{county}{which county?
+\item{alpha}{A number in [0,1] specifying the transperency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 0.7.}
 
-$ list w/in out_list
-$ plot
-$ one-row data frame with location, longitude, latidue, exposure,
-radius, buffer_area, chemicals, start_date, end_date, aerial_ground
-- each one-row data frame and represents a unique exposure estimate for unique
-combination of column values
-- better way to organize this?
+\item{pls_labels}{TRUE / FALSE for whether you would like sections or townships
+to be labeled with their PLS ID. The default is \code{FALSE}.}
 
-clean_pur_df included in exposure_list.}
+\item{pls_labels_size}{A number specifying the size of PLS labels. The default
+is 4.}
+}
+\value{
+A list with the following elements:
+\describe{
+  \item{maps}{A list of plots. One plot for each exposure value returned in
+  the \code{exposure} element of the \code{calculate_exposure} list.}
+  \item{pls_data}{A list of data frames with 12 columns: \code{pls}, giving
+  the PLS ID, \code{percent}, the % intersection of that PLS unit with the
+  buffer, \code{kg}, the amount of kg of pesticides applied in that PLS unit
+  for the relevant time period, chemicals, and application method,
+  \code{kg_intersection}, \code{kg} multiplied by \code{percent} (this is the
+  value that is plotted), \code{start_date}, \code{end_date}, \code{chemicals},
+  \code{aerial_ground}, which give the time period, chemicals, and application
+  method for each plot/exposure estiamte, \code{none_recorded}, \code{location},
+  \code{radius} (m), and \code{area} (m^2).}
+  \item{cutoff_values}{A list of data frames with two columns: \code{percentile} and
+  \code{kg} giving the cutoff values for each percentile. Only returned if
+  \code{color_by = "percentile"}.}
+}
 }
 \description{
-- list from calculate_exposure() for single location and radius
-- this function returns a plot for each date range, aerial/ground,
-and chemicals (if chemical_class was used in calculate_exposure()
-combination)
-- amounts of active ingredients are plotted based on the % intersection of the
-PLS unit with the buffer around a location (for time period, a/g, and chemicals)
-- ^ this function plots amount, not exposure.
+\code{map_exposure} returns a plot of pesticide application in the PLS units
+intersected by a buffer for each combination of time period, applied active
+ingredients, and applicaiton method relevant for the exposure values returned
+from \code{calculate_exposure}.
+}
+\examples{
+\dontrun{
+tulare_list <- pull_clean_pur(2010, "tulare") \%>\%
+   calculate_exposure(location = "-119.3473, 36.2077",
+                      radius = 3500) \%>\%
+   map_exposure()
+names(tulare_list)
+tulare_list$maps
+tulare_list$pls_data
+tulare_list$exposure
+tulare_list$cutoff_values
+
+# return one plot, pls_data data frame, exposure row, and cutoff_values
+data frame for each exposure combination
+
+dalton_list <- pull_clean_pur(2000, "modoc") \%>\%
+    calculate_exposure(location = "-121.4182, 41.9370",
+                       radius = 4000,
+                       time_period = "6 months",
+                       aerial_ground = TRUE) \%>\%
+    map_exposure(fill_option = "plasma")
+do.call("rbind", dalton_list$exposure)
+# one map for each exposure value (unique combination of chemicals,
+dates, and aerial/ground application)
+dalton_list$maps[[1]]
+dalton_list$maps[[2]]
+dalton_list$maps[[3]]
+dalton_list$maps[[4]]
+dalton_list$maps[[5]]
+dalton_list$maps[[6]]
+
+# exposure to a particular active ingredient
+# plot amounts instead of percentile categories
+chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium")) \%>\%
+     dplyr::rename(chemical_class = chemical)
+
+santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
+                              chemicals = chemical_df$chemname,
+                              sum_application = TRUE,
+                              sum = "chemical_class",
+                              chemical_class = chemical_df) \%>\%
+     calculate_exposure(location = "-119.6122, 34.90635",
+                        radius = 3000,
+                        time_period = "1 year",
+                        chemicals = "chemical_class") \%>\%
+     map_exposure("amount")
+do.call("rbind", santa_maria$exposure)
+santa_maria$maps[[1]]
+santa_maria$maps[[2]]
+santa_maria$maps[[3]]
+
+# scale colors based on buffer or county
+turk <- pull_clean_pur(1996, "fresno") \%>\%
+     dplyr::filter(chemname == "PHOSPHORIC ACID") \%>\%
+     calculate_exposure(location = "-120.218404, 36.1806",
+                        radius = 1500)
+
+map_exposure(turk, buffer_or_county = "county")$maps
+map_exposure(turk, buffer_or_county = "buffer")$maps
+
+map_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+map_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
+}
 }

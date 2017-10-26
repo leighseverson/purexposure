@@ -7,12 +7,12 @@
 exp_out_val(exp, buffer_area, ...)
 }
 \arguments{
-\item{exp}{exp data frame}
+\item{exp}{A data frame}
 
-\item{buffer_area}{numeric value}
+\item{buffer_area}{A numeric value}
 
 \item{...}{Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
-quoted.}
+quoted}
 }
 \value{
 A data frame with exposure values in kg/m^2 at a location for each

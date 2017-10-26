@@ -6,7 +6,7 @@
 \usage{
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
-  chemical_class = NULL, aerial_ground = FALSE, verbose = TRUE,
+  chemical_class = NULL, aerial_ground = TRUE, verbose = TRUE,
   download_progress = FALSE)
 }
 \arguments{
@@ -64,7 +64,7 @@ comprehensive classifications of active ingredients.}
 
 \item{aerial_ground}{TRUE / FALSE indicating if you would like to
 retain aerial/ground application data ("A" = aerial, "G" = ground, and
-"O" = other.) The default is TRUE.}
+"O" = other.) The default is FALSE.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The

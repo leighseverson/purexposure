@@ -4,21 +4,17 @@
 \alias{daterange_calcexp}
 \title{Return exposure data for a single start and end date}
 \usage{
-daterange_calcexp(start_date, end_date, aerial_ground, buffer_area, chemicals,
-  clean_pur_df, exp, location, pls, pls_percents, pur_filt, pur_out, radius)
+daterange_calcexp(start_date, end_date, aerial_ground, chemicals, clean_pur_df,
+  location, pls_percents, pur_filt, radius)
 }
 \arguments{
 \item{start_date}{A date, "yyyy-mm-dd"}
 
 \item{end_date}{A date, "yyyy-mm-dd"}
 
-\item{aerial_ground}{}
+\item{aerial_ground}{TRUE / FALSE}
 
-\item{buffer_area}{}
-
-\item{exp}{exp data frame}
-
-\item{radius}{}
+\item{chemicals}{Either "all" or "chemical_class"}
 }
 \value{
 A nested data frame with two columns: The \code{row_out} column
