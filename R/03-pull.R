@@ -309,6 +309,11 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     was developed based on methods used by Gunier et al. (2001). Please see
 #'     the package vignette for more detail regarding these methods. Will have
 #'     values of \code{NA} if \code{sum_application = TRUE}.}
+#'     \item{prodno}{Integer. The California Registration Number for the applied
+#'     pesticide (will be repeated for different active ingredients present in
+#'     the product). You can match product registration numbers with product
+#'     names, which can be pulled using the \code{pull_product_table} function.
+#'     This column is not returned if \code{sum_application = TRUE}.}
 #'  }
 #'
 #' @section Note:
@@ -336,8 +341,16 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       chemicals = "methylene",
 #'                       aerial_ground = TRUE)
 #'
+#' # filter to particular products
+#' prod_nos <- find_product_name(2003, "insecticide") %>%
+#'     dplyr::select(prodno) %>%
+#'     tibble_to_vector()
+#'
+#' df3 <- pull_clean_pur(2003) %>%
+#'     dplyr::filter(prodno %in% prod_nos)
+#'
 #' # Sum application by active ingredients
-#' df3 <- pull_clean_pur(years = 2000:2010,
+#' df4 <- pull_clean_pur(years = 2000:2010,
 #'                       counties = c("01", "nevada", "riverside"),
 #'                       chemicals = "methylene",
 #'                       unit = "township", sum_application = TRUE)
@@ -347,7 +360,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
 #'
-#' df4 <- pull_clean_pur(years = 1995,
+#' df5 <- pull_clean_pur(years = 1995,
 #'                       counties = "fresno",
 #'                       chemicals = chemical_class_df$chemname,
 #'                       sum_application = TRUE,
@@ -375,7 +388,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                   township = as.character(paste0(base_ln_mer, township_pad, tship_dir)),
                   MTR = as.character(paste0(township, range, range_dir))) %>%
     dplyr::select(chem_code, lbs_chm_used, MTRS, MTR, county_cd, applic_dt,
-                  aer_gnd_ind, use_no, acre_treated, unit_treated) %>%
+                  aer_gnd_ind, use_no, acre_treated, unit_treated, prodno) %>%
     dplyr::mutate(unit_treated = as.factor(unit_treated)) %>%
     dplyr::filter(!MTRS %in% c(".0..0..0.", ".00.00.00", "NANANANANANA"),
                   unit_treated %in% c("A", "S")) %>%
@@ -500,7 +513,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     dplyr::mutate(use_no = paste0(use_no, "_", lubridate::year(applic_dt)),
                   kg_chm_used = lbs_chm_used/2.20562) %>%
     dplyr::select(chem_code, chemname, kg_chm_used, MTRS, MTR, county_name,
-                  county_code, applic_dt, aer_gnd_ind, use_no, outlier) %>%
+                  county_code, applic_dt, aer_gnd_ind, use_no, outlier, prodno) %>%
     dplyr::rename(section = MTRS,
                   township = MTR,
                   date = applic_dt,
@@ -622,6 +635,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     }
   }
 
+  if ("prodno" %in% colnames(out)) {
+    out <- out %>% dplyr::mutate(prodno = as.integer(prodno))
+  }
+
   return(out)
 
 }
@@ -704,5 +721,84 @@ pull_spdf <- function(county, section_township = "section",
   setwd(current_dir)
 
   return(shp)
+
+}
+
+#' Pull PUR Product Table
+#'
+#' This function pulls a California Department of Pesticide Regulation Product
+#' Table for a particular year.
+#'
+#' @param year A four digit year in the range of 1990 to 2015.
+#' @param download_progress TRUE / FALSE indicating whether you would like a
+#'   message and progress bar printed for the product table that is downloaded.
+#'   The default value is FALSE.
+#'
+#' @return A data frame with four columns:
+#' \describe{
+#' \item{prodno}{Integer. The California Registration number for the pesticide
+#' product. This corresponds to the \code{prodno} column in a raw or cleaned PUR
+#' dataset returned from \code{pull_raw_pur} or \code{pull_clean_pur}.}
+#' \item{prodstat_ind}{Character. An indication of product registration status:
+#'   \itemize{
+#'   \item A = Active
+#'   \item B = Inactive
+#'   \item C = Inactive, Not Renewed
+#'   \item D = Inactive, Voluntary Cancellation
+#'   \item E = Inactive, Cancellation
+#'   \item F = Inactive, Suspended
+#'   \item G = Inactive, Invalid Data
+#'   \item H = Active, Suspended}}
+#' \item{product_name}{Character. The name of the product taken from the
+#' registered product label. May have been modified by DPR's Registration Branch
+#' to ensure uniqueness.}
+#' \item{signlwrd_ind}{Integer. The signal word printed on the front of the
+#' product label:
+#'   \itemize{
+#'   \item 1 = Danger (Poison)
+#'   \item 2 = Danger (Only)
+#'   \item 3 = Warning
+#'   \item 4 = Caution
+#'   \item 5 = None}}
+#' \item{year}{Integer. Four digit year indicating the year for which data was
+#' pulled.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' prod_95 <- pull_product_table(1995)
+#' }
+#' @importFrom magrittr %>%
+pull_product_table <- function(year, download_progress = FALSE) {
+
+  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                year, ".zip")
+  file <- paste0("pur", year, ".zip")
+  current_dir <- getwd()
+  dir <- tempdir()
+
+  if (download_progress) {
+    quiet <- FALSE
+  } else {
+    quiet <- TRUE
+  }
+
+  download.file(url, destfile = file, mode = "wb", quiet = quiet)
+  unzip(file, exdir = dir)
+  setwd(dir)
+
+  suppressWarnings(suppressMessages(
+    product_file <- readr::read_csv("product.txt") %>%
+      dplyr::select(prodno, prodstat_ind, product_name, signlwrd_ind) %>%
+      dplyr::mutate(prodno = as.integer(prodno),
+                    prodstat_ind = as.character(prodstat_ind),
+                    product_name = as.character(product_name),
+                    signlwrd_ind = as.integer(signlwrd_ind),
+                    year = as.integer(year))
+  ))
+
+  setwd(current_dir)
+
+  return(product_file)
 
 }

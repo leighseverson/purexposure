@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_sum_application}
 \alias{help_sum_application}
-\title{Sum application}
+\title{Sum application by section, township, chemical, and method of application}
 \usage{
 help_sum_application(df, sum, unit, aerial_ground, section_townships,
   chemical_class = NULL, ...)

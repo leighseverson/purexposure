@@ -120,6 +120,11 @@ A data frame with 12 columns:
     was developed based on methods used by Gunier et al. (2001). Please see
     the package vignette for more detail regarding these methods. Will have
     values of \code{NA} if \code{sum_application = TRUE}.}
+    \item{prodno}{Integer. The California Registration Number for the applied
+    pesticide (will be repeated for different active ingredients present in
+    the product). You can match product registration numbers with product
+    names, which can be pulled using the \code{pull_product_table} function.
+    This column is not returned if \code{sum_application = TRUE}.}
  }
 }
 \description{
@@ -154,6 +159,10 @@ df2 <- pull_clean_pur(years = 2000:2010,
                       counties = c("01", "nevada", "riverside"),
                       chemicals = "methylene",
                       aerial_ground = TRUE)
+
+# filter to a particular product
+prod_table <- pull_product_table(2003) \%>\%
+    dplyr::filter(product_name == )
 
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2000:2010,

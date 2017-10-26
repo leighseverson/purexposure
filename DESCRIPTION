@@ -3,8 +3,8 @@ Title: Pull and Calculate Exposure to CA Pesticide Use Registry Records
 Version: 0.0.0.9000
 Authors@R: person("Rachel", "Severson", email = "rachel.severson@colostate.edu", 
                   role = c("aut", "cre"))
-Description: Pulls and cleans data from California's Pesticide Use Registry 
-    (PUR) to visualize and calculate exposure to active ingredients present 
+Description: Pulls and cleans California Pesticide Use Report (PUR) datasets 
+    data to visualize and calculate exposure to active ingredients present 
     in applied pesticides.
 Depends: R (>= 3.4.1)
 License: GPL-2
@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: TRUE
 Imports: 
     dplyr (>= 0.7.3),
-    tidyr,
+    tidyr (>= 0.7.1),
     purrr (>= 0.2.3),
     stringr (>= 1.2.0),
     lubridate (>= 1.6.0),
@@ -20,7 +20,7 @@ Imports:
     sp (>= 1.2.5),
     broom (>= 0.4.2),
     ggplot2 (>= 2.2),
-    ggmap,
+    ggmap (>= 2.6.1),
     maps (>= 3.2.0),
     maptools (>= 0.9.2),
     geosphere (>= 1.5.5),
@@ -28,11 +28,10 @@ Imports:
     rgeos (>= 0.3.23),
     magrittr (>= 1.5),
     utils (>= 3.4.1),
-    viridis,
-    colormap,
-    grDevices,
-    methods,
-    zoo
+    colormap (>= 0.1.9000),
+    grDevices (<= 3.4.1),
+    methods (>= 3.4.1),
+    zoo (>= 1.8.0)
 RoxygenNote: 6.0.1
 Suggests: 
     testthat,

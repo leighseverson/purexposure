@@ -20,6 +20,8 @@ pull_chemical_list <- function(year) {
   chemical_file <- readr::read_csv("chemical.txt") %>%
     dplyr::select(-chemalpha_cd)
 
+  setwd(current_dir)
+
   return(chemical_file)
 
 }

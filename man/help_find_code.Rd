@@ -2,11 +2,20 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_find_code}
 \alias{help_find_code}
+\alias{help_find_code}
 \title{Find California county code or name}
 \usage{
-help_find_code(county, find = "codes")
+help_find_code(chemical, df)
+
+help_find_code(chemical, df)
 }
 \arguments{
+\item{chemical}{A string giving search term of a
+chemical to match with active ingredients present in pesticides applied
+in the given year.}
+
+\item{df}{A chemical table data frame.}
+
 \item{county}{A character string giving either a county name or
 two digit PUR county code. Not case sensitive. California names and county
 codes as they appear in PUR datasets can be found in the \code{county_codes}
@@ -19,13 +28,21 @@ to return county name.}
 If \code{return = "codes"}, a two-character string giving
   the corresponding PUR county codes. If \code{return = "names"}, a county
   name.
+
+A data frame with three columns: \code{chem_code}, \code{chemname},
+and \code{chemical}.
 }
 \description{
 Given a county, \code{help_find_code} returns either the PUR
 county code or name.
+
+This function uses grep to return \code{chemname} values that match an input
+search term.
 }
 \details{
 This is a helper function for \code{find_counties}.
+
+This is a helper function for \code{find_chemical_codes}.
 }
 \examples{
 help_find_code("01", find = "names")

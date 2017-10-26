@@ -1075,3 +1075,75 @@ help_categorize <- function(section_data, buffer_or_county,
   return(out)
 
 }
+
+#' Pull a chemical code based on its name.
+#'
+#' This function uses grep to return \code{chemname} values that match an input
+#' search term.
+#'
+#' This is a helper function for \code{find_chemical_codes}.
+#'
+#' @param chemical A string giving search term of a
+#'   chemical to match with active ingredients present in pesticides applied
+#'   in the given year.
+#' @param df A chemical table data frame.
+#'
+#' @return A data frame with three columns: \code{chem_code}, \code{chemname},
+#' and \code{chemical}.
+#'
+#' @importFrom magrittr %>%
+help_find_code <- function(chemical, df) {
+
+  quotemeta <- function(string) {
+    stringr::str_replace_all(string, "(\\W)", "\\\\\\1")
+  }
+
+  chem_up <- toupper(chemical)
+  chem_up <- substr(chem_up, 1, 50)
+  if (chem_up == "ALL") {
+    df2 <- df
+  } else {
+    df2 <- df[grep(quotemeta(chem_up), df$chemname), ]
+    df2 <- df2 %>% dplyr::mutate(chemical = chemical)
+  }
+
+  return(df2)
+
+}
+
+#' Pull a chemical code based on its name.
+#'
+#' This function uses grep to return \code{chemname} values that match an input
+#' search term.
+#'
+#' This is a helper function for \code{find_chemical_codes}.
+#'
+#' @param chemical A string giving search term of a
+#'   chemical to match with active ingredients present in pesticides applied
+#'   in the given year.
+#' @param df A chemical table data frame.
+#'
+#' @return A data frame with three columns: \code{chem_code}, \code{chemname},
+#' and \code{chemical}.
+#'
+#' @importFrom magrittr %>%
+help_find_product <- function(product, df) {
+
+  quotemeta <- function(string) {
+    stringr::str_replace_all(string, "(\\W)", "\\\\\\1")
+  }
+
+  prod_up <- toupper(product)
+  prod_up <- substr(prod_up, 1, 50)
+  if (prod_up == "ALL") {
+    df2 <- df
+  } else {
+    df2 <- df[grep(quotemeta(prod_up), df$product_name), ]
+    df2 <- df2 %>% dplyr::mutate(product = product)
+  }
+
+  return(df2)
+
+}
+
+

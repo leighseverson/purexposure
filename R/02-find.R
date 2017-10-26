@@ -42,27 +42,76 @@ find_chemical_codes <- function(year, chemicals = "all") {
   df <- purexposure::chemical_list
   df <- df[[as.character(year)]]
 
-  pull_chemical_code <- function(chemical) {
+  out <- purrr::map_dfr(chemicals, help_find_code, df)  %>%
+    unique()
 
-    quotemeta <- function(string) {
-      stringr::str_replace_all(string, "(\\W)", "\\\\\\1")
-    }
+  return(out)
 
-    chem_up <- toupper(chemical)
-    chem_up <- substr(chem_up, 1, 50)
-    if (chem_up == "ALL") {
-      df2 <- df
+}
+
+test <- find_product_name(2000, c("mosquito beater", "herbicide"))
+
+#' Find Pesticide Product names and registration numbers from PUR Product Lookup
+#' Tables.
+#'
+#' For a year and vector of product search terms, \code{find_product_name} returns
+#' a data frame with corresponding product registration numbers, \code{prodno},
+#' indicator codes, and product names.
+#'
+#' @param products A character string or a vector of character strings with
+#'   pesticide product names that you would like to search for. Not case
+#'   sensitive. The default is "all", which will return all pesticide products
+#'   applied for a given year.
+#' @inheritParams pull_product_table
+#'
+#' @return A data frame with six columns:
+#' \describe{
+#'   \item{prodno}{The CA registration number. Can be matched with the
+#'   \code{prodno} in a raw or cleaned PUR dataset.}
+#'   \item{prodstat_ind}{Character. An indication of product registration status:
+#'   \itemize{
+#'   \item A = Active
+#'   \item B = Inactive
+#'   \item C = Inactive, Not Renewed
+#'   \item D = Inactive, Voluntary Cancellation
+#'   \item E = Inactive, Cancellation
+#'   \item F = Inactive, Suspended
+#'   \item G = Inactive, Invalid Data
+#'   \item H = Active, Suspended}}
+#'   \item{product_name}{Character. The name of the product taken from the
+#'   registered product label. May have been modified by DPR's Registration Branch
+#'   to ensure uniqueness.}
+#'   \item{signlwrd_ind}{Integer. The signal word printed on the front of the
+#' product label:
+#'   \itemize{
+#'   \item 1 = Danger (Poison)
+#'   \item 2 = Danger (Only)
+#'   \item 3 = Warning
+#'   \item 4 = Caution
+#'   \item 5 = None}}
+#'   \item{year}{The year for which product table information was pulled.}
+#'   \item{product}{Product name search terms.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' prod_df <- find_product_name(2000, "mosquito")
+#' prod_df <- find_product_name(2010, c("insecticide", "rodenticide"))
+#' }
+find_product_name <- function(year, products = "all", download_progress = FALSE) {
+
+  prod_df <- pull_product_table(year, download_progress = download_progress)
+
+  for (i in 1:length(products)) {
+    df <- help_find_product(products[i], prod_df)
+    if (i == 1) {
+      out <- df
     } else {
-      df2 <- df[grep(quotemeta(chem_up), df$chemname), ]
-      df2 <- df2 %>% dplyr::mutate(chemical = chemical)
+      out <- rbind(out, df)
     }
-
-    return(df2)
-
   }
 
-  out <- purrr::map_dfr(chemicals, pull_chemical_code)  %>%
-    unique()
+  out <- unique(out)
 
   return(out)
 
