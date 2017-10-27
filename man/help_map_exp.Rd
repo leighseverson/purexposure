@@ -84,5 +84,5 @@ For a unique combination of time periods, chemicals, and application methods,
 units intersecting with the buffer.
 }
 \details{
-This is a helper function for \code{map_exposure}.
+This is a helper function for \code{plot_exposure}.
 }

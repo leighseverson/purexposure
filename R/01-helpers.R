@@ -53,10 +53,10 @@ help_read_in_counties <- function(code_or_file, type, year) {
 #'   name.
 #'
 #' @examples
-#' help_find_code("01", find = "names")
-#' help_find_code("contra costa", find = "codes")
+#' help_find_code("01", return = "names")
+#' help_find_code("contra costa", return = "codes")
 #' @importFrom magrittr %>%
-help_find_code <- function(county, find = "codes") {
+help_find_code <- function(county, return = "codes") {
 
   code_df <- purexposure::county_codes
 
@@ -102,9 +102,9 @@ help_find_code <- function(county, find = "codes") {
   }
 
   if (is.null(error)) {
-    if (find == "codes") {
+    if (return == "codes") {
       return(code)
-    } else if (find == "names") {
+    } else if (return == "names") {
       return(name)
     }
   } else {
@@ -631,9 +631,9 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 #' \code{help_map_exp} returns a plot showing amounts of pesticides applied for PLS
 #' units intersecting with the buffer.
 #'
-#' This is a helper function for \code{map_exposure}.
+#' This is a helper function for \code{plot_exposure}.
 #'
-#' @inheritParams map_exposure
+#' @inheritParams plot_exposure
 #' @inheritParams calculate_exposure
 #' @param data_pls A data frame
 #' @param gradient A character vector of hex color codes

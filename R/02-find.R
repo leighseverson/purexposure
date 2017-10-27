@@ -143,7 +143,7 @@ find_counties <- function(counties, return = "codes") {
 
   for (i in 1:length(counties)) {
 
-    county_name <- help_find_code(counties[i], find = return)
+    county_name <- help_find_code(counties[i], return)
     if (is.null(county_name)) {
 
       stop(paste0("\"", counties[i], "\"", " doesn't match any ",

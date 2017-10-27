@@ -160,12 +160,16 @@ df2 <- pull_clean_pur(years = 2000:2010,
                       chemicals = "methylene",
                       aerial_ground = TRUE)
 
-# filter to a particular product
-prod_table <- pull_product_table(2003) \%>\%
-    dplyr::filter(product_name == )
+# filter to particular products
+prod_nos <- find_product_name(2003, "insecticide") \%>\%
+    dplyr::select(prodno) \%>\%
+    tibble_to_vector()
+
+df3 <- pull_clean_pur(2003) \%>\%
+    dplyr::filter(prodno \%in\% prod_nos)
 
 # Sum application by active ingredients
-df3 <- pull_clean_pur(years = 2000:2010,
+df4 <- pull_clean_pur(years = 2000:2010,
                       counties = c("01", "nevada", "riverside"),
                       chemicals = "methylene",
                       unit = "township", sum_application = TRUE)
@@ -175,7 +179,7 @@ chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) \%>\%
    dplyr::rename(chemical_class = chemical)
 
-df4 <- pull_clean_pur(years = 1995,
+df5 <- pull_clean_pur(years = 1995,
                       counties = "fresno",
                       chemicals = chemical_class_df$chemname,
                       sum_application = TRUE,
