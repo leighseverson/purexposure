@@ -1,6 +1,6 @@
 #' Map a county's location in California
 #'
-#' \code{map_county_locations} returns one or multiple plots with county
+#' \code{plot_county_locations} returns one or multiple plots with county
 #' locations in California given either a vector of county names or codes,
 #' or a PUR data frame with a \code{county_cd}, \code{county_name}, or
 #' \code{county_code} column (A data frame returned from either
@@ -26,12 +26,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' map_county_locations("fresno")
+#' plot_county_locations("fresno")
 #'
 #' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"), verbose = FALSE)
-#' map_county_locations(pur_df)
+#' plot_county_locations(pur_df)
 #'
-#' plot_list <- map_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
+#' plot_list <- plot_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
 #' names(plot_list)
 #' plot_list[[1]]
 #' plot_list[[2]]
@@ -40,7 +40,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @export
-map_county_locations <- function(counties_or_df, one_plot = TRUE,
+plot_county_locations <- function(counties_or_df, one_plot = TRUE,
                                  fill_color = "red", alpha = 0.5) {
 
   ca_shp <- purexposure::california_shp
@@ -126,7 +126,7 @@ map_county_locations <- function(counties_or_df, one_plot = TRUE,
 
 #' Map pesticide application by county
 #'
-#' \code{map_county_application} returns a plot of applied pesticides (either the
+#' \code{plot_county_application} returns a plot of applied pesticides (either the
 #' sum of all active ingredients present in the input \code{pull_clean_pur} data
 #' frame, a specified chemical class, or a specified active ingredient). Application
 #' is summed by section or township. PLS units can be shaded by amount or by
@@ -185,18 +185,18 @@ map_county_locations <- function(counties_or_df, one_plot = TRUE,
 #'
 #' @examples
 #' \dontrun{
-#' tulare_list <- pull_clean_pur(2010, "tulare") %>% map_county_application()
+#' tulare_list <- pull_clean_pur(2010, "tulare") %>% plot_county_application()
 #'
 #' # plot all active ingredients
 #' pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-#' fresno_list <- map_county_application(pur_df, color_by = "percentile",
+#' fresno_list <- plot_county_application(pur_df, color_by = "percentile",
 #'                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 #' fresno_list$map
 #' head(fresno_list$data)
 #' fresno_list$cutoff_values
 #'
 #' # map a specific active ingredient
-#' fresno_list2 <- map_county_application(pur_df, pls = "township",
+#' fresno_list2 <- plot_county_application(pur_df, pls = "township",
 #'                                        chemicals = "sulfur",
 #'                                        fill_option = "plasma")
 #' fresno_list2$map
@@ -213,7 +213,7 @@ map_county_locations <- function(counties_or_df, one_plot = TRUE,
 #'                           verbose = F, sum_application = T,
 #'                           sum = "chemical_class",
 #'                           chemical_class = chemical_class_df) %>%
-#'    map_county_application()
+#'    plot_county_application()
 #' op_yuba$map
 #' }
 #'
@@ -221,7 +221,7 @@ map_county_locations <- function(counties_or_df, one_plot = TRUE,
 #' @importFrom rlang !!
 #' @importFrom rlang :=
 #' @export
-map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
+plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                    color_by = "amount",
                                    percentile = c(0.25, 0.5, 0.75),
                                    start_date = NULL, end_date = NULL,
@@ -422,12 +422,12 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
 #' Map exposure to applied pesticides by PLS unit and buffer.
 #'
-#' \code{map_exposure} returns a plot of pesticide application in the PLS units
+#' \code{plot_exposure} returns a plot of pesticide application in the PLS units
 #' intersected by a buffer for each combination of time period, applied active
 #' ingredients, and applicaiton method relevant for the exposure values returned
 #' from \code{calculate_exposure}.
 #'
-#' @inheritParams map_county_application
+#' @inheritParams plot_county_application
 #' @param exposure_list A list returned from \code{calculate_exposure}.
 #' @param buffer_or_county Either "county" (the default) or "buffer". Specifies
 #'   whether you would like colors to be scaled according to the limits
@@ -463,7 +463,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>%
 #'    calculate_exposure(location = "-119.3473, 36.2077",
 #'                       radius = 3500) %>%
-#'    map_exposure()
+#'    plot_exposure()
 #' names(tulare_list)
 #' tulare_list$maps
 #' tulare_list$pls_data
@@ -478,7 +478,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'                        radius = 4000,
 #'                        time_period = "6 months",
 #'                        aerial_ground = TRUE) %>%
-#'     map_exposure(fill_option = "plasma")
+#'     plot_exposure(fill_option = "plasma")
 #' do.call("rbind", dalton_list$exposure)
 #' # one map for each exposure value (unique combination of chemicals,
 #' dates, and aerial/ground application)
@@ -503,7 +503,7 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'                         radius = 3000,
 #'                         time_period = "1 year",
 #'                         chemicals = "chemical_class") %>%
-#'      map_exposure("amount")
+#'      plot_exposure("amount")
 #' do.call("rbind", santa_maria$exposure)
 #' santa_maria$maps[[1]]
 #' santa_maria$maps[[2]]
@@ -515,14 +515,14 @@ map_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'      calculate_exposure(location = "-120.218404, 36.1806",
 #'                         radius = 1500)
 #'
-#' map_exposure(turk, buffer_or_county = "county")$maps
-#' map_exposure(turk, buffer_or_county = "buffer")$maps
+#' plot_exposure(turk, buffer_or_county = "county")$maps
+#' plot_exposure(turk, buffer_or_county = "buffer")$maps
 #'
-#' map_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
-#' map_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
+#' plot_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+#' plot_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
 #' @importFrom magrittr %>%
-map_exposure <- function(exposure_list,  color_by = "amount",
+plot_exposure <- function(exposure_list,  color_by = "amount",
                          buffer_or_county = "county",
                          percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
                          alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
@@ -625,3 +625,8 @@ map_exposure <- function(exposure_list,  color_by = "amount",
 
   return(out_maps_list)
 }
+
+
+#' Plot time series
+
+plot_application_timeseries <- function(clean_pur_df) {}
