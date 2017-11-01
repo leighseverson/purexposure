@@ -53,7 +53,7 @@ A data frame with 33 columns. Different years and counties for which
 
 \examples{
 \dontrun{
-df <- pull_raw_pur(download_progress = TRUE)
+df <- pull_raw_pur(download_progress = TRUE) # this will take a while to run
 df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
 df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 }

@@ -42,7 +42,7 @@ find_chemical_codes <- function(year, chemicals = "all") {
   df <- purexposure::chemical_list
   df <- df[[as.character(year)]]
 
-  out <- purrr::map_dfr(chemicals, help_find_code, df)  %>%
+  out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
     unique()
 
   return(out)
@@ -137,6 +137,7 @@ find_product_name <- function(year, products = "all", download_progress = FALSE)
 #'
 #' find_counties(c("01", "03", "el dorado"), return = "names")
 #' find_counties(c("contra costa", "45"), return = "names")
+#' find_counties("fresno")
 #' @importFrom magrittr %>%
 #' @export
 find_counties <- function(counties, return = "codes") {

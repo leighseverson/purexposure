@@ -9,3 +9,9 @@ plot_application_timeseries(clean_pur_df)
 \description{
 Plot time series
 }
+\examples{
+\dontrun{
+clean_pur <- pull_clean_pur(1990:2015, "fresno", chemicals = "methyl bromide",
+                            sum_application = TRUE)
+}
+}

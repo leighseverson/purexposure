@@ -20,7 +20,8 @@ county_codes <- readr::read_csv("county.txt")
 county_codes <- county_codes %>%
   dplyr::rename(county_name = couty_name,
                 county_code = county_cd) %>%
-  dplyr::select(county_name, county_code)
+  dplyr::select(county_name, county_code) %>%
+  dplyr::filter(county_name != "UNKNOWN") # no "unknown" files in 1990:2015
 
 setwd(current_dir)
 

@@ -18,20 +18,46 @@ help_read_in_counties <- function(code_or_file, type, year) {
   if (type == "codes") {
 
     raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"))))
+      readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"),
+                      progress = FALSE)))
     raw_data <- dplyr::mutate_all(raw_data, as.character)
-
-    return(raw_data)
 
   } else if (type == "files") {
 
     raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(code_or_file)))
+      readr::read_csv(code_or_file, progress = FALSE)))
     raw_data <- dplyr::mutate_all(raw_data, as.character)
 
-    return(raw_data)
+  }
+
+  # neither of these columns are documented in PUR guide, and they
+  # are inconsistently included in PUR datasets.
+  if ("error_flag" %in% colnames(raw_data)) {
+
+    raw_data <- raw_data %>%
+      dplyr::select(-error_flag)
 
   }
+
+  if ("comtrs" %in% colnames(raw_data)) {
+
+    raw_data <- raw_data %>%
+      dplyr::select(-comtrs)
+
+  }
+
+  date_min <- lubridate::ymd(paste0(year, "-01-01"))
+  date_max <- lubridate::ymd(paste0(year, "-12-31"))
+
+  # sometimes 12/31 from the previous year is included...
+  raw_data <- raw_data %>%
+    dplyr::mutate(applic_dt = lubridate::mdy(applic_dt)) %>%
+    dplyr::filter(applic_dt >= date_min &
+                    applic_dt <= date_max) %>%
+    dplyr::mutate(applic_dt = as.character(applic_dt))
+
+  return(raw_data)
+
 }
 
 #' Find California county code or name
@@ -1092,7 +1118,7 @@ help_categorize <- function(section_data, buffer_or_county,
 #' and \code{chemical}.
 #'
 #' @importFrom magrittr %>%
-help_find_code <- function(chemical, df) {
+help_find_chemical <- function(chemical, df) {
 
   quotemeta <- function(string) {
     stringr::str_replace_all(string, "(\\W)", "\\\\\\1")

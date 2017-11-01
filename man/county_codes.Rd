@@ -4,13 +4,13 @@
 \name{county_codes}
 \alias{county_codes}
 \title{California Pesticide Use Report county codes.}
-\format{A data frame with 59 rows and two columns:
+\format{A data frame with 58 rows and two columns:
 \describe{
   \item{county_name}{A character vector giving California county names.}
   \item{county_code}{A character vector giving county codes (ranging from "01"
-  through "58", with "-1" indicating "unknown") corresponding to each
-  California county. Note: these codes are unique to California PUR datasets;
-  they do not correspond to FIPS codes.}
+  through "58") corresponding to each California county. Note: these codes
+  are unique to California PUR datasets; they do not correspond to FIPS
+  codes.}
 }}
 \source{
 \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}

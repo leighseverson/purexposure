@@ -26,7 +26,7 @@
 #' }
 #' @importFrom magrittr %>%
 #' @export
-pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
+pull_pur_file <- function(year, counties = "all", download_progress = TRUE) {
 
   current_dir <- getwd()
 
@@ -92,7 +92,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 #'   default value is TRUE.
 #' @param download_progress TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for each year of PUR data that is downloaded.
-#'   The default value is FALSE.
+#'   The default value is TRUE.
 #'
 #' @return A data frame with 33 columns. Different years and counties for which
 #'   data was pulled are indicated by \code{applic_dt} and \code{county_cd},
@@ -112,23 +112,23 @@ pull_pur_file <- function(year, counties = "all", download_progress = FALSE) {
 #'
 #' @examples
 #' \dontrun{
-#' df <- pull_raw_pur(download_progress = TRUE)
+#' df <- pull_raw_pur(download_progress = TRUE) # this will take a while to run
 #' df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
 #' df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 #' }
 #' @importFrom magrittr %>%
 #' @export
 pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
-                         download_progress = FALSE) {
+                         download_progress = TRUE) {
 
+  if ("all" %in% tolower(years)) {
+    years <- 1990:2015
+  }
   if (!all(is.numeric(years))) {
     stop("Years should be four-digit numeric values.")
   }
   if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > 2015)) {
     stop("Years should be between 1990 and 2015.")
-  }
-  if ("all" %in% tolower(years)) {
-    years <- 1990:2015
   }
 
   code_df <- purexposure::county_codes
@@ -191,7 +191,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
       tidyr::nest() %>%
       dplyr::mutate(counties = purrr::map(data, tibble_to_vector))
 
-    # hmm..
     for (i in 1:nrow(years_counties)) {
       df <- purrr::map2_dfr(years_counties$year[[i]],
                             years_counties$counties[[i]],
@@ -374,7 +373,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            aerial_ground = TRUE, verbose = TRUE,
-                           download_progress = FALSE) {
+                           download_progress = TRUE) {
 
   raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                          download_progress = download_progress)
@@ -421,14 +420,37 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       tidyr::nest() %>%
       dplyr::mutate(chemicals = purrr::map(data, tibble_to_vector))
 
+    ###
+    # works with a single year.
+    # bug here w/ find_chemical_code ??
     chem_df <- purrr::map2_dfr(years_chemicals$year, years_chemicals$chemicals,
                                find_chemical_codes) %>% unique()
+
+    for (i in 1:nrow(years_chemicals)) {
+
+      chem_df <- find_chemical_codes(eval(years_chemicals$year[i]),
+                                     eval(years_chemicals$chemicals[[i]]))
+
+      find_chemical_codes(1990, "methyl bromide")
+      year <- years_chemicals$year[i]
+      chemicals <- years_chemicals$chemicals[[i]]
+      find_chemical_codes(year, chemicals)
+
+      if (i == 1) {
+        out_chem_df <- chem_df
+      } else {
+        out_chem_df <- rbind(out_chem_df, chem_df)
+      }
+
+    }
+
+    ####
 
     df <- df %>%
       dplyr::filter(chem_code %in% chem_df$chem_code) %>%
       dplyr::left_join(chem_df, by = "chem_code") %>%
       dplyr::select(-chemical) %>%
-      dplyr::mutate(applic_dt = lubridate::mdy(applic_dt))
+      dplyr::mutate(applic_dt = lubridate::ymd(applic_dt))
 
     # chemicals
     if (nrow(df) == 0) {
@@ -655,7 +677,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #'   SpatialPolygonsDataFrame.
 #' @param download_progress TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for the shapefile that is downloaded.
-#'   The default value is FALSE.
+#'   The default value is FALSE
 #'
 #' @return A SpatialPolygonsDataFrame object.
 #'
