@@ -202,7 +202,7 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
     tibble_to_vector()
 
   cols_to_keep <- colnames(df)[!colnames(df) %in% cols_to_remove]
-  cols_names <- unlist(purrr::map(cols_to_keep, quo_name))
+  cols_names <- unlist(purrr::map(cols_to_keep, rlang::quo_name))
   df <- df %>% dplyr::select(!!cols_names)
 
   return(df)

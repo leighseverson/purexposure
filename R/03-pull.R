@@ -262,6 +262,12 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
 #'   "O" = other.) The default is FALSE.
+#' @param raw_pur_df A raw PUR data frame. Optional. If you've already downloaded
+#'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
+#'   \code{pull_clean_pur} from downloading the same data again. In this case,
+#'   \code{years} and \code{counties} arguments can't be left as their defaults.
+#'   They need to be set to years and counties that are present in the raw PUR
+#'   dataset.
 #'
 #' @return A data frame with 12 columns:
 #'   \describe{
@@ -373,10 +379,75 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            aerial_ground = TRUE, verbose = TRUE,
-                           download_progress = TRUE) {
+                           download_progress = TRUE,
+                           raw_pur_df = NULL) {
 
-  raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
-                         download_progress = download_progress)
+  if (is.null(raw_pur_df)) {
+    raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
+                           download_progress = download_progress)
+  } else {
+
+    check <- colnames(raw_pur_df == c("use_no", "prodno", "chem_code",
+                                      "prodchem_pct", "lbs_chm_used",
+                                      "lbs_prd_used", "amt_prd_used",
+                                      "unit_of_meas", "acre_planted",
+                                      "unit_planted", "acre_treated",
+                                      "unit_treated", "applic_cnt", "applic_dt",
+                                      "applic_time", "county_cd", "base_ln_mer",
+                                      "township", "tship_dir", "range",
+                                      "range_dir", "section", "site_loc_id",
+                                      "grower_id", "license_no", "planting_seq",
+                                      "aer_gnd_ind", "site_code", "qualify_cd",
+                                      "batch_no", "document_no", "summary_cd",
+                                      "record_id"))
+
+    if (!check) {
+      stop(paste0("The raw_pur_df data frame should be returned from ",
+                  "pull_raw_pur() and should have 33 columns."))
+    }
+
+    unique_years <- raw_pur_df %>%
+      dplyr::mutate(year = lubridate::year(lubridate::ymd(applic_dt))) %>%
+      dplyr::select(year) %>%
+      unique() %>%
+      tibble_to_vector()
+
+    unique_counties <- raw_pur_df %>%
+      dplyr::select(county_cd) %>%
+      unique() %>%
+      tibble_to_vector() %>%
+      find_counties(return = "codes")
+
+    if (is.character(years)) {
+      if (years == "all") {
+      years_check <- 1990:2015
+      }
+    } else {
+      years_check <- years
+    }
+
+    if (counties == "all") {
+      counties_check <- purexposure::county_codes$county_code
+    } else {
+      counties_check <- find_counties(counties)
+    }
+
+    years_check <- years_check %in% unique_years
+
+    if (!all(years_check)) {
+      stop(paste0("The years argument specifies years not present in the given ",
+                  "raw_pur_df data frame."))
+    }
+
+    counties_check <- counties_check %in% unique_counties
+
+    if (!all(counties_check)) {
+      stop(paste0("The counties argument specifies counties not present in the ",
+                  "given raw_pur_df data frame."))
+    }
+
+    raw_df <- raw_pur_df
+  }
 
   df <- raw_df %>%
     dplyr::mutate(township_pad = stringr::str_pad(raw_df$township, 2, "left", pad = "0"),
@@ -406,7 +477,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
   # with the calculated max rate multiplied by number of acres treated (acre_treated)
   ## might want to re-think this... PUR already has outlier control. (outlier90.txt)
   calc_max <- df %>%
-    dplyr::group_by(chem_code) %>%
+    dplyr::mutate(year = as.character(lubridate::year(lubridate::ymd(applic_dt)))) %>%
+    dplyr::group_by(chem_code, year) %>%
     dplyr::summarize(mean = mean(lbs_per_acre, na.rm = TRUE),
                      sd = sd(lbs_per_acre, na.rm = TRUE)) %>%
     dplyr::mutate(calc_max = mean + 2*sd)
@@ -420,31 +492,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       tidyr::nest() %>%
       dplyr::mutate(chemicals = purrr::map(data, tibble_to_vector))
 
-    ###
-    # works with a single year.
-    # bug here w/ find_chemical_code ??
     chem_df <- purrr::map2_dfr(years_chemicals$year, years_chemicals$chemicals,
                                find_chemical_codes) %>% unique()
-
-    for (i in 1:nrow(years_chemicals)) {
-
-      chem_df <- find_chemical_codes(eval(years_chemicals$year[i]),
-                                     eval(years_chemicals$chemicals[[i]]))
-
-      find_chemical_codes(1990, "methyl bromide")
-      year <- years_chemicals$year[i]
-      chemicals <- years_chemicals$chemicals[[i]]
-      find_chemical_codes(year, chemicals)
-
-      if (i == 1) {
-        out_chem_df <- chem_df
-      } else {
-        out_chem_df <- rbind(out_chem_df, chem_df)
-      }
-
-    }
-
-    ####
 
     df <- df %>%
       dplyr::filter(chem_code %in% chem_df$chem_code) %>%
@@ -519,14 +568,17 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
   }
 
+  df <- df %>% dplyr::mutate(year = as.character(lubridate::year(applic_dt)))
+
   df2 <- calc_max %>%
-    dplyr::select(chem_code, calc_max) %>%
-    dplyr::right_join(df, by = "chem_code") %>%
+    dplyr::select(chem_code, year, calc_max) %>%
+    dplyr::right_join(df, by = c("chem_code", "year")) %>%
     dplyr::mutate(outlier = ifelse((!is.na(calc_max) &
                                       lbs_per_acre > calc_max), TRUE, FALSE),
                   lbs_chm_used = ifelse(lbs_per_acre > calc_max,
                                         calc_max*acre_treated, lbs_chm_used)) %>%
-    dplyr::rename(county_code = county_cd)
+    dplyr::rename(county_code = county_cd) %>%
+    dplyr::ungroup()
 
   county <- purexposure::county_codes
 
