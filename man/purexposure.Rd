@@ -6,7 +6,7 @@
 \alias{purexposure-package}
 \title{purexposure: A package for working with CA Pesticide Use Registry data.}
 \description{
-The purexposure package provides functions to pull data from California's
+The \code{purexposure} package provides functions to pull data from California's
 Pesticide Use Registry (PUR), as well as to calculate exposure to and
 visualize active ingredients present in applied pesticides. The main function
 categories are \code{find_*}, \code{pull_*}, \code{calculate_*}, and
@@ -15,8 +15,7 @@ categories are \code{find_*}, \code{pull_*}, \code{calculate_*}, and
 \section{find_* functions}{
 
 \code{find_} functions help with searches of PUR chemical, county, and
-product codes, as well as the county in which an address or coordinate pair
-is located.
+product codes.
 \itemize{
   \item \code{find_chemical_codes}: Pull active ingredient chemical codes
   from PUR Chemical Lookup Tables.

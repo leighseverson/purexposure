@@ -855,6 +855,7 @@ pull_spdf <- function(county, section_township = "section",
 #' prod_95 <- pull_product_table(1995)
 #' }
 #' @importFrom magrittr %>%
+#' @export
 pull_product_table <- function(year, download_progress = FALSE) {
 
   url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",

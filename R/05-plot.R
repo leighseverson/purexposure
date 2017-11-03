@@ -522,6 +522,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' plot_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
 #' @importFrom magrittr %>%
+#' @export
 plot_exposure <- function(exposure_list,  color_by = "amount",
                          buffer_or_county = "county",
                          percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
@@ -652,6 +653,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 #'
 #' pull_clean_pur(2000, "riverside") %>% plot_application_timeseries()
 #' }
+#' @export
 plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
                                         y_axis = "fixed") {
 

@@ -21,7 +21,7 @@ county_codes
 \description{
 A data frame containing California county names and corresponding codes
 used to identify counties in California Pesticide Use Reports. This file,
-"county.txt" was pulled from the .zip file "pur2000.zip" found here:
+"county.txt", was pulled from the .zip file "pur2000.zip" found here:
 \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 }
 \keyword{datasets}
