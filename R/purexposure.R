@@ -4,7 +4,7 @@
 #' Pesticide Use Registry (PUR), as well as to calculate exposure to and
 #' visualize active ingredients present in applied pesticides. Functions are
 #' organized into \code{find_*}, \code{pull_*}, \code{calculate_*}, and
-#' \code{plot_*}. There are a few main functions from each category:
+#' \code{plot_*}. These are the main functions from each category:
 #'
 #' @section find_* functions:
 #' The code{find_} functions help with searches of PUR chemical, county, and
