@@ -264,10 +264,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   "O" = other.) The default is FALSE.
 #' @param raw_pur_df A raw PUR data frame. Optional. If you've already downloaded
 #'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
-#'   \code{pull_clean_pur} from downloading the same data again. In this case,
-#'   \code{years} and \code{counties} arguments can't be left as their defaults.
-#'   They need to be set to years and counties that are present in the raw PUR
-#'   dataset.
+#'   \code{pull_clean_pur} from downloading the same data again.
 #'
 #' @return A data frame with 12 columns:
 #'   \describe{
@@ -372,6 +369,10 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       sum = "chemical_class",
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
+#'
+#' # clean an existing raw PUR dataset
+#' placer_05 <- pull_raw_pur(2005, "placer")
+#' df6 <- pull_clean_pur(raw_pur_df = placer_05)
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -387,7 +388,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            download_progress = download_progress)
   } else {
 
-    check <- colnames(raw_pur_df == c("use_no", "prodno", "chem_code",
+    check <- colnames(raw_pur_df) == c("use_no", "prodno", "chem_code",
                                       "prodchem_pct", "lbs_chm_used",
                                       "lbs_prd_used", "amt_prd_used",
                                       "unit_of_meas", "acre_planted",
@@ -399,9 +400,9 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                       "grower_id", "license_no", "planting_seq",
                                       "aer_gnd_ind", "site_code", "qualify_cd",
                                       "batch_no", "document_no", "summary_cd",
-                                      "record_id"))
+                                      "record_id")
 
-    if (!check) {
+    if (!all(check)) {
       stop(paste0("The raw_pur_df data frame should be returned from ",
                   "pull_raw_pur() and should have 33 columns."))
     }
@@ -420,14 +421,14 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
     if (is.character(years)) {
       if (years == "all") {
-      years_check <- 1990:2015
+      years_check <- unique_years
       }
     } else {
       years_check <- years
     }
 
     if (counties == "all") {
-      counties_check <- purexposure::county_codes$county_code
+      counties_check <- unique_counties
     } else {
       counties_check <- find_counties(counties)
     }
@@ -552,6 +553,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
   } else {
 
+    if (years == "all") {
+      years <- 1990:2015
+    }
+
     chem_df <- purexposure::chemical_list
     out_chem_list <- list()
     for (i in 1:length(years)) {
@@ -561,7 +566,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     }
     out_chem_df <- dplyr::bind_rows(out_chem_list)
 
-    df <- df %>% dplyr::mutate(applic_dt = lubridate::mdy(applic_dt),
+    df <- df %>% dplyr::mutate(applic_dt = lubridate::ymd(applic_dt),
                                year = lubridate::year(applic_dt),
                                year = as.character(year)) %>%
       dplyr::left_join(out_chem_df, by = c("chem_code", "year"))
@@ -596,17 +601,23 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
   # missing section and township IDs
 
-  missing_sections <- grep("\\?", out$section, value = TRUE)
-  missing_townships <- grep("\\?", out$township, value = TRUE)
+  missing_sections <- c(grep("\\?", out$section, value = TRUE),
+                        grep("000000000", out$section, value = TRUE))
+  missing_townships <- c(grep("\\?", out$township, value = TRUE),
+                         grep("0000000", out$township, value = TRUE))
 
   if (length(missing_sections) != 0) {
     out <- out %>% dplyr::mutate(section = ifelse(section %in% missing_sections,
+                                                  NA, section),
+                                 section = ifelse(section == "000000000",
                                                   NA, section))
   }
 
   if (length(missing_townships) != 0) {
     out <- out %>% dplyr::mutate(township = ifelse(township %in% missing_sections,
-                                                   NA, township))
+                                                   NA, township),
+                                 township = ifelse(township == "000000",
+                                                   NA, section))
   }
 
   if (sum_application) {

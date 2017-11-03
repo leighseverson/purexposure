@@ -145,7 +145,7 @@
 #' exp_list4$meta_data
 #'
 #' # incorporate aerial/ground application information
-#' clean_pur4 <- pull_clean_pur(2000, "yolo", aerial_ground = TRUE)
+#' clean_pur4 <- pull_clean_pur(2000, "yolo")
 #' exp_list5 <- calculate_exposure(clean_pur4,
 #'                                 location = "-121.9018, 38.7646",
 #'                                 radius = 2500,

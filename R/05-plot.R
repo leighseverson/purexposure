@@ -629,15 +629,11 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 
 #' Plot time series
 #'
-#' important not to sum_application w/ this... need date, still
-#' hm
-#' ^ means you end up doing things twice, if you want to sum application.
-#' return un-summed dataset in list from pull_clean_pur?
-#' returning a list would mess up piping to other functions. or would it?? hm
 #'
 #' @examples
 #' \dontrun{
-#' clean_pur <- pull_clean_pur(1990:2015, "fresno", chemicals = "methyl bromide")
+#' clean_pur <- pull_clean_pur(1990:2015, "fresno", chemicals = "methyl bromide",
+#'          raw_df = readRDS("~/Desktop/raw_df_ex.rds"))
 #' }
 plot_application_timeseries <- function(clean_pur_df) {}
 

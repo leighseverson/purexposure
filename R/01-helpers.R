@@ -375,7 +375,7 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 
   group_by <- rlang::quos(...)
 
-  pur_summed <- pur_filt %>%
+  pur_summed <- "pur_filt" %>%
     dplyr::filter(date >= start_date & date <= end_date) %>%
     dplyr::group_by(!!!group_by) %>%
     dplyr::summarise(kg = sum(kg_chm_used)) %>%
