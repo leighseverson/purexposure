@@ -4,7 +4,7 @@
 \alias{pull_pur_file}
 \title{Pull raw PUR file for a single year and a county or counties.}
 \usage{
-pull_pur_file(year, counties = "all", download_progress = FALSE)
+pull_pur_file(year, counties = "all", download_progress = TRUE)
 }
 \arguments{
 \item{counties}{A character vector giving either county names or two digit
@@ -16,7 +16,7 @@ will pull data for all 58 California counties.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that is downloaded.
-The default value is FALSE.}
+The default value is TRUE.}
 }
 \value{
 A data frame with 33 columns. Counties are indicated by

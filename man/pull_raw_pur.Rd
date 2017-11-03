@@ -5,7 +5,7 @@
 \title{Pull raw PUR data by counties and years}
 \usage{
 pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
-  download_progress = FALSE)
+  download_progress = TRUE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -26,7 +26,7 @@ default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that is downloaded.
-The default value is FALSE.}
+The default value is TRUE.}
 }
 \value{
 A data frame with 33 columns. Different years and counties for which

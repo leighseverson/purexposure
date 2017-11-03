@@ -18,7 +18,7 @@ SpatialPolygonsDataFrame.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the shapefile that is downloaded.
-The default value is FALSE.}
+The default value is FALSE}
 }
 \value{
 A SpatialPolygonsDataFrame object.

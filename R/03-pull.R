@@ -266,7 +266,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 #'   \code{pull_clean_pur} from downloading the same data again.
 #'
-#' @return A data frame with 12 columns:
+#' @return A data frame with 13 columns:
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
 #'     for the active ingredient applied. Not included if
@@ -553,8 +553,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
   } else {
 
-    if (years == "all") {
-      years <- 1990:2015
+    if (is.character(years)) {
+      if (years == "all") {
+        years <- 1990:2015
+      }
     }
 
     chem_df <- purexposure::chemical_list

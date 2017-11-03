@@ -7,7 +7,7 @@
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
   chemical_class = NULL, aerial_ground = TRUE, verbose = TRUE,
-  download_progress = FALSE)
+  download_progress = TRUE, raw_pur_df = NULL)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -72,7 +72,11 @@ default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that is downloaded.
-The default value is FALSE.}
+The default value is TRUE.}
+
+\item{raw_pur_df}{A raw PUR data frame. Optional. If you've already downloaded
+a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
+\code{pull_clean_pur} from downloading the same data again.}
 }
 \value{
 A data frame with 12 columns:
@@ -186,5 +190,9 @@ df5 <- pull_clean_pur(years = 1995,
                       sum = "chemical_class",
                       unit = "township",
                       chemical_class = chemical_class_df)
+
+# clean an existing raw PUR dataset
+placer_05 <- pull_raw_pur(2005, "placer")
+df6 <- pull_clean_pur(raw_pur_df = placer_05)
 }
 }

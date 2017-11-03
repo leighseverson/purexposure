@@ -626,16 +626,70 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
   return(out_maps_list)
 }
 
-
-#' Plot time series
+#' Plot time series of active ingredients in applied pesticides
 #'
+#' \code{plot_application_timeseries} returns a \code{ggplot2} time series plot
+#' of pesticides present in a \code{pull_clean_pur} data frame. You can choose
+#' whether to facet the time series by active ingredient (\code{chemname}) or by
+#' \code{chemical_class}.
+#'
+#' @param clean_pur_df A data frame returned from \code{pull_clean_pur}.
+#' @param facet TRUE / FALSE for whether you would like time series
+#'   plots to be faceted by unqiue \code{chemname} or \code{chemical_class}
+#'   column values. If \code{facet = FALSE} (the default), all active ingredients
+#'   present in the dataset will be summed per day.
+#' @param y_axis A character string passed on to the \code{scales} argument of
+#'   \code{ggplot2::facet_wrap} (\code{"fixed"}, \code{"free"}, \code{"free_x"},
+#'   or \code{"free_y"}). The default is \code{"fixed"}.
+#'
+#' @return A \code{ggplot2} object.
 #'
 #' @examples
 #' \dontrun{
-#' clean_pur <- pull_clean_pur(1990:2015, "fresno", chemicals = "methyl bromide",
-#'          raw_df = readRDS("~/Desktop/raw_df_ex.rds"))
+#' pull_clean_pur(1990:1992, "fresno") %>%
+#'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
+#'     plot_application_timeseries(facet = TRUE)
+#'
+#' pull_clean_pur(2000, "riverside") %>% plot_application_timeseries()
 #' }
-plot_application_timeseries <- function(clean_pur_df) {}
+plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
+                                        y_axis = "fixed") {
+
+  if (facet) {
+    if ("chemname" %in% colnames(clean_pur_df)) {
+      plot <- clean_pur_df %>%
+        dplyr::group_by(date, chemname)
+    } else if ("chemical_class" %in% colnames(clean_pur_df)) {
+      plot <- clean_pur_df %>%
+        dplyr::group_by(date, chemical_class)
+    }
+  } else {
+    plot <- clean_pur_df %>%
+      dplyr::group_by(date)
+  }
+
+
+  plot <- plot %>%
+    dplyr::summarise(kg_perday = sum(kg_chm_used, na.rm = TRUE)) %>%
+    ggplot2::ggplot(ggplot2::aes(x = date, y = kg_perday)) +
+    ggplot2::geom_line() +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(x = "Application date",
+                  y = "Kilograms of active ingredient\napplied per day ")
+
+  if (facet) {
+    if ("chemname" %in% colnames(clean_pur_df)) {
+      plot <- plot +
+        ggplot2::facet_wrap(~chemname, scales = y_axis)
+    } else if ("chemical_class" %in% colnames(clean_pur_df)) {
+      plot <- plot +
+        ggplot2::facet_wrap(~chemical_class, scales = y_axis )
+    }
+  }
+
+  return(plot)
+
+}
 
 
 
