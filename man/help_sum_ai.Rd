@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_sum_ai}
 \alias{help_sum_ai}
-\title{Find summed applied active ingredients}
+\title{Find summed applied active ingredients.}
 \usage{
 help_sum_ai(pur_filt, start_date, end_date, ...)
 }

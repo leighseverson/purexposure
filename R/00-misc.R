@@ -114,7 +114,7 @@ tibble_to_vector <- function(tib) {
 
 }
 
-#' Include alpha in ggplot2::scale_fill_gradientn()
+#' Include alpha in ggplot2::scale_fill_gradientn().
 #'
 #' This function adds an `alpha` argument to scale_fill_gradientn() from the
 #' ggplot2 package.
@@ -129,7 +129,7 @@ scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
                             na.value = na.value, guide = guide, ...)
 }
 
-#' Include alpha option in scales::gradient_n_pal()
+#' Include alpha option in scales::gradient_n_pal().
 #'
 #' This function adds an "alpha" argument from gradient_n_pal() from the scales
 #' package.

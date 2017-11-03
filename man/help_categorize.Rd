@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_categorize}
 \alias{help_categorize}
-\title{Categorize a continuous scale by percentile cutpoints}
+\title{Categorize a continuous scale by percentile cutpoints.}
 \usage{
 help_categorize(section_data, buffer_or_county, start_date = NULL,
   end_date = NULL, aerial_ground = NULL, chemicals = NULL,

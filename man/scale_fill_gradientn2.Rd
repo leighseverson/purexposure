@@ -2,7 +2,7 @@
 % Please edit documentation in R/00-misc.R
 \name{scale_fill_gradientn2}
 \alias{scale_fill_gradientn2}
-\title{Include alpha in ggplot2::scale_fill_gradientn()}
+\title{Include alpha in ggplot2::scale_fill_gradientn().}
 \usage{
 scale_fill_gradientn2(..., colours, values = NULL, space = "Lab",
   na.value = "grey50", guide = "colourbar", colors, alpha = NULL)

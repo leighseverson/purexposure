@@ -2,7 +2,7 @@
 % Please edit documentation in R/05-plot.R
 \name{plot_county_application}
 \alias{plot_county_application}
-\title{Map pesticide application by county}
+\title{Plot pesticide application by county.}
 \usage{
 plot_county_application(clean_pur_df, county = NULL, pls = NULL,
   color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,

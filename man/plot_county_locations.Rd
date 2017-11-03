@@ -2,7 +2,7 @@
 % Please edit documentation in R/05-plot.R
 \name{plot_county_locations}
 \alias{plot_county_locations}
-\title{Map a county's location in California}
+\title{Plot a county's location in California.}
 \usage{
 plot_county_locations(counties_or_df, one_plot = TRUE, fill_color = "red",
   alpha = 0.5)

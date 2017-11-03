@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_remove_cols}
 \alias{help_remove_cols}
-\title{Remove columns with all missing values}
+\title{Remove columns with all missing values.}
 \usage{
 help_remove_cols(col_quote, df)
 }

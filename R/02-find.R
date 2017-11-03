@@ -115,7 +115,7 @@ find_product_name <- function(year, products = "all", download_progress = FALSE)
 
 }
 
-#' Find California county codes or names
+#' Find California county codes or names.
 #'
 #' Given a vector of counties, \code{find_counties} returns either PUR
 #' county codes or names.

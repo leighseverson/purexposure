@@ -2,7 +2,7 @@
 % Please edit documentation in R/02-find.R
 \name{find_counties}
 \alias{find_counties}
-\title{Find California county codes or names}
+\title{Find California county codes or names.}
 \usage{
 find_counties(counties, return = "codes")
 }

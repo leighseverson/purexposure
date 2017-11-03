@@ -2,7 +2,7 @@
 % Please edit documentation in R/03-pull.R
 \name{pull_raw_pur}
 \alias{pull_raw_pur}
-\title{Pull raw PUR data by counties and years}
+\title{Pull raw PUR data by counties and years.}
 \usage{
 pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
   download_progress = TRUE)

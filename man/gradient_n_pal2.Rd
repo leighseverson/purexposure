@@ -2,7 +2,7 @@
 % Please edit documentation in R/00-misc.R
 \name{gradient_n_pal2}
 \alias{gradient_n_pal2}
-\title{Include alpha option in scales::gradient_n_pal()}
+\title{Include alpha option in scales::gradient_n_pal().}
 \usage{
 gradient_n_pal2(colours, values = NULL, space = "Lab", alpha = NULL)
 }

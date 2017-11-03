@@ -72,7 +72,7 @@ pull_pur_file <- function(year, counties = "all", download_progress = TRUE) {
 
 }
 
-#' Pull raw PUR data by counties and years
+#' Pull raw PUR data by counties and years.
 #'
 #' \code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
 #'   California counties.
@@ -216,7 +216,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 
 }
 
-#' Pull cleaned PUR data by counties, years, and active ingredients
+#' Pull cleaned PUR data by counties, years, and active ingredients.
 #'
 #' \code{pull_clean_pur} returns a data frame of cleaned Pesticide Use Report data
 #' filtered by counties, years, and active ingredients. Active ingredients
@@ -476,7 +476,6 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
   # if lbs per acre is larger than the calculated max rate of lbs per acre
   # (mean rate plus 2 standard deviations) then lbs_chm_used is replaced
   # with the calculated max rate multiplied by number of acres treated (acre_treated)
-  ## might want to re-think this... PUR already has outlier control. (outlier90.txt)
   calc_max <- df %>%
     dplyr::mutate(year = as.character(lubridate::year(lubridate::ymd(applic_dt)))) %>%
     dplyr::group_by(chem_code, year) %>%
@@ -730,7 +729,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
 }
 
-#' Pull California county SpatialPolygonsDataFrame
+#' Pull California county SpatialPolygonsDataFrame.
 #'
 #' \code{pull_spdf} pulls either the section or township-level
 #' SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
@@ -811,7 +810,7 @@ pull_spdf <- function(county, section_township = "section",
 
 }
 
-#' Pull PUR Product Table
+#' Pull PUR Product Table.
 #'
 #' This function pulls a California Department of Pesticide Regulation Product
 #' Table for a particular year.

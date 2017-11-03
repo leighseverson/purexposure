@@ -2,7 +2,7 @@
 % Please edit documentation in R/03-pull.R
 \name{pull_spdf}
 \alias{pull_spdf}
-\title{Pull California county SpatialPolygonsDataFrame}
+\title{Pull California county SpatialPolygonsDataFrame.}
 \usage{
 pull_spdf(county, section_township = "section", download_progress = FALSE)
 }

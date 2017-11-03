@@ -139,7 +139,7 @@ help_find_code <- function(county, return = "codes") {
 
 }
 
-#' Sum application by section, township, chemical, and method of application
+#' Sum application by section, township, chemical, and method of application.
 #'
 #' \code{help_sum_application} sums application of a PUR dataset by chemicals,
 #' PLS unit, and aerial/ground application.
@@ -209,7 +209,7 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
 
 }
 
-#' Remove columns with all missing values
+#' Remove columns with all missing values.
 #'
 #' Given a quoted column name and its data frame, \code{help_remove_cols} determines
 #' if that column has all missing values or not.
@@ -356,7 +356,7 @@ help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
 
 }
 
-#' Find summed applied active ingredients
+#' Find summed applied active ingredients.
 #'
 #' \code{help_sum_ai} finds the summed amount of applied active ingredients by
 #' section or township, chemical class, and aerial/ground application.
@@ -385,7 +385,7 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 
 }
 
-#' Return a \code{meta_data} data frame
+#' Return a \code{meta_data} data frame.
 #'
 #' \code{help_write_md} returns a data frame to be output as the \code{meta_data}
 #' element in the list returned from \code{calculate_exposure}.
@@ -564,7 +564,7 @@ help_return_exposure <- function(start_date, end_date, location, radius,
 
 }
 
-#' Return exposure data for a single start and end date
+#' Return exposure data for a single start and end date.
 #'
 #' For a single date range, \code{help_calculate_exposure} returns the
 #' \code{exposure} and \code{meta_data} data frames to be output in the
@@ -939,7 +939,7 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 
 }
 
-#' Categorize a continuous scale by percentile cutpoints
+#' Categorize a continuous scale by percentile cutpoints.
 #'
 #' Given a data frame with a column with a continuous numeric variable,
 #' \code{help_categorize} returns the data frame with a new column categorizing

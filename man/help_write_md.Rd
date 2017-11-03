@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_write_md}
 \alias{help_write_md}
-\title{Return a \code{meta_data} data frame}
+\title{Return a \code{meta_data} data frame.}
 \usage{
 help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
   end_date, radius, buffer_area, mtrs_mtr, section_township)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/05-plot.R
 \name{plot_exposure}
 \alias{plot_exposure}
-\title{Map exposure to applied pesticides by PLS unit and buffer.}
+\title{Plot exposure to applied pesticides at a location.}
 \usage{
 plot_exposure(exposure_list, color_by = "amount",
   buffer_or_county = "county", percentile = c(0.25, 0.5, 0.75),

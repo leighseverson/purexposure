@@ -2,7 +2,7 @@
 % Please edit documentation in R/03-pull.R
 \name{pull_product_table}
 \alias{pull_product_table}
-\title{Pull PUR Product Table}
+\title{Pull PUR Product Table.}
 \usage{
 pull_product_table(year, download_progress = FALSE)
 }

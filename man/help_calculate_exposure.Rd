@@ -2,7 +2,7 @@
 % Please edit documentation in R/01-helpers.R
 \name{help_calculate_exposure}
 \alias{help_calculate_exposure}
-\title{Return exposure data for a single start and end date}
+\title{Return exposure data for a single start and end date.}
 \usage{
 help_calculate_exposure(start_date, end_date, aerial_ground, chemicals,
   clean_pur_df, location, pls_percents, pur_filt, radius)

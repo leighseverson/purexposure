@@ -1,4 +1,4 @@
-#' Map a county's location in California
+#' Plot a county's location in California.
 #'
 #' \code{plot_county_locations} returns one or multiple plots with county
 #' locations in California given either a vector of county names or codes,
@@ -124,7 +124,7 @@ plot_county_locations <- function(counties_or_df, one_plot = TRUE,
 
 }
 
-#' Map pesticide application by county
+#' Plot pesticide application by county.
 #'
 #' \code{plot_county_application} returns a plot of applied pesticides (either the
 #' sum of all active ingredients present in the input \code{pull_clean_pur} data
@@ -420,7 +420,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
 }
 
-#' Map exposure to applied pesticides by PLS unit and buffer.
+#' Plot exposure to applied pesticides at a location.
 #'
 #' \code{plot_exposure} returns a plot of pesticide application in the PLS units
 #' intersected by a buffer for each combination of time period, applied active
@@ -626,7 +626,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
   return(out_maps_list)
 }
 
-#' Plot time series of active ingredients in applied pesticides
+#' Plot time series of active ingredients in applied pesticides.
 #'
 #' \code{plot_application_timeseries} returns a \code{ggplot2} time series plot
 #' of pesticides present in a \code{pull_clean_pur} data frame. You can choose
@@ -690,24 +690,3 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
   return(plot)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

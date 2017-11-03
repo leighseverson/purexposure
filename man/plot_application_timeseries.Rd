@@ -2,7 +2,7 @@
 % Please edit documentation in R/05-plot.R
 \name{plot_application_timeseries}
 \alias{plot_application_timeseries}
-\title{Plot time series of active ingredients in applied pesticides}
+\title{Plot time series of active ingredients in applied pesticides.}
 \usage{
 plot_application_timeseries(clean_pur_df, facet = FALSE, y_axis = "fixed")
 }

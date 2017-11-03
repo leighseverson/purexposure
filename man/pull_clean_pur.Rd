@@ -2,7 +2,7 @@
 % Please edit documentation in R/03-pull.R
 \name{pull_clean_pur}
 \alias{pull_clean_pur}
-\title{Pull cleaned PUR data by counties, years, and active ingredients}
+\title{Pull cleaned PUR data by counties, years, and active ingredients.}
 \usage{
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
@@ -79,7 +79,7 @@ a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 \code{pull_clean_pur} from downloading the same data again.}
 }
 \value{
-A data frame with 12 columns:
+A data frame with 13 columns:
   \describe{
     \item{chem_code}{An integer value giving the PUR chemical code
     for the active ingredient applied. Not included if
