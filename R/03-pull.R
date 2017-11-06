@@ -20,6 +20,7 @@
 #' example), check your working directory. You may want to change it back from a
 #' temporary directory.
 #'
+#' @examples
 #' \dontrun{
 #' raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
 #' raw_file <- pull_pur_file(2015, "all")

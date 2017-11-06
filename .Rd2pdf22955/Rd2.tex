@@ -1,0 +1,2351 @@
+\documentclass[a4paper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8]{inputenc} % @SET ENCODING@
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\begin{document}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `purexposure'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\inputencoding{utf8}
+\item[Title]\AsIs{Pull and Calculate Exposure to CA Pesticide Use Registry Records}
+\item[Version]\AsIs{0.0.0.9000}
+\item[Description]\AsIs{Pulls and cleans California Pesticide Use Report (PUR) datasets
+data to visualize and calculate exposure to active ingredients present
+in applied pesticides.}
+\item[Depends]\AsIs{R (>= 3.4.1)}
+\item[License]\AsIs{GPL-2}
+\item[Encoding]\AsIs{UTF-8}
+\item[LazyData]\AsIs{TRUE}
+\item[Imports]\AsIs{dplyr (>= 0.7.3),
+tidyr (>= 0.7.1),
+purrr (>= 0.2.3),
+stringr (>= 1.2.0),
+lubridate (>= 1.6.0),
+rgdal (>= 1.2.8),
+sp (>= 1.2.5),
+broom (>= 0.4.2),
+ggplot2 (>= 2.2),
+ggmap (>= 2.6.1),
+maps (>= 3.2.0),
+maptools (>= 0.9.2),
+geosphere (>= 1.5.5),
+rlang (>= 0.1.2.9000),
+rgeos (>= 0.3.23),
+magrittr (>= 1.5),
+utils (>= 3.4.1),
+colormap (>= 0.1.9000),
+grDevices (<= 3.4.1),
+methods (>= 3.4.1),
+zoo (>= 1.8.0)}
+\item[RoxygenNote]\AsIs{6.0.1}
+\item[Suggests]\AsIs{testthat,
+knitr,
+rmarkdown}
+\item[VignetteBuilder]\AsIs{knitr}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{calculate\_exposure}{Calculate exposure to active ingredients present in applied pesticides.}{calculate.Rul.exposure}
+%
+\begin{Description}\relax
+For a particular location, buffer radius, date range, and active ingredient
+or class of active ingredients, \code{calculate\_exposure} calculates an
+estimate of exposure in kg of active ingredient per m\textasciicircum{}2.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+calculate_exposure(clean_pur_df, location, radius, time_period = NULL,
+  start_date = NULL, end_date = NULL, chemicals = "all",
+  aerial_ground = FALSE, verbose = TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{clean\_pur\_df}] A data frame returned by \code{pull\_clean\_pur} that
+includes data for the county of your location (before running
+\code{pull\_clean\_pur}, you can use the \code{find\_location\_county}
+function to figure this out), the time period, and the active ingredients
+or chemical classes for which you want to calculate exposure.
+
+\item[\code{location}] A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".
+
+\item[\code{radius}] A numeric value greater than zero that gives the radius in meters
+defining the buffer around your location in which you would like to
+calculate exposure. For reference, the length and width of a PLS section is
+about 1,609 meters (1 mile). That of a township could range from about
+9,656 to 11,265 meters (6-7 miles).
+
+\item[\code{time\_period}] Optional. A character string giving a time period over which you
+would like to calculate exposure. For example, if you enter "6 months" for
+\code{time\_period}, \code{calculate\_exposure} will calculate exposure for
+every six month period starting from the earliest date present in the
+\code{clean\_pur\_df} data frame. Start and end dates can be optionally specified
+with the \code{start\_date} and \code{end\_date} arguments. Alternatively, to
+calculate exposure over only one time period, you can leave this argument
+NULL and specify start and end dates.
+
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{chemicals}] Either "all" or "chemical\_class". The default is "all", which
+will calculate exposure to the summed active ingredients present in the
+\code{clean\_pur\_df} data frame. Enter "chemical\_class" to calculate
+exposure to each of the chemical classes present in the \code{chemical\_class}
+column of your \code{clean\_pur\_df} data frame.
+
+\item[\code{aerial\_ground}] TRUE / FALSE for whether you would like to
+incorporate aerial/ground application into exposure calculations. If
+\code{aerial\_ground = TRUE}, there should be an \code{aerial\_ground}
+column in the input \code{clean\_pur\_df} data frame. There will be a value of
+exposure calculated for each chemical ("all" or by chemical class) and for
+each method of application: aerial or ground. The default is FALSE.
+
+\item[\code{verbose}] TRUE / FALSE for whether you would like a message to print out
+while the function is running. The default is \code{TRUE}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list with five elements:
+\begin{description}
+
+\item[exposure] A data frame with 7 columns: \code{exposure},
+the estimate of exposure in kg/m\textasciicircum{}2, \code{chemicals}, (either "all",
+indicating that all active ingredients present in the \code{clean\_pur\_df}
+were summed or the chemical class(es) specified in the \code{clean\_pur\_df}
+data frame), \code{start\_date}, \code{end\_date}, \code{aerial\_ground},
+which can take values of "A" = aerial, "G" = ground, and "O" = others, (if
+the \code{aerial\_ground} argument is \code{FALSE}, \code{aerial\_ground}
+will be \code{NA} in the \code{exposure} data frame), \code{location}, and
+\code{radius}, the radius in meters for the buffer extending from the
+location
+\item[meta\_data] A data frame with 12 columns and at least one row for
+every section or township intersected by the specified buffer extending
+from the given location. Columns include \code{pls}, giving either the
+Public Land Survey (PLS) section (9 characters long) or township (7
+characters long), \code{chemicals}, \code{percent}, the percent that the
+PLS unit is overlapped by the buffer, \code{kg}, the total amount of kg
+applied for the specified chemicals and date range in that section or
+township, \code{kg\_intersection}, the amount of kilograms applied
+multiplied by the percent of overlap, \code{start\_date} and \code{end\_date},
+\code{aerial\_ground}, which can take values of "A" (aerial), "G" (ground),
+or "O" (other), and will be \code{NA} if exposure calculations did not
+take aerial/ground application into account, \code{none\_recorded}, logical
+for whether any pesticide application was recorded for the specified section
+or township, date range, and chemicals, \code{location}, and \code{radius}
+\item[buffer\_plot] A data frame with 24 columns. Contains spatial plotting
+data for the buffer and overlapping sections or townships. You can use the
+\code{df\_plot} function to quickly plot and get a rough idea of the
+area for which exposure was calculated, before moving on to other map\_*
+or plot\_* functions.
+\item[county\_plot] A ggplot2 plot showing the location of your specified
+buffer in the context of the county. Depending on if your \code{clean\_pur\_df}
+data frame was summed by section or township, the county will be shown
+with the relevant PLS units.
+\item[clean\_pur\_df] The data frame supplied to the \code{clean\_pur\_df}
+argument, filtered to the county and date range for which exposure
+was calcualted.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Section}{Note}
+
+\begin{itemize}
+
+\item If the \code{time\_period}, \code{start\_date}, and \code{end\_date}
+arguments are all left as NULL (their defaults), then exposure will
+be estiamted across the entire date range of the \code{clean\_pur\_df}
+data frame.
+\item If you pulled PUR data from \code{pull\_clean\_pur} specifying
+\code{sum\_application = TRUE} and \code{unit = "township"}, then
+exposure will be calculated based on townships. Using the
+\code{df\_plot} function to plot the returned \code{buffer\_plot}
+list element to take a look at the \code{county\_plot} plot element
+could be helpful to see the difference between calculating exposure
+based on sections or townships for a certain buffer radius.
+\item This function takes advantage of the Google Maps Geocoding API, and
+is limited by the standard usage limit of 2,500 free requests per
+day and 50 requests per second.
+\url{https://developers.google.com/maps/documentation/geocoding/usage-limits}
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+clean_pur <- pull_clean_pur(2000, counties = "10")
+exposure_list <- calculate_exposure(clean_pur,
+                                    location = "13883 Lassen Ave, Helm, CA 93627",
+                                    radius = 3000)
+exposure_list$county_plot
+
+# specify time intervals
+exp_list2 <- calculate_exposure(clean_pur,
+                                location = "13883 Lassen Ave, Helm, CA 93627",
+                                radius = 3000,
+                                time_period = "4 months")
+exp_list2$exposure
+
+# calculate exposure by township
+clean_pur2 <- pull_clean_pur(1995, counties = "san bernardino",
+                             sum_application = TRUE, unit = "township")
+exp_list3 <- calculate_exposure(clean_pur2,
+                                location = "-116.45, 34.96",
+                                radius = 5000)
+df_plot(exp_list3$buffer_plot)
+exp_list3$county_plot
+
+# calculate exposure by specified chemical classes
+# this is an example of `none_recorded = TRUE`
+chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
+                           find_chemical_codes(2000, "aldehyde")) %>%
+   dplyr::rename(chemical_class = chemical)
+clean_pur3 <- pull_clean_pur(1995, "fresno",
+                             chemicals = chemical_class_df$chemname,
+                             sum_application = TRUE,
+                             sum = "chemical_class",
+                             chemical_class = chemical_class_df)
+exp_list4 <- calculate_exposure(clean_pur3,
+                                location = "13883 Lassen Ave, Helm, CA 93627",
+                                radius = 1500,
+                                chemicals = "chemical_class")
+exp_list4$meta_data
+
+# incorporate aerial/ground application information
+clean_pur4 <- pull_clean_pur(2000, "yolo")
+exp_list5 <- calculate_exposure(clean_pur4,
+                                location = "-121.9018, 38.7646",
+                                radius = 2500,
+                                aerial_ground = TRUE)
+exp_list5$exposure
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{california\_shp}{California state SpatialPolygonsDataFrame object.}{california.Rul.shp}
+\keyword{datasets}{california\_shp}
+%
+\begin{Description}\relax
+A SpatialPolygonsDataFrame object for the outline of the state of California.
+Downloaded and subset from the 2016 U.S. Census Cartographic Boundary
+Shapefile for states.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+california_shp
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A SpatialPolygonsDataFrame object at the 1:20,000,000 resolution level.
+\end{Format}
+%
+\begin{Source}\relax
+\url{https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html}
+\end{Source}
+\inputencoding{utf8}
+\HeaderA{chemical\_list}{California Pesticide Use Report chemical codes.}{chemical.Rul.list}
+\keyword{datasets}{chemical\_list}
+%
+\begin{Description}\relax
+A list of data frames (one for each year from 1990 through 2015) containing
+California Department of Pesticide Regulation chemical codes and names used
+to identify active ingredients in Pesticide Use Report data. "chemical.txt"
+files for each year were pulled from the .zip files "pur1990.zip" through
+"pur2015.zip" found here:
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+chemical_list
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A list of 26 elements. Each element is a data frame with a variable
+number of rows ranging from 3,579 to 3,934 and two columns:
+\begin{description}
+
+\item[chem\_code] An integer giving the chemical code. This uniquely
+identifies a chemical within a year.
+\item[chemname] A character vector giving common chemical name for each
+active ingredient. These are usually listed on the pesticide product
+label.
+
+\end{description}
+\end{Format}
+%
+\begin{Source}\relax
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+\end{Source}
+\inputencoding{utf8}
+\HeaderA{county\_codes}{California Pesticide Use Report county codes.}{county.Rul.codes}
+\keyword{datasets}{county\_codes}
+%
+\begin{Description}\relax
+A data frame containing California county names and corresponding codes
+used to identify counties in California Pesticide Use Reports. This file,
+"county.txt", was pulled from the .zip file "pur2000.zip" found here:
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+county_codes
+\end{verbatim}
+\end{Usage}
+%
+\begin{Format}
+A data frame with 58 rows and two columns:
+\begin{description}
+
+\item[county\_name] A character vector giving California county names.
+\item[county\_code] A character vector giving county codes (ranging from "01"
+through "58") corresponding to each California county. Note: these codes
+are unique to California PUR datasets; they do not correspond to FIPS
+codes.
+
+\end{description}
+\end{Format}
+%
+\begin{Source}\relax
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+\end{Source}
+\inputencoding{utf8}
+\HeaderA{df\_plot}{Plot data frame spatial objects.}{df.Rul.plot}
+%
+\begin{Description}\relax
+\code{df\_plot} plots a data frame spatial object. (A
+SpatialPolygonsDataFrame that has been "tidied" using the broom package.)
+Meant to be analogous to the ease of using plot() to quickly view a
+SpatialPolygonDataFrame object.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+df_plot(df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{df}] A data frame returned from the \code{spdf\_to\_df} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A ggplot2 plot of the county.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+shp <- pull_spdf("san diego", "township")
+df <- spdf_to_df(shp)
+df_plot(df)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{euc\_distance}{Calculate euclidean distance between two points.}{euc.Rul.distance}
+%
+\begin{Description}\relax
+\code{euc\_distance} calculates the straight-line distance between
+two points.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+euc_distance(long, lat, origin_long, origin_lat)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{long}] Longitude (x) of second point
+
+\item[\code{lat}] Latitude (y) of second point
+
+\item[\code{origin\_long}] Longitude (x) of first point
+
+\item[\code{origin\_lat}] Latitude (y) of first point
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A data frame with one row and three columns: \code{long} and
+\code{lat} give the second point's coordinates, and \code{dist} gives the
+euclidian distance from these coordinates from the origin.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{find\_chemical\_codes}{Pull active ingredient chemical codes from PUR Chemical Lookup Tables.}{find.Rul.chemical.Rul.codes}
+%
+\begin{Description}\relax
+For a vector of chemical names, \code{find\_chemical\_codes} returns
+a data frame with corresponding chemical codes from the PUR Chemical Lookup
+Table for a given year. This function uses pattern matching to return results.
+As a starting place, or for more thorough classifications, see the CA
+Department of Pesticide Regulation's Summary of Pesticide Use Report Data,
+Indexed by Chemical (2008):
+\url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf}
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+find_chemical_codes(year, chemicals = "all")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{year}] A four-digit numeric year in the range of 1990 to 2015. Indicates
+the year in which you would like to match chemical codes.
+
+\item[\code{chemicals}] A string or vector of strings giving search terms of
+chemicals to match with active ingredients present in pesticides applied
+in the given year. The default value is "all", which returns codes for all
+active ingredients applied in a given year.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with three columns:
+\begin{description}
+
+\item[chem\_code] An integer value with chemical codes corresponding to
+each active ingredient. \code{chem\_code} values are used to later filter
+raw PUR datasets.
+\item[chemname] A character string giving unique active ingredients
+corresponding to each search term.
+\item[chemical] A character string with search terms given in the
+\code{chemicals} argument.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Section}{Note}
+
+The PUR Chemical Lookup Table for a year lists all active ingredients present
+in applied pesticides across the state of California. Therefore, PUR data for
+a particular county may not include records for active ingredients returned
+by \code{find\_chemical\_codes} for the same year.
+\end{Section}
+%
+\begin{Examples}
+\begin{ExampleCode}
+find_chemical_codes(2000, "methyl bromide")
+find_chemical_codes(1995, c("ammonia", "benzene"))
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{find\_counties}{Find California county codes or names.}{find.Rul.counties}
+%
+\begin{Description}\relax
+Given a vector of counties, \code{find\_counties} returns either PUR
+county codes or names.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+find_counties(counties, return = "codes")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{return}] Either "codes" to return county codes (the default) or "names"
+to return county names.
+
+\item[\code{county}] A vector of character strings giving either a county names or
+two digit PUR county codes. Not case sensitive. California names and county
+codes as they appear in PUR datasets can be found in the \code{county\_codes}
+dataset available with this package.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+If \code{return = "codes"}, a vector of two-character strings giving
+the corresponding PUR county codes. If \code{return = "names"}, a vector
+of county names.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+find_counties(c("01", "03", "el dorado"))
+find_counties(c("contra costa", "45"))
+
+find_counties(c("01", "03", "el dorado"), return = "names")
+find_counties(c("contra costa", "45"), return = "names")
+find_counties("fresno")
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{find\_location\_county}{Find the county from an address or coordinate pair.}{find.Rul.location.Rul.county}
+%
+\begin{Description}\relax
+Given a California address or longitude/latitude coordinates,
+\code{find\_location\_county} returns the corresponding California county or
+PUR code.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+find_location_county(location, return = "name", latlon_out = NULL)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{location}] A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".
+
+\item[\code{return}] Either "name" to return county name (the default) or "code"
+to return county code.
+
+\item[\code{latlon\_out}] A numeric vector of two with longitude and latitude
+values. If the \code{geocode} code has been run earlier and this output is
+available, this saves a redundant request to the Google Maps API.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A character string giving the California county where the address or
+coordinate pair given in \code{location} is located.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+address <- "13883 Lassen Ave, Helm, CA 93627"
+find_location_county(location = address)
+
+long_lat <- c("-120.09789, 36.53379")
+find_location_county(location = long_lat)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{find\_product\_name}{Find Pesticide Product names and registration numbers from PUR Product Lookup Tables.}{find.Rul.product.Rul.name}
+%
+\begin{Description}\relax
+For a year and vector of product search terms, \code{find\_product\_name} returns
+a data frame with corresponding product registration numbers, \code{prodno},
+indicator codes, and product names.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+find_product_name(year, products = "all", download_progress = FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{year}] A four digit year in the range of 1990 to 2015.
+
+\item[\code{products}] A character string or a vector of character strings with
+pesticide product names that you would like to search for. Not case
+sensitive. The default is "all", which will return all pesticide products
+applied for a given year.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for the product table that is downloaded.
+The default value is FALSE.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with six columns:
+\begin{description}
+
+\item[prodno] The CA registration number. Can be matched with the
+\code{prodno} in a raw or cleaned PUR dataset.
+\item[prodstat\_ind] Character. An indication of product registration status:
+\begin{itemize}
+
+\item A = Active
+\item B = Inactive
+\item C = Inactive, Not Renewed
+\item D = Inactive, Voluntary Cancellation
+\item E = Inactive, Cancellation
+\item F = Inactive, Suspended
+\item G = Inactive, Invalid Data
+\item H = Active, Suspended
+\end{itemize}
+
+\item[product\_name] Character. The name of the product taken from the
+registered product label. May have been modified by DPR's Registration Branch
+to ensure uniqueness.
+\item[signlwrd\_ind] Integer. The signal word printed on the front of the
+product label:
+\begin{itemize}
+
+\item 1 = Danger (Poison)
+\item 2 = Danger (Only)
+\item 3 = Warning
+\item 4 = Caution
+\item 5 = None
+\end{itemize}
+
+\item[year] The year for which product table information was pulled.
+\item[product] Product name search terms.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+prod_df <- find_product_name(2000, "mosquito")
+prod_df <- find_product_name(2010, c("insecticide", "rodenticide"))
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{gradient\_n\_pal2}{Include alpha option in scales::gradient\_n\_pal().}{gradient.Rul.n.Rul.pal2}
+%
+\begin{Description}\relax
+This function adds an "alpha" argument from gradient\_n\_pal() from the scales
+package.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+gradient_n_pal2(colours, values = NULL, space = "Lab", alpha = NULL)
+\end{verbatim}
+\end{Usage}
+\inputencoding{utf8}
+\HeaderA{help\_calculate\_exposure}{Return exposure data for a single start and end date.}{help.Rul.calculate.Rul.exposure}
+%
+\begin{Description}\relax
+For a single date range, \code{help\_calculate\_exposure} returns the
+\code{exposure} and \code{meta\_data} data frames to be output in the
+\code{calculate\_exposure} list as a nested data frame.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_calculate_exposure(start_date, end_date, aerial_ground, chemicals,
+  clean_pur_df, location, pls_percents, pur_filt, radius)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{aerial\_ground}] TRUE / FALSE for whether you would like to
+incorporate aerial/ground application into exposure calculations. If
+\code{aerial\_ground = TRUE}, there should be an \code{aerial\_ground}
+column in the input \code{clean\_pur\_df} data frame. There will be a value of
+exposure calculated for each chemical ("all" or by chemical class) and for
+each method of application: aerial or ground. The default is FALSE.
+
+\item[\code{chemicals}] Either "all" or "chemical\_class". The default is "all", which
+will calculate exposure to the summed active ingredients present in the
+\code{clean\_pur\_df} data frame. Enter "chemical\_class" to calculate
+exposure to each of the chemical classes present in the \code{chemical\_class}
+column of your \code{clean\_pur\_df} data frame.
+
+\item[\code{clean\_pur\_df}] A data frame returned by \code{pull\_clean\_pur} that
+includes data for the county of your location (before running
+\code{pull\_clean\_pur}, you can use the \code{find\_location\_county}
+function to figure this out), the time period, and the active ingredients
+or chemical classes for which you want to calculate exposure.
+
+\item[\code{location}] A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".
+
+\item[\code{pls\_percents}] A data frame
+
+\item[\code{pur\_filt}] A data frame
+
+\item[\code{radius}] A numeric value greater than zero that gives the radius in meters
+defining the buffer around your location in which you would like to
+calculate exposure. For reference, the length and width of a PLS section is
+about 1,609 meters (1 mile). That of a township could range from about
+9,656 to 11,265 meters (6-7 miles).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A nested data frame with two columns: The \code{row\_out} column
+contains the \code{exposure} data frame for the date range, and
+\code{meta\_data} contains the \code{meta\_data} data frame for the date range.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_calc\_exp}{Return a single exposure value for each combination of conditions.}{help.Rul.calc.Rul.exp}
+%
+\begin{Description}\relax
+\code{help\_calc\_exp} returns a data frame with exposure values (kg/m\textasciicircum{}2) by
+chemicals (including \code{chemicals = "all"}) or by chemicals and aerial/ground
+application.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_calc_exp(exp, buffer_area, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{exp}] A data frame
+
+\item[\code{...}] Either \code{chemicals} or \code{chemicals, aerial\_ground}. Not
+quoted
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A data frame with exposure values in kg/m\textasciicircum{}2 at a location for each
+relevant condition.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_categorize}{Categorize a continuous scale by percentile cutpoints.}{help.Rul.categorize}
+%
+\begin{Description}\relax
+Given a data frame with a column with a continuous numeric variable,
+\code{help\_categorize} returns the data frame with a new column categorizing
+that continuous variable by percentile cutpoints.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_categorize(section_data, buffer_or_county, start_date = NULL,
+  end_date = NULL, aerial_ground = NULL, chemicals = NULL,
+  clean_pur = NULL, s_t = NULL, percentile)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{section\_data}] A data frame with a continuous numeric variable named "kg"
+
+\item[\code{buffer\_or\_county}] Should cutpoints be determined by "county" or "buffer"?
+
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{aerial\_ground}] TRUE / FALSE for whether you would like to
+incorporate aerial/ground application into exposure calculations. If
+\code{aerial\_ground = TRUE}, there should be an \code{aerial\_ground}
+column in the input \code{clean\_pur\_df} data frame. There will be a value of
+exposure calculated for each chemical ("all" or by chemical class) and for
+each method of application: aerial or ground. The default is FALSE.
+
+\item[\code{chemicals}] Either "all" or "chemical\_class". The default is "all", which
+will calculate exposure to the summed active ingredients present in the
+\code{clean\_pur\_df} data frame. Enter "chemical\_class" to calculate
+exposure to each of the chemical classes present in the \code{chemical\_class}
+column of your \code{clean\_pur\_df} data frame.
+
+\item[\code{clean\_pur}] A \code{pull\_clean\_pur} data frame
+
+\item[\code{s\_t}] "section" or "township"
+
+\item[\code{percentile}] A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color\_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_map\_exp}.
+\end{Details}
+%
+\begin{Value}
+The input \code{section\_data} data frame with an additional column
+named \code{category}.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_filter\_pls}{Find PLS units intersecting with a buffer.}{help.Rul.filter.Rul.pls}
+%
+\begin{Description}\relax
+\code{help\_filter\_pls} filters a SpatialPolygonsDataFrame to include only PLS
+units intersecting with a buffer, and filters the data frame returned from
+\code{pull\_clean\_pur} to include only those sections or townships.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_filter_pls(pls, pls_quote, which_pls, shp, buffer, df, clean_pur_df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{pls}] Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted
+
+\item[\code{pls\_quote}] Either \code{"MTRS"} or \code{"MTR"}
+
+\item[\code{which\_pls}] A vector of character string PLS units
+
+\item[\code{shp}] A county's shapefile
+
+\item[\code{buffer}] A data frame with buffer coordinates
+
+\item[\code{df}] A data frame
+
+\item[\code{clean\_pur\_df}] A data frame returned by \code{pull\_clean\_pur} that
+includes data for the county of your location (before running
+\code{pull\_clean\_pur}, you can use the \code{find\_location\_county}
+function to figure this out), the time period, and the active ingredients
+or chemical classes for which you want to calculate exposure.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A list with four elements:
+\begin{description}
+
+\item[pur\_filt] A cleaned PUR data frame filtered to PLS units intersecting
+with a buffer.
+\item[comb\_df\_filt] A spatial data frame with intersecting PLS units and
+a buffer.
+\item[pls\_intersections] A data frame with two columns: \code{pls} and
+\code{percent}, the corresponding percent intersection with the buffer.
+\item[pls\_int] A character vector with all PLS units intersecting with the
+buffer.
+
+\end{description}
+
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_find\_chemical}{Pull a chemical code based on its name.}{help.Rul.find.Rul.chemical}
+%
+\begin{Description}\relax
+This function uses grep to return \code{chemname} values that match an input
+search term.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_find_chemical(chemical, df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{chemical}] A string giving search term of a
+chemical to match with active ingredients present in pesticides applied
+in the given year.
+
+\item[\code{df}] A chemical table data frame.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{find\_chemical\_codes}.
+\end{Details}
+%
+\begin{Value}
+A data frame with three columns: \code{chem\_code}, \code{chemname},
+and \code{chemical}.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_find\_code}{Find California county code or name}{help.Rul.find.Rul.code}
+%
+\begin{Description}\relax
+Given a county, \code{help\_find\_code} returns either the PUR
+county code or name.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_find_code(county, return = "codes")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{county}] A character string giving either a county name or
+two digit PUR county code. Not case sensitive. California names and county
+codes as they appear in PUR datasets can be found in the \code{county\_codes}
+dataset available with this package.
+
+\item[\code{return}] Either "codes" to return county code (the default) or "names"
+to return county name.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{find\_counties}.
+\end{Details}
+%
+\begin{Value}
+If \code{return = "codes"}, a two-character string giving
+the corresponding PUR county codes. If \code{return = "names"}, a county
+name.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+help_find_code("01", return = "names")
+help_find_code("contra costa", return = "codes")
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{help\_find\_product}{Pull a chemical code based on its name.}{help.Rul.find.Rul.product}
+%
+\begin{Description}\relax
+This function uses grep to return \code{chemname} values that match an input
+search term.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_find_product(product, df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{df}] A chemical table data frame.
+
+\item[\code{chemical}] A string giving search term of a
+chemical to match with active ingredients present in pesticides applied
+in the given year.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{find\_chemical\_codes}.
+\end{Details}
+%
+\begin{Value}
+A data frame with three columns: \code{chem\_code}, \code{chemname},
+and \code{chemical}.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_map\_exp}{Return a map for a given exposure estimate.}{help.Rul.map.Rul.exp}
+%
+\begin{Description}\relax
+For a unique combination of time periods, chemicals, and application methods,
+\code{help\_map\_exp} returns a plot showing amounts of pesticides applied for PLS
+units intersecting with the buffer.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_map_exp(start_date, end_date, chemicals, aerial_ground, none_recorded,
+  data_pls, gradient, location_longitude, location_latitude, buffer_df, buffer2,
+  buffer, buffer_or_county, alpha, clean_pur, pls_labels, pls_labels_size,
+  percentile, color_by)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{chemicals}] Either "all" or "chemical\_class". The default is "all", which
+will calculate exposure to the summed active ingredients present in the
+\code{clean\_pur\_df} data frame. Enter "chemical\_class" to calculate
+exposure to each of the chemical classes present in the \code{chemical\_class}
+column of your \code{clean\_pur\_df} data frame.
+
+\item[\code{aerial\_ground}] TRUE / FALSE for whether you would like to
+incorporate aerial/ground application into exposure calculations. If
+\code{aerial\_ground = TRUE}, there should be an \code{aerial\_ground}
+column in the input \code{clean\_pur\_df} data frame. There will be a value of
+exposure calculated for each chemical ("all" or by chemical class) and for
+each method of application: aerial or ground. The default is FALSE.
+
+\item[\code{data\_pls}] A data frame
+
+\item[\code{gradient}] A character vector of hex color codes
+
+\item[\code{location\_longitude}] A numeric longitude value
+
+\item[\code{location\_latitude}] A numeric latitude value
+
+\item[\code{buffer\_df}] A data frame
+
+\item[\code{buffer2}] A data frame
+
+\item[\code{buffer}] A gpc.poly object
+
+\item[\code{buffer\_or\_county}] "buffer" or "county"
+
+\item[\code{alpha}] A number in [0,1] specifying the transperency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 0.7.
+
+\item[\code{clean\_pur}] A \code{clean\_pur\_df} data frame
+
+\item[\code{pls\_labels}] TRUE / FALSE for whether you would like sections or townships
+to be labeled with their PLS ID. The default is \code{FALSE}.
+
+\item[\code{pls\_labels\_size}] A number specifying the size of PLS labels. The default
+is 4.
+
+\item[\code{percentile}] A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color\_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.
+
+\item[\code{color\_by}] Either "amount" (the default) or "percentile". Specifies
+whether you would like application amounts to be colored according to
+amount, resulting in a gradient legend, or by the percentile that they fall
+into for the given dataset and date range. You can specify percentile
+cutpoints with the \code{percentile} argument.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{plot\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A list with three elements:
+\begin{description}
+
+\item[plot] An exposure plot
+\item[data] A data frame with information about each PLS unit
+\item[cutoff\_values] A data frame with cutoff values returned if
+\code{color\_by = "percentile"}
+
+\end{description}
+
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_read\_in\_counties}{Read in PUR county dataset for a year.}{help.Rul.read.Rul.in.Rul.counties}
+%
+\begin{Description}\relax
+Once a year of PUR data has been downloaded, this function reads in a
+selected county's dataset.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_read_in_counties(code_or_file, type, year)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{code\_or\_file}] A PUR county code or a file name for a county's dataset.
+
+\item[\code{type}] Either "codes" or "files", specifying the type of argument supplied
+to \code{code\_or\_file}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{pull\_pur\_file}.
+\end{Details}
+%
+\begin{Value}
+A data frame of raw PUR data for a single county and year.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_remove\_cols}{Remove columns with all missing values.}{help.Rul.remove.Rul.cols}
+%
+\begin{Description}\relax
+Given a quoted column name and its data frame, \code{help\_remove\_cols} determines
+if that column has all missing values or not.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_remove_cols(col_quote, df)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{col\_quote}] A quoted column name
+
+\item[\code{df}] A data frame
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_sum\_application}.
+\end{Details}
+%
+\begin{Value}
+A data frame with two columns: \code{col} gives the column name, and
+\code{all\_missing} is a logical value.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_return\_exposure}{Return a data frame with exposure values and other related data.}{help.Rul.return.Rul.exposure}
+%
+\begin{Description}\relax
+For a single date range, \code{help\_return\_exposure} returns a data frame with
+exposure values calculated from \code{help\_calc\_exp} as well as other relevant
+data. This one row data frame is combined with data frames for other date
+ranges and then returned as the \code{exposure} element from a
+\code{calculate\_exposure} list.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_return_exposure(start_date, end_date, location, radius, exp, buffer_area,
+  ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{location}] A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".
+
+\item[\code{radius}] A numeric value greater than zero that gives the radius in meters
+defining the buffer around your location in which you would like to
+calculate exposure. For reference, the length and width of a PLS section is
+about 1,609 meters (1 mile). That of a township could range from about
+9,656 to 11,265 meters (6-7 miles).
+
+\item[\code{exp}] A data frame
+
+\item[\code{...}] Either \code{chemicals} or \code{chemicals, aerial\_ground}. Not
+quoted.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A data frame with one row and the columns found in the
+\code{calculate\_exposure\$exposure} data frame.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_sum\_ai}{Find summed applied active ingredients.}{help.Rul.sum.Rul.ai}
+%
+\begin{Description}\relax
+\code{help\_sum\_ai} finds the summed amount of applied active ingredients by
+section or township, chemical class, and aerial/ground application.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_sum_ai(pur_filt, start_date, end_date, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{pur\_filt}] A data frame
+
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{...}] A list of variables to group by. Options include \code{section},
+\code{township}, \code{chemical\_class}, and \code{aerial\_ground}. Not quoted
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A data frame a \code{kg} column and one to three additional columns,
+depending on the grouping variables.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_sum\_application}{Sum application by section, township, chemical, and method of application.}{help.Rul.sum.Rul.application}
+%
+\begin{Description}\relax
+\code{help\_sum\_application} sums application of a PUR dataset by chemicals,
+PLS unit, and aerial/ground application.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_sum_application(df, sum, unit, aerial_ground, section_townships,
+  chemical_class = NULL, ...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{df}] A data frame from \code{pull\_clean\_pur} before summing has taken
+place
+
+\item[\code{sum}] A character string giving either "all" (the
+default) or "chemical\_class". If \code{sum\_application = TRUE},
+\code{sum} indicates whether you would like to sum across all active
+ingredients, giving an estimation of the total pesticides applied in a
+given section or township ("all"), or by a chemical class specified in a
+data frame given in the argument \code{chemical\_class}.
+
+\item[\code{unit}] A character string giving either "section" or "township".
+Specifies whether applications of each active ingredient should be summed
+by California section (the default) or by township. Only used if
+\code{sum\_application} is \code{TRUE}.
+
+\item[\code{aerial\_ground}] TRUE / FALSE indicating if you would like to
+retain aerial/ground application data ("A" = aerial, "G" = ground, and
+"O" = other.) The default is FALSE.
+
+\item[\code{section\_townships}] A section\_townships data frame
+
+\item[\code{chemical\_class}] A data frame with only three columns: \code{chem\_code},
+\code{chemname}, and \code{chemical\_class}. \code{chem\_code} should have
+integer values giving PUR chemical codes, and \code{chemname} should have
+character strings with corresponding PUR chemical names (these can be
+searched for using the \code{find\_chemical\_codes} function or with the
+\code{chemical\_list} dataset included with this package). The
+\code{chemical\_class} column should have character strings indicating the
+chemical class corresponding to each \code{chem\_code}. The
+\code{chemical\_class} for a group of active ingredients should be decided
+upon by the user. Only used if \code{sum = "chemical\_class"}. See
+the CDPR's Summary of PUR Data document here:
+\url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
+comprehensive classifications of active ingredients.
+
+\item[\code{...}] grouping variables
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{pull\_clean\_pur}.
+\end{Details}
+%
+\begin{Value}
+A data frame. The number of columns is dependent on the grouping
+variables supplied to the \code{...} argument.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{help\_write\_md}{Return a \code{meta\_data} data frame.}{help.Rul.write.Rul.md}
+%
+\begin{Description}\relax
+\code{help\_write\_md} returns a data frame to be output as the \code{meta\_data}
+element in the list returned from \code{calculate\_exposure}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
+  end_date, radius, buffer_area, mtrs_mtr, section_township)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{clean\_pur\_df}] A data frame returned by \code{pull\_clean\_pur} that
+includes data for the county of your location (before running
+\code{pull\_clean\_pur}, you can use the \code{find\_location\_county}
+function to figure this out), the time period, and the active ingredients
+or chemical classes for which you want to calculate exposure.
+
+\item[\code{pls\_percents}] A data frame
+
+\item[\code{pur\_out}] A data frame
+
+\item[\code{location}] A length-one character string. Either a California address
+including street name, city, state, and zip code, or a pair of coordinates
+in the form "longitude, latitude".
+
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" specifying the start date for
+exposure estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" specifying the end date for exposure
+estimation. This date should be present in the \code{clean\_pur\_df}
+data frame.
+
+\item[\code{radius}] A numeric value greater than zero that gives the radius in meters
+defining the buffer around your location in which you would like to
+calculate exposure. For reference, the length and width of a PLS section is
+about 1,609 meters (1 mile). That of a township could range from about
+9,656 to 11,265 meters (6-7 miles).
+
+\item[\code{buffer\_area}] A numeric value
+
+\item[\code{mtrs\_mtr}] Either \code{MTRS} or \code{MTR}. Not quoted
+
+\item[\code{section\_township}] Either \code{section} or \code{township}. Not quoted
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{help\_calculate\_exposure}.
+\end{Details}
+%
+\begin{Value}
+A data frame with the twelve columns in the
+\code{calculate\_exposure\$meta\_data} data frame.
+\end{Value}
+\inputencoding{utf8}
+\HeaderA{plot\_application\_timeseries}{Plot time series of active ingredients in applied pesticides.}{plot.Rul.application.Rul.timeseries}
+%
+\begin{Description}\relax
+\code{plot\_application\_timeseries} returns a \code{ggplot2} time series plot
+of pesticides present in a \code{pull\_clean\_pur} data frame. You can choose
+whether to facet the time series by active ingredient (\code{chemname}) or by
+\code{chemical\_class}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot_application_timeseries(clean_pur_df, facet = FALSE, y_axis = "fixed")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{clean\_pur\_df}] A data frame returned from \code{pull\_clean\_pur}.
+
+\item[\code{facet}] TRUE / FALSE for whether you would like time series
+plots to be faceted by unqiue \code{chemname} or \code{chemical\_class}
+column values. If \code{facet = FALSE} (the default), all active ingredients
+present in the dataset will be summed per day.
+
+\item[\code{y\_axis}] A character string passed on to the \code{scales} argument of
+\code{ggplot2::facet\_wrap} (\code{"fixed"}, \code{"free"}, \code{"free\_x"},
+or \code{"free\_y"}). The default is \code{"fixed"}.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A \code{ggplot2} object.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+pull_clean_pur(1990:1992, "fresno") %>%
+    dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
+    plot_application_timeseries(facet = TRUE)
+
+pull_clean_pur(2000, "riverside") %>% plot_application_timeseries()
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{plot\_county\_application}{Plot pesticide application by county.}{plot.Rul.county.Rul.application}
+%
+\begin{Description}\relax
+\code{plot\_county\_application} returns a plot of applied pesticides (either the
+sum of all active ingredients present in the input \code{pull\_clean\_pur} data
+frame, a specified chemical class, or a specified active ingredient). Application
+is summed by section or township. PLS units can be shaded by amount or by
+percentile.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot_county_application(clean_pur_df, county = NULL, pls = NULL,
+  color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
+  end_date = NULL, chemicals = "all", fill_option = "viridis",
+  crop = FALSE, alpha = 1)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{clean\_pur\_df}] A data frame returned by \code{pull\_clean\_pur}.
+
+\item[\code{county}] Optional. If your \code{clean\_pur\_df} data frame contains data
+for multiple counties, this argument specifies which county you would like
+to plot application for. Either a PUR county name or county code. California
+names and county codes as they appear in PUR datasets can be found in the
+county\_codes dataset available with this package.
+
+\item[\code{pls}] Optional. Either "section" or "township". If your
+\code{clean\_pur\_df} data frame has both a \code{section} and
+\code{township} column, the \code{pls} argument specifies which pls unit
+you would like to plot application for. If you pulled data specifying
+\code{unit = "township"}, application will be plotted by township.
+
+\item[\code{color\_by}] Either "amount" (the default) or "percentile". Specifies
+whether you would like application amounts to be colored according to
+amount, resulting in a gradient legend, or by the percentile that they fall
+into for the given dataset and date range. You can specify percentile
+cutpoints with the \code{percentile} argument.
+
+\item[\code{percentile}] A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color\_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.
+
+\item[\code{start\_date}] Optional. "yyyy-mm-dd" giving a starting date for the date
+range that you would like to map application for. The default is to plot
+application for the entire date range in your \code{clean\_pur\_df} data frame.
+
+\item[\code{end\_date}] Optional. "yyyy-mm-dd" giving an ending date for the date
+range that you would like to plot application for. The default is to plot
+application for the entire date range in your \code{clean\_pur\_df} data frame.
+
+\item[\code{chemicals}] Either "all" (the default) to plot summed active ingredents
+present in your \code{clean\_pur\_df} data frame, a chemical class present in
+the \code{chemical\_class} column of the \code{clean\_pur\_df} data frame, or
+a specific active ingredient present in the \code{chemname} column of the
+\code{clean\_pur\_df} data frame.
+
+\item[\code{fill\_option}] A palette from the colormap package. The default is
+"viridis". See colormap palette options by visiting
+\url{https://bhaskarvk.github.io/colormap/} or by running
+\code{colormap::colormaps}.
+
+\item[\code{crop}] TRUE / FALSE for whether you would like your plot zoomed in on
+sections or townships with recorded application data.
+
+\item[\code{alpha}] A number in [0,1] specifying the transperency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 1.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list with three elements:
+\begin{description}
+
+\item[map] A plot of the county with application summed by section or
+township and colored by amount or by percentile.
+\item[data] A data frame with the plotted application data.
+\item[cutoff\_values] A data frame with two columns: \code{percentile}
+and \code{kg}, giving the cut points for each percentile in the
+\code{clean\_pur\_df} for the specified chemicals. This element of the list
+is not returned if \code{color\_by = "amount"}.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+tulare_list <- pull_clean_pur(2010, "tulare") %>% plot_county_application()
+
+# plot all active ingredients
+pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
+fresno_list <- plot_county_application(pur_df, color_by = "percentile",
+                                      percentile = c(0.2, 0.4, 0.6, 0.8))
+fresno_list$map
+head(fresno_list$data)
+fresno_list$cutoff_values
+
+# map a specific active ingredient
+fresno_list2 <- plot_county_application(pur_df, pls = "township",
+                                       chemicals = "sulfur",
+                                       fill_option = "plasma")
+fresno_list2$map
+
+# map a chemical class
+chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
+                                             "naled", "malathion",
+                                             "trichlorfon"),
+                                     find_chemical_codes) %>%
+     dplyr::mutate(chemical_class = "organophosphates") %>%
+     dplyr::select(-chemical)
+op_yuba <- pull_clean_pur(2010, "yuba",
+                          chemicals = chemical_class_df$chemname,
+                          verbose = F, sum_application = T,
+                          sum = "chemical_class",
+                          chemical_class = chemical_class_df) %>%
+   plot_county_application()
+op_yuba$map
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{plot\_county\_locations}{Plot a county's location in California.}{plot.Rul.county.Rul.locations}
+%
+\begin{Description}\relax
+\code{plot\_county\_locations} returns one or multiple plots with county
+locations in California given either a vector of county names or codes,
+or a PUR data frame with a \code{county\_cd}, \code{county\_name}, or
+\code{county\_code} column (A data frame returned from either
+\code{pull\_pur\_file}, \code{pull\_raw\_pur}, or \code{pull\_clean\_pur}).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot_county_locations(counties_or_df, one_plot = TRUE, fill_color = "red",
+  alpha = 0.5)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{counties\_or\_df}] A character vector of county names or county codes.
+You can use the \code{county\_codes} dataset included with this package to
+check out PUR county names and codes. This argument can also be a data frame
+with a \code{county\_cd}, \code{county\_name}, or \code{county\_code} column. If
+you provide a data frame, a plot for every county with data in that dataset
+will be output.
+
+\item[\code{one\_plot}] TRUE / FALSE. If you provided multiple counties, whether you
+would like county outlines plotted in the same plot (TRUE), or if you would
+like separate plots returned in a list (FALSE). The default is TRUE
+
+\item[\code{fill\_color}] A character string giving either a ggplot2 color or a
+hex color code ("\#0000FF", for example). The default is "red".
+
+\item[\code{alpha}] A number in [0,1] specifying the transparency of the fill
+color. Numbers closer to 0 will result in more transparency. The default is
+0.5.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A ggplot or a list of ggplots of Califnornia with shaded-in counties.
+List element names correspond to county names.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+plot_county_locations("fresno")
+
+pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"), verbose = FALSE)
+plot_county_locations(pur_df)
+
+plot_list <- plot_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
+names(plot_list)
+plot_list[[1]]
+plot_list[[2]]
+
+## End(Not run)
+
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{plot\_exposure}{Plot exposure to applied pesticides at a location.}{plot.Rul.exposure}
+%
+\begin{Description}\relax
+\code{plot\_exposure} returns a plot of pesticide application in the PLS units
+intersected by a buffer for each combination of time period, applied active
+ingredients, and applicaiton method relevant for the exposure values returned
+from \code{calculate\_exposure}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plot_exposure(exposure_list, color_by = "amount",
+  buffer_or_county = "county", percentile = c(0.25, 0.5, 0.75),
+  fill_option = "viridis", alpha = 0.7, pls_labels = FALSE,
+  pls_labels_size = 4)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{exposure\_list}] A list returned from \code{calculate\_exposure}.
+
+\item[\code{color\_by}] Either "amount" (the default) or "percentile". Specifies
+whether you would like application amounts to be colored according to
+amount, resulting in a gradient legend, or by the percentile that they fall
+into for the given dataset and date range. You can specify percentile
+cutpoints with the \code{percentile} argument.
+
+\item[\code{buffer\_or\_county}] Either "county" (the default) or "buffer". Specifies
+whether you would like colors to be scaled according to the limits
+of application within the buffer, or in the county for the same time period,
+chemicals, and method of application.
+
+\item[\code{percentile}] A numeric vector in (0, 1) specifying percentile cutpoints
+if \code{color\_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
+which results in four categories: < 25th percentile, >= 25th to < 50th,
+>= 50th to < 75th, and >= 75th.
+
+\item[\code{fill\_option}] A palette from the colormap package. The default is
+"viridis". See colormap palette options by visiting
+\url{https://bhaskarvk.github.io/colormap/} or by running
+\code{colormap::colormaps}.
+
+\item[\code{alpha}] A number in [0,1] specifying the transperency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 0.7.
+
+\item[\code{pls\_labels}] TRUE / FALSE for whether you would like sections or townships
+to be labeled with their PLS ID. The default is \code{FALSE}.
+
+\item[\code{pls\_labels\_size}] A number specifying the size of PLS labels. The default
+is 4.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A list with the following elements:
+\begin{description}
+
+\item[maps] A list of plots. One plot for each exposure value returned in
+the \code{exposure} element of the \code{calculate\_exposure} list.
+\item[pls\_data] A list of data frames with 12 columns: \code{pls}, giving
+the PLS ID, \code{percent}, the
+buffer, \code{kg}, the amount of kg of pesticides applied in that PLS unit
+for the relevant time period, chemicals, and application method,
+\code{kg\_intersection}, \code{kg} multiplied by \code{percent} (this is the
+value that is plotted), \code{start\_date}, \code{end\_date}, \code{chemicals},
+\code{aerial\_ground}, which give the time period, chemicals, and application
+method for each plot/exposure estiamte, \code{none\_recorded}, \code{location},
+\code{radius} (m), and \code{area} (m\textasciicircum{}2).
+\item[cutoff\_values] A list of data frames with two columns: \code{percentile} and
+\code{kg} giving the cutoff values for each percentile. Only returned if
+\code{color\_by = "percentile"}.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+tulare_list <- pull_clean_pur(2010, "tulare") %>%
+   calculate_exposure(location = "-119.3473, 36.2077",
+                      radius = 3500) %>%
+   plot_exposure()
+names(tulare_list)
+tulare_list$maps
+tulare_list$pls_data
+tulare_list$exposure
+tulare_list$cutoff_values
+
+# return one plot, pls_data data frame, exposure row, and cutoff_values
+data frame for each exposure combination
+
+dalton_list <- pull_clean_pur(2000, "modoc") %>%
+    calculate_exposure(location = "-121.4182, 41.9370",
+                       radius = 4000,
+                       time_period = "6 months",
+                       aerial_ground = TRUE) %>%
+    plot_exposure(fill_option = "plasma")
+do.call("rbind", dalton_list$exposure)
+# one map for each exposure value (unique combination of chemicals,
+dates, and aerial/ground application)
+dalton_list$maps[[1]]
+dalton_list$maps[[2]]
+dalton_list$maps[[3]]
+dalton_list$maps[[4]]
+dalton_list$maps[[5]]
+dalton_list$maps[[6]]
+
+# exposure to a particular active ingredient
+# plot amounts instead of percentile categories
+chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium")) %>%
+     dplyr::rename(chemical_class = chemical)
+
+santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
+                              chemicals = chemical_df$chemname,
+                              sum_application = TRUE,
+                              sum = "chemical_class",
+                              chemical_class = chemical_df) %>%
+     calculate_exposure(location = "-119.6122, 34.90635",
+                        radius = 3000,
+                        time_period = "1 year",
+                        chemicals = "chemical_class") %>%
+     plot_exposure("amount")
+do.call("rbind", santa_maria$exposure)
+santa_maria$maps[[1]]
+santa_maria$maps[[2]]
+santa_maria$maps[[3]]
+
+# scale colors based on buffer or county
+turk <- pull_clean_pur(1996, "fresno") %>%
+     dplyr::filter(chemname == "PHOSPHORIC ACID") %>%
+     calculate_exposure(location = "-120.218404, 36.1806",
+                        radius = 1500)
+
+plot_exposure(turk, buffer_or_county = "county")$maps
+plot_exposure(turk, buffer_or_county = "buffer")$maps
+
+plot_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+plot_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{pull\_clean\_pur}{Pull cleaned PUR data by counties, years, and active ingredients.}{pull.Rul.clean.Rul.pur}
+%
+\begin{Description}\relax
+\code{pull\_clean\_pur} returns a data frame of cleaned Pesticide Use Report data
+filtered by counties, years, and active ingredients. Active ingredients
+or chemical classes present in applied pesticides can be summed by either
+Public Land Survey (PLS) section or township.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pull_clean_pur(years = "all", counties = "all", chemicals = "all",
+  sum_application = FALSE, unit = "section", sum = "all",
+  chemical_class = NULL, aerial_ground = TRUE, verbose = TRUE,
+  download_progress = TRUE, raw_pur_df = NULL)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{years}] A four-digit numeric year or vector of years in the range of
+1990 to 2015. Indicates the years for which you would like to pull PUR
+datasets. \code{years == "all"} will pull data from 1990 through 2015.
+
+\item[\code{counties}] A vector of character strings giving either a county name or
+a two digit county code for each county. Not case sensitive. California names
+and county codes as they appear in PUR datasets can be found in the
+\code{county\_codes} dataset available with this package. For example, to
+return data for Alameda county, enter either "alameda" or "01" for the
+\code{counties} argument. \code{counties = "all"} will return data for
+all 58 California counties.
+
+\item[\code{chemicals}] A string or vector of strings giving search terms of
+chemicals to match with active ingredients present in pesticides applied in
+the given years. The default value is "all", which returns records for all
+active ingredients applied in a given year. See the CDPR's Summary of PUR
+Data document here:
+\url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
+comprehensive classifications of active ingredients.
+
+\item[\code{sum\_application}] TRUE / FALSE indicating if you would like to sum the
+amounts of applied active ingredients by day, the geographic unit
+given in \code{unit}, and by either active ingredients or chemical class
+(indicated by \code{sum} and \code{chemical\_class}). The default value
+is FALSE.
+
+\item[\code{unit}] A character string giving either "section" or "township".
+Specifies whether applications of each active ingredient should be summed
+by California section (the default) or by township. Only used if
+\code{sum\_application} is \code{TRUE}.
+
+\item[\code{sum}] A character string giving either "all" (the
+default) or "chemical\_class". If \code{sum\_application = TRUE},
+\code{sum} indicates whether you would like to sum across all active
+ingredients, giving an estimation of the total pesticides applied in a
+given section or township ("all"), or by a chemical class specified in a
+data frame given in the argument \code{chemical\_class}.
+
+\item[\code{chemical\_class}] A data frame with only three columns: \code{chem\_code},
+\code{chemname}, and \code{chemical\_class}. \code{chem\_code} should have
+integer values giving PUR chemical codes, and \code{chemname} should have
+character strings with corresponding PUR chemical names (these can be
+searched for using the \code{find\_chemical\_codes} function or with the
+\code{chemical\_list} dataset included with this package). The
+\code{chemical\_class} column should have character strings indicating the
+chemical class corresponding to each \code{chem\_code}. The
+\code{chemical\_class} for a group of active ingredients should be decided
+upon by the user. Only used if \code{sum = "chemical\_class"}. See
+the CDPR's Summary of PUR Data document here:
+\url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf} for
+comprehensive classifications of active ingredients.
+
+\item[\code{aerial\_ground}] TRUE / FALSE indicating if you would like to
+retain aerial/ground application data ("A" = aerial, "G" = ground, and
+"O" = other.) The default is FALSE.
+
+\item[\code{verbose}] TRUE / FALSE indicating whether you would like a single message
+printed indicating which counties and years you are pulling data for. The
+default value is TRUE.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for each year of PUR data that is downloaded.
+The default value is TRUE.
+
+\item[\code{raw\_pur\_df}] A raw PUR data frame. Optional. If you've already downloaded
+a raw PUR data frame using \code{pull\_raw\_pur}, this argument prevents
+\code{pull\_clean\_pur} from downloading the same data again.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with 13 columns:
+\begin{description}
+
+\item[chem\_code] An integer value giving the PUR chemical code
+for the active ingredient applied. Not included if
+\code{sum\_application = TRUE} and \code{sum = "chemical\_class"}.
+\item[chemname] A character string giving PUR chemical active
+ingredient names. Unique values of \code{chemname} are matched with terms
+provided in the \code{chemicals} argument. Not included
+if \code{sum\_application = TRUE} and \code{sum = "chemical\_class"}.
+\item[chemical\_class] If \code{sum\_application = TRUE} and
+\code{sum = "chemical\_class"}, this column will give values of the
+\code{chemical\_class} column in the input \code{chemical\_class} data frame.
+If there are active ingredients pulled based on the
+\code{chemicals} argument that are not present in the \code{chemical\_class}
+data frame, these chemicals will be summed under the class "other".
+\item[kg\_chm\_used] A numeric value giving the amount of the active
+ingredient applied (kilograms).
+\item[section] A string nine characters long indicating the section
+of application. PLS sections are uniquely identified by a combination of
+base line meridian (S, M, or H), township (01-48), township direction
+(N or S), range (01-47), range direction (E or W) and section number
+(01-36). This column is not included if
+\code{sum\_application = TRUE} and \code{unit = "township"}.
+\item[township] A string 7 characters long indicating the township
+of application. PLS townships are uniquely identified by a combination of
+base line meridian (S, M, or H), township (01-48), township direction
+(N or S), range (01-47), and range direction (E or W).
+\item[county\_name] A character string giving the county name where
+application took place.
+\item[county\_code] A string two characters long giving the PUR county
+code where application took place.
+\item[date] The date of application (yyyy-mm-dd).
+\item[aerial\_ground] A character giving the application method.
+"A" = aerial, "G" = ground, and "O" = other. Not included
+if \code{aerial\_ground = FALSE}.
+\item[use\_no] A character string identifing unique application of an
+active ingredient across years. This value is a combination of the raw PUR
+\code{use\_no} column and the year of application. Will have values of
+\code{NA} if \code{sum\_appliction = TRUE}.
+\item[outlier] A logical value indicating whether the
+amount listed in \code{kg\_chm\_used} has been corrected large amounts
+entered in error. The algorithm for identifying and replacing outliers
+was developed based on methods used by Gunier et al. (2001). Please see
+the package vignette for more detail regarding these methods. Will have
+values of \code{NA} if \code{sum\_application = TRUE}.
+\item[prodno] Integer. The California Registration Number for the applied
+pesticide (will be repeated for different active ingredients present in
+the product). You can match product registration numbers with product
+names, which can be pulled using the \code{pull\_product\_table} function.
+This column is not returned if \code{sum\_application = TRUE}.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Section}{Note}
+
+\begin{itemize}
+
+\item The \code{chemical\_list} data frame for a particular year lists
+active ingredients present in applied pesticides across the state of
+California. Therefore, PUR data for a particular county may not include
+records for active ingredients listed in the \code{chemical\_list} dataset
+for the same year.
+\item To pull raw PUR data, see the \code{pull\_raw\_pur} function.
+For documentation of raw PUR data, see the Pesticide Use Report Data User
+Guide \& Documentation document published by the California Department of
+Pesticide Regulation. This file is saved as "cd\_doc.pdf" in
+any "pur[year].zip" file between 1990 and 2015 found here:
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+\item If this function returns an error, check your working directory.
+You may want to change it back from a temporary directory.
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+df <- pull_clean_pur(download_progress = TRUE)
+df2 <- pull_clean_pur(years = 2000:2010,
+                      counties = c("01", "nevada", "riverside"),
+                      chemicals = "methylene",
+                      aerial_ground = TRUE)
+
+# filter to particular products
+prod_nos <- find_product_name(2003, "insecticide") %>%
+    dplyr::select(prodno) %>%
+    tibble_to_vector()
+
+df3 <- pull_clean_pur(2003) %>%
+    dplyr::filter(prodno %in% prod_nos)
+
+# Sum application by active ingredients
+df4 <- pull_clean_pur(years = 2000:2010,
+                      counties = c("01", "nevada", "riverside"),
+                      chemicals = "methylene",
+                      unit = "township", sum_application = TRUE)
+
+# Or by chemical classes
+chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
+                           find_chemical_codes(2000, "aldehyde")) %>%
+   dplyr::rename(chemical_class = chemical)
+
+df5 <- pull_clean_pur(years = 1995,
+                      counties = "fresno",
+                      chemicals = chemical_class_df$chemname,
+                      sum_application = TRUE,
+                      sum = "chemical_class",
+                      unit = "township",
+                      chemical_class = chemical_class_df)
+
+# clean an existing raw PUR dataset
+placer_05 <- pull_raw_pur(2005, "placer")
+df6 <- pull_clean_pur(raw_pur_df = placer_05)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{pull\_product\_table}{Pull PUR Product Table.}{pull.Rul.product.Rul.table}
+%
+\begin{Description}\relax
+This function pulls a California Department of Pesticide Regulation Product
+Table for a particular year.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pull_product_table(year, download_progress = FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{year}] A four digit year in the range of 1990 to 2015.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for the product table that is downloaded.
+The default value is FALSE.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with four columns:
+\begin{description}
+
+\item[prodno] Integer. The California Registration number for the pesticide
+product. This corresponds to the \code{prodno} column in a raw or cleaned PUR
+dataset returned from \code{pull\_raw\_pur} or \code{pull\_clean\_pur}.
+\item[prodstat\_ind] Character. An indication of product registration status:
+\begin{itemize}
+
+\item A = Active
+\item B = Inactive
+\item C = Inactive, Not Renewed
+\item D = Inactive, Voluntary Cancellation
+\item E = Inactive, Cancellation
+\item F = Inactive, Suspended
+\item G = Inactive, Invalid Data
+\item H = Active, Suspended
+\end{itemize}
+
+\item[product\_name] Character. The name of the product taken from the
+registered product label. May have been modified by DPR's Registration Branch
+to ensure uniqueness.
+\item[signlwrd\_ind] Integer. The signal word printed on the front of the
+product label:
+\begin{itemize}
+
+\item 1 = Danger (Poison)
+\item 2 = Danger (Only)
+\item 3 = Warning
+\item 4 = Caution
+\item 5 = None
+\end{itemize}
+
+\item[year] Integer. Four digit year indicating the year for which data was
+pulled.
+
+\end{description}
+
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+prod_95 <- pull_product_table(1995)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{pull\_pur\_file}{Pull raw PUR file for a single year and a county or counties.}{pull.Rul.pur.Rul.file}
+%
+\begin{Description}\relax
+\code{pull\_pur\_file} pulls the raw PUR dataset for a particular year and
+saves datasets for specified counties in a data frame.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pull_pur_file(year, counties = "all", download_progress = TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{counties}] A character vector giving either county names or two digit
+county codes. Not case sensitive. California names and county codes as they
+appear in PUR datasets can be found in the county\_codes dataset available
+with this package. For example, to return data for Alameda county, enter
+either "alameda" or "01" for the county argument. \code{counties = "all"}
+will pull data for all 58 California counties.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for each year of PUR data that is downloaded.
+The default value is TRUE.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with 33 columns. Counties are indicated by
+\code{county\_cd}; the year for which data was pulled is indicated by
+\code{applic\_dt}.
+\end{Value}
+%
+\begin{Section}{Note}
+
+If this function returns an error (because the FTP site is down, for
+example), check your working directory. You may want to change it back from a
+temporary directory.
+
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+raw\_file <- pull\_pur\_file(1999, c("40", "ventura", "yuba"))
+raw\_file <- pull\_pur\_file(2015, "all")
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\end{Section}
+\inputencoding{utf8}
+\HeaderA{pull\_raw\_pur}{Pull raw PUR data by counties and years.}{pull.Rul.raw.Rul.pur}
+%
+\begin{Description}\relax
+\code{pull\_raw\_pur} pulls a raw PUR dataset for a given year and vector of
+California counties.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
+  download_progress = TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{years}] A four-digit numeric year or vector of years in the range of
+1990 to 2015. Indicates the years for which you would like to pull PUR
+datasets. \code{years == "all"} will pull data from 1990 through 2015.
+
+\item[\code{counties}] A vector of character strings giving either a county name or
+a two digit county code for each county. Not case sensitive. California names
+and county codes as they appear in PUR datasets can be found in the
+\code{county\_codes} dataset available with this package. For example, to
+return data for Alameda county, enter either "alameda" or "01" for the
+\code{counties} argument. \code{counties = "all"} will return data for
+all 58 California counties.
+
+\item[\code{verbose}] TRUE / FALSE indicating whether you would like a single message
+printed indicating which counties and years you are pulling data for. The
+default value is TRUE.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for each year of PUR data that is downloaded.
+The default value is TRUE.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with 33 columns. Different years and counties for which
+data was pulled are indicated by \code{applic\_dt} and \code{county\_cd},
+respectively.
+\end{Value}
+%
+\begin{Section}{Note}
+
+\begin{itemize}
+
+\item For documentation of raw PUR data, see the Pesticide Use
+Report Data User Guide \& Documentation document published by the California
+Department of Pesticide Regulation. This file is saved as "cd\_doc.pdf" in any
+"pur[year].zip" file between 1990 and 2015 found here:
+\url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
+\item If this function returns an error (because the FTP site is down, for
+example), check your working directory. You may want to change it back from
+a temporary directory.
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+df <- pull_raw_pur(download_progress = TRUE) # this will take a while to run
+df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
+df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{pull\_spdf}{Pull California county SpatialPolygonsDataFrame.}{pull.Rul.spdf}
+%
+\begin{Description}\relax
+\code{pull\_spdf} pulls either the section or township-level
+SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
+shapefile.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+pull_spdf(county, section_township = "section", download_progress = FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{county}] A vector of character strings giving either a county names or
+two digit PUR county codes. Not case sensitive. California names and county
+codes as they appear in PUR datasets can be found in the \code{county\_codes}
+dataset available with this package.
+
+\item[\code{section\_township}] Either "section" (the default) or "township".
+Specifies whether you would like to pull a section- or township-level
+SpatialPolygonsDataFrame.
+
+\item[\code{download\_progress}] TRUE / FALSE indicating whether you would like a
+message and progress bar printed for the shapefile that is downloaded.
+The default value is FALSE
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A SpatialPolygonsDataFrame object.
+\end{Value}
+%
+\begin{Section}{Source}
+
+SpatialPolygonDataFrame objects are downloaded from GIS shapefiles provided
+by the California Department of Pesticide Regulation:
+\url{http://www.cdpr.ca.gov/docs/emon/grndwtr/gis_shapefiles.htm}
+\end{Section}
+%
+\begin{Section}{Note}
+
+If this function returns an error (because the FTP site is down, for
+example), check your working directory. You may want to change it back from
+a temporary directory.
+\end{Section}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+trinity_shp <- pull_spdf("trinity", download_progress = TRUE)
+plot(trinity_shp)
+
+del_norte_shp <- pull_spdf("08", "township", download_progress = TRUE)
+plot(del_norte_shp)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{purexposure}{purexposure: A package for working with CA Pesticide Use Registry data.}{purexposure}
+\aliasA{purexposure-package}{purexposure}{purexposure.Rdash.package}
+%
+\begin{Description}\relax
+The \code{purexposure} package provides functions to pull data from California's
+Pesticide Use Registry (PUR), as well as to calculate exposure to and
+visualize active ingredients present in applied pesticides. The main function
+categories are \code{find\_*}, \code{pull\_*}, \code{calculate\_*}, and
+\code{plot\_*}. These are the most important functions from each category:
+\end{Description}
+%
+\begin{Section}{find\_* functions}
+
+\code{find\_} functions help with searches of PUR chemical, county, and
+product codes.
+\begin{itemize}
+
+\item \code{find\_chemical\_codes}: Pull active ingredient chemical codes
+from PUR Chemical Lookup Tables.
+\item \code{find\_counties}: Find California county codes or names.
+\item \code{find\_product\_name}: Find Pesticide Product names and registration
+numbers from PUR Product Lookup Tables.
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{Section}{pull\_* functions}
+
+\code{pull\_} functions facilitate downloading data from the CA Department
+of Pesticide Regulation's website.
+\begin{itemize}
+
+\item \code{pull\_raw\_pur}: Pull raw PUR data by counties and years.
+\item \code{pull\_clean\_pur}: Pull cleaned PUR data by counties, years, and
+active ingredients.
+
+\end{itemize}
+
+\end{Section}
+%
+\begin{Section}{calculate\_* function}
+
+The \code{calculate\_exposure} function calculates exposure (in kg/m\textasciicircum{}2) to
+applied pesticides for a given location, buffer extending from that location,
+time period, and active ingredients.
+\end{Section}
+%
+\begin{Section}{plot\_* functions}
+
+\code{plot\_} functions help with visualizations of application.
+\begin{itemize}
+
+\item \code{plot\_county\_application}: Plot pesticide application by county,
+summed by section or township.
+\item \code{plot\_exposure}: Plot exposure to applied pesticides at a
+particular location.
+\item \code{plot\_application\_timeseries}: Plot time series of active
+ingredients in applied pesticides.
+
+\end{itemize}
+
+\end{Section}
+\inputencoding{utf8}
+\HeaderA{scale\_fill\_gradientn2}{Include alpha in ggplot2::scale\_fill\_gradientn().}{scale.Rul.fill.Rul.gradientn2}
+%
+\begin{Description}\relax
+This function adds an `alpha` argument to scale\_fill\_gradientn() from the
+ggplot2 package.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+scale_fill_gradientn2(..., colours, values = NULL, space = "Lab",
+  na.value = "grey50", guide = "colourbar", colors, alpha = NULL)
+\end{verbatim}
+\end{Usage}
+\inputencoding{utf8}
+\HeaderA{spdf\_to\_df}{Convert county SpatialPolygonsDataFrame to a tidy data frame.}{spdf.Rul.to.Rul.df}
+%
+\begin{Description}\relax
+\code{spdf\_to\_df} converts a SpatialPolygonsDataFrame object returned from
+the \code{pull\_spdf} function to a data frame.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+spdf_to_df(spdf)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{spdf}] A SpatialPolygonsDataFrame object returned from
+the \code{pull\_spdf} function.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+A data frame with 24 columns if the \code{spdf} object is on the
+section level and 23 columns if the \code{spdf} object is on the township
+level.
+\end{Value}
+%
+\begin{Examples}
+\begin{ExampleCode}
+## Not run:
+df <- spdf_to_df(pull_spdf("fresno"))
+df2 <- spdf_to_df(pull_spdf("sonoma"))
+
+# use df_plot() function to easily plot the output data frames:
+df_plot(df)
+df_plot(df2)
+
+## End(Not run)
+\end{ExampleCode}
+\end{Examples}
+\inputencoding{utf8}
+\HeaderA{tibble\_to\_vector}{Return a character vector from a tibble with one column.}{tibble.Rul.to.Rul.vector}
+%
+\begin{Description}\relax
+\code{tibble\_to\_vector} takes a tibble with one column and returns the
+values in that column as a character vector.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+tibble_to_vector(tib)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{tib}] A tibble with only one column.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This is a helper function for \code{pull\_raw\_pur}, \code{pull\_clean\_pur},
+and \code{pur\_filt\_df}.
+\end{Details}
+%
+\begin{Value}
+A character vector.
+\end{Value}
+\printindex{}
+\end{document}

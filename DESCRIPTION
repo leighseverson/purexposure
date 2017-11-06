@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: person("Rachel", "Severson", email = "rachel.severson@colostate.edu", 
                   role = c("aut", "cre"))
 Description: Pulls and cleans California Pesticide Use Report (PUR) datasets 
-    data to visualize and calculate exposure to active ingredients present 
+    to visualize and calculate exposure to active ingredients present 
     in applied pesticides.
 Depends: R (>= 3.4.1)
 License: GPL-2
