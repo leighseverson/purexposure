@@ -1110,6 +1110,9 @@ help_categorize <- function(section_data, buffer_or_county,
 #' This is a helper function for \code{pull_raw_pur}.
 #'
 #' @inheritParams pull_raw_pur
+#' @param year A four-digit numeric year in the range of
+#'   1990 to 2015. Indicates the year for which you would like to pull PUR
+#'   datasets.
 #' @param counties A character vector giving either county names or two digit
 #'  county codes. Not case sensitive. California names and county codes as they
 #'  appear in PUR datasets can be found in the county_codes dataset available
@@ -1126,10 +1129,9 @@ help_categorize <- function(section_data, buffer_or_county,
 #' example), check your working directory. You may want to change it back from a
 #' temporary directory.
 #'
-#' @examples
+#' @example
 #' \dontrun{
 #' raw_file <- help_pull_pur(1999, c("40", "ventura", "yuba"))
-#' raw_file2 <- help_pull_pur(2015, "all")
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -1157,7 +1159,7 @@ help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
 
   if (!"all" %in% counties) {
 
-    codes <- find_counties(counties[[1]])
+    codes <- find_counties(counties[[i]])
 
     counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
                                        year = year) %>%
