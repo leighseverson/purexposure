@@ -111,24 +111,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 
   if (!"all" %in% counties) {
 
-    years_counties <- expand.grid(year = years, county = counties) %>%
-      dplyr::group_by(year) %>%
-      tidyr::nest() %>%
-      dplyr::mutate(counties = purrr::map(data, tibble_to_vector))
-
-    for (i in 1:nrow(years_counties)) {
-      df <- purrr::map2_dfr(years_counties$year[[i]],
-                            years_counties$counties[[i]],
-                            help_pull_pur, download_progress = download_progress)
-      if (i == 1) {
-        out <- df
-      } else {
-        out <- rbind(out, df)
-      }
-    }
-
-    raw_df <- out
-
+    raw_df <- purrr::map_dfr(years, help_pull_pur, counties = counties,
+                             download_progress = download_progress)
 
   } else {
 
