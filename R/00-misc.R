@@ -11,9 +11,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' shp <- pull_spdf("san diego", "township")
-#' df <- spdf_to_df(shp)
-#' df_plot(df)
+#' pull_spdf("san diego", "township") %>%
+#'    spdf_to_df() %>%
+#'    df_plot()
 #' }
 #' @export
 df_plot <- function(df) {
@@ -41,8 +41,8 @@ df_plot <- function(df) {
 #'
 #' @examples
 #' \dontrun{
-#' df <- spdf_to_df(pull_spdf("fresno"))
-#' df2 <- spdf_to_df(pull_spdf("sonoma"))
+#' df <- pull_spdf("fresno") %>% spdf_to_df()
+#' df2 <- pull_spdf("sonoma") %>% spdf_to_df()
 #'
 #' # use df_plot() function to easily plot the output data frames:
 #' df_plot(df)
@@ -81,6 +81,10 @@ spdf_to_df <- function(spdf) {
 #' @return A data frame with one row and three columns: \code{long} and
 #' \code{lat} give the second point's coordinates, and \code{dist} gives the
 #' euclidian distance from these coordinates from the origin.
+#'
+#' @example{
+#' euc_distance(-120, 36, 120.5, 37.5)
+#' }
 #' @export
 euc_distance <- function(long, lat, origin_long, origin_lat) {
 
@@ -104,6 +108,11 @@ euc_distance <- function(long, lat, origin_long, origin_lat) {
 #' @param tib A tibble with only one column.
 #'
 #' @return A character vector.
+#'
+#' @example{
+#' tibble::tibble(x = 1:3) %>% tibble_to_vector()
+#' }
+#'
 #' @importFrom magrittr %>%
 #' @export
 tibble_to_vector <- function(tib) {

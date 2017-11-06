@@ -1102,6 +1102,83 @@ help_categorize <- function(section_data, buffer_or_county,
 
 }
 
+#' Pull raw PUR file for a single year and a county or counties.
+#'
+#' \code{help_pull_pur} pulls the raw PUR dataset for a particular year and
+#' saves datasets for specified counties in a data frame.
+#'
+#' This is a helper function for \code{pull_raw_pur}.
+#'
+#' @inheritParams pull_raw_pur
+#' @param counties A character vector giving either county names or two digit
+#'  county codes. Not case sensitive. California names and county codes as they
+#'  appear in PUR datasets can be found in the county_codes dataset available
+#'  with this package. For example, to return data for Alameda county, enter
+#'  either "alameda" or "01" for the county argument. \code{counties = "all"}
+#'  will pull data for all 58 California counties.
+#'
+#' @return A data frame with 33 columns. Counties are indicated by
+#'   \code{county_cd}; the year for which data was pulled is indicated by
+#'   \code{applic_dt}.
+#'
+#' @section Note:
+#' If this function returns an error (because the FTP site is down, for
+#' example), check your working directory. You may want to change it back from a
+#' temporary directory.
+#'
+#' @examples
+#' \dontrun{
+#' raw_file <- help_pull_pur(1999, c("40", "ventura", "yuba"))
+#' raw_file2 <- help_pull_pur(2015, "all")
+#' }
+#' @importFrom magrittr %>%
+#' @export
+help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
+
+  current_dir <- getwd()
+
+  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                year, ".zip")
+  file <- paste0("pur", year, ".zip")
+
+  dir <- tempdir()
+  setwd(dir)
+
+  if (download_progress) {
+    quiet <- FALSE
+  } else {
+    quiet <- TRUE
+  }
+
+  download.file(url, destfile = file, mode = "wb", quiet = quiet)
+  unzip(file, exdir = dir)
+
+  sm_year <- substr(year, 3, 4)
+
+  if (!"all" %in% counties) {
+
+    codes <- find_counties(counties[[1]])
+
+    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
+                                       year = year) %>%
+      dplyr::arrange(applic_dt, county_cd)
+
+  } else {
+
+    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+
+    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
+                                       year = year) %>%
+      dplyr::arrange(applic_dt, county_cd)
+
+  }
+
+  setwd(current_dir)
+
+  return(counties_in_year)
+
+}
+
 #' Pull a chemical code based on its name.
 #'
 #' This function uses grep to return \code{chemname} values that match an input

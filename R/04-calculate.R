@@ -9,9 +9,10 @@
 #'   in the form "longitude, latitude".
 #' @param clean_pur_df A data frame returned by \code{pull_clean_pur} that
 #'   includes data for the county of your location (before running
-#'   \code{pull_clean_pur}, you can use the \code{find_location_county}
-#'   function to figure this out), the time period, and the active ingredients
-#'   or chemical classes for which you want to calculate exposure.
+#'   \code{pull_clean_pur}, you can use the
+#'   \code{find_location_county} function to figure this out), the time period,
+#'   and the active ingredients or chemical classes for which you want to
+#'   calculate exposure.
 #' @param radius A numeric value greater than zero that gives the radius in meters
 #'   defining the buffer around your location in which you would like to
 #'   calculate exposure. For reference, the length and width of a PLS section is
@@ -20,11 +21,11 @@
 #' @param time_period Optional. A character string giving a time period over which you
 #'   would like to calculate exposure. For example, if you enter "6 months" for
 #'   \code{time_period}, \code{calculate_exposure} will calculate exposure for
-#'   every six month period starting from the earliest date present in the
+#'   every six month period starting January 1 of the earliest year present in the
 #'   \code{clean_pur_df} data frame. Start and end dates can be optionally specified
 #'   with the \code{start_date} and \code{end_date} arguments. Alternatively, to
-#'   calculate exposure over only one time period, you can leave this argument
-#'   NULL and specify start and end dates.
+#'   calculate exposure over only one specified time period, you can leave this
+#'   argument NULL and specify start and end dates.
 #' @param start_date Optional. "yyyy-mm-dd" specifying the start date for
 #'   exposure estimation. This date should be present in the \code{clean_pur_df}
 #'   data frame.
@@ -56,7 +57,7 @@
 #'    the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground}
 #'    will be \code{NA} in the \code{exposure} data frame), \code{location}, and
 #'    \code{radius}, the radius in meters for the buffer extending from the
-#'    location}
+#'    location.}
 #'    \item{meta_data}{A data frame with 12 columns and at least one row for
 #'    every section or township intersected by the specified buffer extending
 #'    from the given location. Columns include \code{pls}, giving either the
@@ -70,34 +71,34 @@
 #'    or "O" (other), and will be \code{NA} if exposure calculations did not
 #'    take aerial/ground application into account, \code{none_recorded}, logical
 #'    for whether any pesticide application was recorded for the specified section
-#'    or township, date range, and chemicals, \code{location}, and \code{radius}}
+#'    or township, date range, and chemicals, \code{location}, and \code{radius}.}
 #'    \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
 #'    data for the buffer and overlapping sections or townships. You can use the
 #'    \code{df_plot} function to quickly plot and get a rough idea of the
-#'    area for which exposure was calculated, before moving on to other map_*
-#'    or plot_* functions.}
+#'    area for which exposure was calculated, before moving on to other
+#'    plot_* functions.}
 #'    \item{county_plot}{A ggplot2 plot showing the location of your specified
 #'    buffer in the context of the county. Depending on if your \code{clean_pur_df}
 #'    data frame was summed by section or township, the county will be shown
 #'    with the relevant PLS units.}
 #'    \item{clean_pur_df}{The data frame supplied to the \code{clean_pur_df}
 #'    argument, filtered to the county and date range for which exposure
-#'    was calcualted.}
+#'    was calculated.}
 #'  }
 #'
 #' @section Note:
 #'  \itemize{
 #'    \item{If the \code{time_period}, \code{start_date}, and \code{end_date}
 #'          arguments are all left as NULL (their defaults), then exposure will
-#'          be estiamted across the entire date range of the \code{clean_pur_df}
+#'          be estimated across the entire date range of the \code{clean_pur_df}
 #'          data frame.}
 #'    \item{If you pulled PUR data from \code{pull_clean_pur} specifying
 #'          \code{sum_application = TRUE} and \code{unit = "township"}, then
 #'          exposure will be calculated based on townships. Using the
 #'          \code{df_plot} function to plot the returned \code{buffer_plot}
-#'          list element to take a look at the \code{county_plot} plot element
-#'          could be helpful to see the difference between calculating exposure
-#'          based on sections or townships for a certain buffer radius.}
+#'          list element could be helpful to see the difference between
+#'          calculating exposure based on sections or townships for a certain
+#'          buffer radius.}
 #'     \item{This function takes advantage of the Google Maps Geocoding API, and
 #'           is limited by the standard usage limit of 2,500 free requests per
 #'           day and 50 requests per second.
