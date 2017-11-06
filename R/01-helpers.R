@@ -1159,7 +1159,7 @@ help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
 
   if (!"all" %in% counties) {
 
-    codes <- find_counties(counties[[i]])
+    codes <- find_counties(counties)
 
     counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
                                        year = year) %>%

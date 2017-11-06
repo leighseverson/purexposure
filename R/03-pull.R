@@ -1,78 +1,3 @@
-#' Pull raw PUR file for a single year and a county or counties.
-#'
-#' \code{pull_pur_file} pulls the raw PUR dataset for a particular year and
-#' saves datasets for specified counties in a data frame.
-#'
-#' @inheritParams pull_raw_pur
-#' @param counties A character vector giving either county names or two digit
-#'  county codes. Not case sensitive. California names and county codes as they
-#'  appear in PUR datasets can be found in the county_codes dataset available
-#'  with this package. For example, to return data for Alameda county, enter
-#'  either "alameda" or "01" for the county argument. \code{counties = "all"}
-#'  will pull data for all 58 California counties.
-#'
-#' @return A data frame with 33 columns. Counties are indicated by
-#'   \code{county_cd}; the year for which data was pulled is indicated by
-#'   \code{applic_dt}.
-#'
-#' @section Note:
-#' If this function returns an error (because the FTP site is down, for
-#' example), check your working directory. You may want to change it back from a
-#' temporary directory.
-#'
-#' @examples
-#' \dontrun{
-#' raw_file <- pull_pur_file(1999, c("40", "ventura", "yuba"))
-#' raw_file2 <- pull_pur_file(2015, "all")
-#' }
-#' @importFrom magrittr %>%
-#' @export
-pull_pur_file <- function(year, counties = "all", download_progress = TRUE) {
-
-  current_dir <- getwd()
-
-  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
-                year, ".zip")
-  file <- paste0("pur", year, ".zip")
-
-  dir <- tempdir()
-  setwd(dir)
-
-  if (download_progress) {
-    quiet <- FALSE
-  } else {
-    quiet <- TRUE
-  }
-
-  download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  unzip(file, exdir = dir)
-
-  sm_year <- substr(year, 3, 4)
-
-  if (!"all" %in% counties) {
-
-    codes <- find_counties(counties[[1]])
-
-    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
-
-  } else {
-
-    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
-
-    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
-
-  }
-
-  setwd(current_dir)
-
-  return(counties_in_year)
-
-}
-
 #' Pull raw PUR data by counties and years.
 #'
 #' \code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
@@ -92,8 +17,8 @@ pull_pur_file <- function(year, counties = "all", download_progress = TRUE) {
 #'   printed indicating which counties and years you are pulling data for. The
 #'   default value is TRUE.
 #' @param download_progress TRUE / FALSE indicating whether you would like a
-#'   message and progress bar printed for each year of PUR data that is downloaded.
-#'   The default value is TRUE.
+#'   message and progress bar printed for each year and county of PUR data that
+#'   is downloaded. The default value is TRUE.
 #'
 #' @return A data frame with 33 columns. Different years and counties for which
 #'   data was pulled are indicated by \code{applic_dt} and \code{county_cd},
@@ -113,9 +38,8 @@ pull_pur_file <- function(year, counties = "all", download_progress = TRUE) {
 #'
 #' @examples
 #' \dontrun{
-#' df <- pull_raw_pur(download_progress = TRUE) # this will take a while to run
-#' df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
-#' df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
+#' df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
+#' df2 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -195,7 +119,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
     for (i in 1:nrow(years_counties)) {
       df <- purrr::map2_dfr(years_counties$year[[i]],
                             years_counties$counties[[i]],
-                            pull_pur_file, download_progress = download_progress)
+                            help_pull_pur, download_progress = download_progress)
       if (i == 1) {
         out <- df
       } else {
@@ -208,7 +132,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 
   } else {
 
-    raw_df <- purrr::map_dfr(years, pull_pur_file, counties = "all",
+    raw_df <- purrr::map_dfr(years, help_pull_pur, counties = "all",
                              download_progress = download_progress)
 
   }
@@ -338,24 +262,22 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'
 #' @examples
 #' \dontrun{
-#' df <- pull_clean_pur(download_progress = TRUE)
-#' df2 <- pull_clean_pur(years = 2000:2010,
+#' df <- pull_clean_pur(years = 2000:2001,
 #'                       counties = c("01", "nevada", "riverside"),
 #'                       chemicals = "methylene",
 #'                       aerial_ground = TRUE)
 #'
-#' # filter to particular products
+#' # filter to active ingredients present in particular products
 #' prod_nos <- find_product_name(2003, "insecticide") %>%
 #'     dplyr::select(prodno) %>%
 #'     tibble_to_vector()
 #'
-#' df3 <- pull_clean_pur(2003) %>%
+#' df2 <- pull_clean_pur(2003, "10") %>%
 #'     dplyr::filter(prodno %in% prod_nos)
 #'
 #' # Sum application by active ingredients
-#' df4 <- pull_clean_pur(years = 2000:2010,
+#' df3 <- pull_clean_pur(years = 2009:2010,
 #'                       counties = c("01", "nevada", "riverside"),
-#'                       chemicals = "methylene",
 #'                       unit = "township", sum_application = TRUE)
 #'
 #' # Or by chemical classes
@@ -363,7 +285,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
 #'
-#' df5 <- pull_clean_pur(years = 1995,
+#' df4 <- pull_clean_pur(years = 1995,
 #'                       counties = "fresno",
 #'                       chemicals = chemical_class_df$chemname,
 #'                       sum_application = TRUE,
