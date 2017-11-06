@@ -17,7 +17,7 @@
 #'   printed indicating which counties and years you are pulling data for. The
 #'   default value is TRUE.
 #' @param download_progress TRUE / FALSE indicating whether you would like a
-#'   message and progress bar printed for each year and county of PUR data that
+#'   message and progress bar printed for each year of PUR data that
 #'   is downloaded. The default value is TRUE.
 #'
 #' @return A data frame with 33 columns. Different years and counties for which
@@ -262,7 +262,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' # Sum application by active ingredients
 #' df3 <- pull_clean_pur(years = 2009:2010,
 #'                       counties = c("01", "nevada", "riverside"),
-#'                       unit = "township", sum_application = TRUE)
+#'                       unit = "township",
+#'                       sum_application = TRUE)
 #'
 #' # Or by chemical classes
 #' chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
@@ -279,7 +280,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'
 #' # clean an existing raw PUR dataset
 #' placer_05 <- pull_raw_pur(2005, "placer")
-#' df6 <- pull_clean_pur(raw_pur_df = placer_05)
+#' df5 <- pull_clean_pur(raw_pur_df = placer_05)
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -525,7 +526,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     out <- out %>% dplyr::mutate(township = ifelse(township %in% missing_sections,
                                                    NA, township),
                                  township = ifelse(township == "000000",
-                                                   NA, section))
+                                                   NA, township))
   }
 
   if (sum_application) {
