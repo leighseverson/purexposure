@@ -132,6 +132,7 @@ clean_pur <- pull_clean_pur(2000, counties = "10")
 exposure_list <- calculate_exposure(clean_pur,
                                     location = "13883 Lassen Ave, Helm, CA 93627",
                                     radius = 3000)
+names(exposure_list)
 exposure_list$county_plot
 
 # specify time intervals
@@ -155,23 +156,21 @@ exp_list3$county_plot
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) \%>\%
    dplyr::rename(chemical_class = chemical)
-clean_pur3 <- pull_clean_pur(1995, "fresno",
-                             chemicals = chemical_class_df$chemname,
-                             sum_application = TRUE,
-                             sum = "chemical_class",
-                             chemical_class = chemical_class_df)
-exp_list4 <- calculate_exposure(clean_pur3,
-                                location = "13883 Lassen Ave, Helm, CA 93627",
-                                radius = 1500,
-                                chemicals = "chemical_class")
+exp_list4 <- pull_clean_pur(1995, "fresno",
+                            chemicals = chemical_class_df$chemname,
+                            sum_application = TRUE,
+                            sum = "chemical_class",
+                            chemical_class = chemical_class_df) \%>\%
+   calculate_exposure(location = "13883 Lassen Ave, Helm, CA 93627",
+                      radius = 1500,
+                      chemicals = "chemical_class")
 exp_list4$meta_data
 
 # incorporate aerial/ground application information
-clean_pur4 <- pull_clean_pur(2000, "yolo")
-exp_list5 <- calculate_exposure(clean_pur4,
-                                location = "-121.9018, 38.7646",
-                                radius = 2500,
-                                aerial_ground = TRUE)
+exp_list5 <- pull_clean_pur(2000, "yolo") \%>\%
+   calculate_exposure(location = "-121.9018, 38.7646",
+   radius = 2500,
+   aerial_ground = TRUE)
 exp_list5$exposure
 }
 }

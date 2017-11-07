@@ -21,8 +21,9 @@ county_codes dataset available with this package.}
 \item{pls}{Optional. Either "section" or "township". If your
 \code{clean_pur_df} data frame has both a \code{section} and
 \code{township} column, the \code{pls} argument specifies which pls unit
-you would like to plot application for. If you pulled data specifying
-\code{unit = "township"}, application will be plotted by township.}
+you would like to plot application for (the default in this case is
+"section"). If you pulled data specifying \code{unit = "township"},
+application will be plotted by township.}
 
 \item{color_by}{Either "amount" (the default) or "percentile". Specifies
 whether you would like application amounts to be colored according to
@@ -50,8 +51,8 @@ a specific active ingredient present in the \code{chemname} column of the
 \code{clean_pur_df} data frame.}
 
 \item{fill_option}{A palette from the colormap package. The default is
-"viridis". See colormap palette options by visiting
-\url{https://bhaskarvk.github.io/colormap/} or by running
+"viridis". To see colormap palette options, visit
+\url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
 
 \item{crop}{TRUE / FALSE for whether you would like your plot zoomed in on
@@ -82,17 +83,19 @@ percentile.
 \examples{
 \dontrun{
 tulare_list <- pull_clean_pur(2010, "tulare") \%>\% plot_county_application()
+names(tulare_list)
 
 # plot all active ingredients
-pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-fresno_list <- plot_county_application(pur_df, color_by = "percentile",
+fresno_df <- pull_clean_pur(2000:2001, "fresno")
+freno_list <- plot_county_application(fresno_df,
+                                      color_by = "percentile",
                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 fresno_list$map
 head(fresno_list$data)
 fresno_list$cutoff_values
 
 # map a specific active ingredient
-fresno_list2 <- plot_county_application(pur_df, pls = "township",
+fresno_list2 <- plot_county_application(fresno_df, pls = "township",
                                        chemicals = "sulfur",
                                        fill_option = "plasma")
 fresno_list2$map

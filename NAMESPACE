@@ -2,11 +2,11 @@
 
 export(calculate_exposure)
 export(df_plot)
-export(euc_distance)
 export(find_chemical_codes)
 export(find_counties)
 export(find_location_county)
 export(gradient_n_pal2)
+export(help_euc_distance)
 export(help_pull_pur)
 export(plot_application_timeseries)
 export(plot_county_application)

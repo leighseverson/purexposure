@@ -25,7 +25,7 @@ printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
-message and progress bar printed for each year and county of PUR data that
+message and progress bar printed for each year of PUR data that
 is downloaded. The default value is TRUE.}
 }
 \value{

@@ -4,8 +4,8 @@
 \alias{plot_county_locations}
 \title{Plot a county's location in California.}
 \usage{
-plot_county_locations(counties_or_df, one_plot = TRUE, fill_color = "red",
-  alpha = 0.5)
+plot_county_locations(counties_or_df, separate_plots = FALSE,
+  fill_color = "red", alpha = 0.5)
 }
 \arguments{
 \item{counties_or_df}{A character vector of county names or county codes.
@@ -15,9 +15,9 @@ with a \code{county_cd}, \code{county_name}, or \code{county_code} column. If
 you provide a data frame, a plot for every county with data in that dataset
 will be output.}
 
-\item{one_plot}{TRUE / FALSE. If you provided multiple counties, whether you
-would like county outlines plotted in the same plot (TRUE), or if you would
-like separate plots returned in a list (FALSE). The default is TRUE}
+\item{separate_plots}{TRUE / FALSE. If you provided multiple counties, whether you
+would like county outlines plotted in the same plot (FALSE), or if you would
+like separate plots returned in a list (TRUE). The default is FALSE.}
 
 \item{fill_color}{A character string giving either a ggplot2 color or a
 hex color code ("#0000FF", for example). The default is "red".}
@@ -41,10 +41,11 @@ or a PUR data frame with a \code{county_cd}, \code{county_name}, or
 \dontrun{
 plot_county_locations("fresno")
 
-pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"), verbose = FALSE)
+pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 plot_county_locations(pur_df)
 
-plot_list <- plot_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
+plot_list <- plot_county_locations(c("san bernardino", "ventura"),
+                                   separate_plots = TRUE)
 names(plot_list)
 plot_list[[1]]
 plot_list[[2]]

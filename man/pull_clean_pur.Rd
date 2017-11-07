@@ -71,7 +71,7 @@ printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
-message and progress bar printed for each year and county of PUR data that
+message and progress bar printed for each year of PUR data that
 is downloaded. The default value is TRUE.}
 
 \item{raw_pur_df}{A raw PUR data frame. Optional. If you've already downloaded
@@ -102,7 +102,7 @@ A data frame with 13 columns:
     (N or S), range (01-47), range direction (E or W) and section number
     (01-36). This column is not included if
     \code{sum_application = TRUE} and \code{unit = "township"}.}
-    \item{township}{A string 7 characters long indicating the township
+    \item{township}{A string seven characters long indicating the township
     of application. PLS townships are uniquely identified by a combination of
     base line meridian (S, M, or H), township (01-48), township direction
     (N or S), range (01-47), and range direction (E or W).}
@@ -174,7 +174,8 @@ df2 <- pull_clean_pur(2003, "10") \%>\%
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2009:2010,
                       counties = c("01", "nevada", "riverside"),
-                      unit = "township", sum_application = TRUE)
+                      unit = "township",
+                      sum_application = TRUE)
 
 # Or by chemical classes
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
@@ -191,6 +192,6 @@ df4 <- pull_clean_pur(years = 1995,
 
 # clean an existing raw PUR dataset
 placer_05 <- pull_raw_pur(2005, "placer")
-df6 <- pull_clean_pur(raw_pur_df = placer_05)
+df5 <- pull_clean_pur(raw_pur_df = placer_05)
 }
 }

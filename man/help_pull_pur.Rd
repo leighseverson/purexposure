@@ -19,7 +19,7 @@ either "alameda" or "01" for the county argument. \code{counties = "all"}
 will pull data for all 58 California counties.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
-message and progress bar printed for each year and county of PUR data that
+message and progress bar printed for each year of PUR data that
 is downloaded. The default value is TRUE.}
 }
 \value{

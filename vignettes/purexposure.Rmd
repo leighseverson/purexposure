@@ -19,10 +19,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-The California Department of Pesticide Regulation publishes free copies of Pesticide Use Reports online through the California Pesticide Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The `purexposure` package makes it easy to download Pesticide Use Report (PUR) raw data, output reports in a clean and tidy format, calculate exposure to applied pesticides, and visualize application for counties or more specific locations. 
+The California Department of Pesticide Regulation publishes free copies of Pesticide Use Reports online through the California Pesticide Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The `purexposure` package makes it easy to download Pesticide Use Report (PUR) raw data, output reports in a tidy format, calculate exposure to applied pesticides, and visualize application for counties or more specific locations. 
 
-The `purexposure` has five main categories of functions: `find_*`, `pull_*`, `calculate_*`, `map_*`, and `plot_*`. `find_*` functions are designed to explore active ingredients present in applied pesticides, return county names or codes as they are used in PUR datasets, and find the county of a particular location. `pull_*`
-functions pull raw or cleaned PUR datasets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `map_*` and `plot_*` functions return visualizations of application and exposure.  
+The `purexposure` package has four main categories of functions: `find_*`, `pull_*`, `calculate_*`, and `plot_*`. `find_*` functions are designed to explore active ingredients present in applied pesticides, return county names or codes as they are used in PUR datasets, and find the county of a particular location. `pull_*` functions pull raw or cleaned PUR datasets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `plot_*` functions return visualizations of application and exposure.  
 
 `purexposure` currently exists in a development version on GitHub. You can install and load the package with the following code: 
 
@@ -31,7 +30,7 @@ devtools::install_github("leighseverson/purexposure")
 library(purexposure)
 ```
 
-## Example of using the package 
+## `purexposure` functions 
 
 **Some text about the designed pathway of the package for an analysis** ? Is this redundant? 
 

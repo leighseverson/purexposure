@@ -166,8 +166,8 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   a specific active ingredient present in the \code{chemname} column of the
 #'   \code{clean_pur_df} data frame.
 #' @param fill_option A palette from the colormap package. The default is
-#'   "viridis". See colormap palette options by visiting
-#'   \url{https://bhaskarvk.github.io/colormap/} or by running
+#'   "viridis". To see colormap palette options, visit
+#'   \url{https://bhaskarvk.github.io/colormap/} or run
 #'   \code{colormap::colormaps}.
 #' @param crop TRUE / FALSE for whether you would like your plot zoomed in on
 #'   sections or townships with recorded application data.

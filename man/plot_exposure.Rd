@@ -29,8 +29,8 @@ which results in four categories: < 25th percentile, >= 25th to < 50th,
 >= 50th to < 75th, and >= 75th.}
 
 \item{fill_option}{A palette from the colormap package. The default is
-"viridis". See colormap palette options by visiting
-\url{https://bhaskarvk.github.io/colormap/} or by running
+"viridis". To see colormap palette options, visit
+\url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
 
 \item{alpha}{A number in [0,1] specifying the transperency of fill colors.
@@ -70,17 +70,15 @@ from \code{calculate_exposure}.
 \examples{
 \dontrun{
 tulare_list <- pull_clean_pur(2010, "tulare") \%>\%
-   calculate_exposure(location = "-119.3473, 36.2077",
-                      radius = 3500) \%>\%
+   calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) \%>\%
    plot_exposure()
 names(tulare_list)
 tulare_list$maps
 tulare_list$pls_data
 tulare_list$exposure
-tulare_list$cutoff_values
 
 # return one plot, pls_data data frame, exposure row, and cutoff_values
-data frame for each exposure combination
+# data frame for each exposure combination
 
 dalton_list <- pull_clean_pur(2000, "modoc") \%>\%
     calculate_exposure(location = "-121.4182, 41.9370",
@@ -90,7 +88,7 @@ dalton_list <- pull_clean_pur(2000, "modoc") \%>\%
     plot_exposure(fill_option = "plasma")
 do.call("rbind", dalton_list$exposure)
 # one map for each exposure value (unique combination of chemicals,
-dates, and aerial/ground application)
+# dates, and aerial/ground application)
 dalton_list$maps[[1]]
 dalton_list$maps[[2]]
 dalton_list$maps[[3]]
@@ -100,7 +98,7 @@ dalton_list$maps[[6]]
 
 # exposure to a particular active ingredient
 # plot amounts instead of percentile categories
-chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium")) \%>\%
+chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) \%>\%
      dplyr::rename(chemical_class = chemical)
 
 santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
