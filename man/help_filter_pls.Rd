@@ -21,9 +21,10 @@ help_filter_pls(pls, pls_quote, which_pls, shp, buffer, df, clean_pur_df)
 
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
 includes data for the county of your location (before running
-\code{pull_clean_pur}, you can use the \code{find_location_county}
-function to figure this out), the time period, and the active ingredients
-or chemical classes for which you want to calculate exposure.}
+\code{pull_clean_pur}, you can use the
+\code{find_location_county} function to figure this out), the time period,
+and the active ingredients or chemical classes for which you want to
+calculate exposure.}
 }
 \value{
 A list with four elements:

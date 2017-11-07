@@ -25,8 +25,8 @@ printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
-message and progress bar printed for each year of PUR data that is downloaded.
-The default value is TRUE.}
+message and progress bar printed for each year and county of PUR data that
+is downloaded. The default value is TRUE.}
 }
 \value{
 A data frame with 33 columns. Different years and counties for which
@@ -53,8 +53,7 @@ A data frame with 33 columns. Different years and counties for which
 
 \examples{
 \dontrun{
-df <- pull_raw_pur(download_progress = TRUE) # this will take a while to run
-df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
-df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
+df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
+df2 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 }
 }

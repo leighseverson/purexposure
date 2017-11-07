@@ -71,8 +71,8 @@ printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
 \item{download_progress}{TRUE / FALSE indicating whether you would like a
-message and progress bar printed for each year of PUR data that is downloaded.
-The default value is TRUE.}
+message and progress bar printed for each year and county of PUR data that
+is downloaded. The default value is TRUE.}
 
 \item{raw_pur_df}{A raw PUR data frame. Optional. If you've already downloaded
 a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
@@ -158,24 +158,22 @@ Public Land Survey (PLS) section or township.
 
 \examples{
 \dontrun{
-df <- pull_clean_pur(download_progress = TRUE)
-df2 <- pull_clean_pur(years = 2000:2010,
+df <- pull_clean_pur(years = 2000:2001,
                       counties = c("01", "nevada", "riverside"),
                       chemicals = "methylene",
                       aerial_ground = TRUE)
 
-# filter to particular products
+# filter to active ingredients present in particular products
 prod_nos <- find_product_name(2003, "insecticide") \%>\%
     dplyr::select(prodno) \%>\%
     tibble_to_vector()
 
-df3 <- pull_clean_pur(2003) \%>\%
+df2 <- pull_clean_pur(2003, "10") \%>\%
     dplyr::filter(prodno \%in\% prod_nos)
 
 # Sum application by active ingredients
-df4 <- pull_clean_pur(years = 2000:2010,
+df3 <- pull_clean_pur(years = 2009:2010,
                       counties = c("01", "nevada", "riverside"),
-                      chemicals = "methylene",
                       unit = "township", sum_application = TRUE)
 
 # Or by chemical classes
@@ -183,7 +181,7 @@ chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) \%>\%
    dplyr::rename(chemical_class = chemical)
 
-df5 <- pull_clean_pur(years = 1995,
+df4 <- pull_clean_pur(years = 1995,
                       counties = "fresno",
                       chemicals = chemical_class_df$chemname,
                       sum_application = TRUE,

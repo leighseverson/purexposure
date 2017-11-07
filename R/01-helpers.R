@@ -375,7 +375,7 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 
   group_by <- rlang::quos(...)
 
-  pur_summed <- "pur_filt" %>%
+  pur_summed <- pur_filt %>%
     dplyr::filter(date >= start_date & date <= end_date) %>%
     dplyr::group_by(!!!group_by) %>%
     dplyr::summarise(kg = sum(kg_chm_used)) %>%
@@ -724,7 +724,12 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
         pls <- pls[grDevices::chull(pls), ]
         pls <- methods::as(pls, "gpc.poly")
 
-        intersection <- raster::intersect(pls, buffer)
+        suppressWarnings(
+          intersection <- raster::intersect(pls, buffer)
+        )
+        # Warning message:
+        #   In `[<-`(`*tmp*`, i, value = gpc) :
+        #   implicit list embedding of S4 objects is deprecated
 
         int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
           dplyr::rename(long = x,
@@ -764,7 +769,7 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
       if (buffer_or_county == "buffer") {
 
         plot <- plot +
-          geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
+          ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
                        color = "black") +
           scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label,
                                 na.value = "#FFFFFF")
@@ -811,8 +816,9 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 
         ##
         plot <- plot +
-          geom_polygon(ggplot2::aes(x = long, y = lat, group = group, fill = kg),
-                       color = "black") +
+          ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group,
+                                             fill = kg),
+                                color = "black") +
           scale_fill_gradientn2(colours = gradient, alpha = alpha, name = legend_label,
                                 limits = limits, na.value = "#FFFFFF")
       }
@@ -893,21 +899,23 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 
     if (color_by == "percentile") {
 
-      missing_plot <- ggplot(missing_buffer_df) +
-        geom_polygon(aes(x = long, y = lat, group = group, fill = perc_fill), color = "black") +
-        geom_point(x = location_longitude, y = location_latitude, color = "black",
+      missing_plot <- ggplot2::ggplot(missing_buffer_df) +
+        ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group,
+                                           fill = perc_fill), color = "black") +
+        ggplot2::geom_point(x = location_longitude, y = location_latitude, color = "black",
                    size = 2) +
-        theme_void() +
-        scale_fill_manual(name = legend_label, values = c("None recorded" = NA))
+        ggplot2::theme_void() +
+        ggplot2::scale_fill_manual(name = legend_label, values = c("None recorded" = NA))
 
     } else if (color_by == "amount") {
 
-      missing_plot <- ggplot(missing_buffer_df) +
-        geom_polygon(aes(x = long, y = lat, group = group, fill = scale_fill), color = "black") +
-        geom_point(x = location_longitude, y = location_latitude, color = "black",
+      missing_plot <- ggplot2::ggplot(missing_buffer_df) +
+        ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group,
+                                           fill = scale_fill), color = "black") +
+        ggplot2::geom_point(x = location_longitude, y = location_latitude, color = "black",
                    size = 2) +
-        theme_void() +
-        scale_fill_manual(name = legend_label, values = c("0" = NA))
+        ggplot2::theme_void() +
+        ggplot2::scale_fill_manual(name = legend_label, values = c("0" = NA))
 
     }
 
@@ -1250,5 +1258,37 @@ help_find_product <- function(product, df) {
   return(df2)
 
 }
+
+#' Calculate euclidean distance between two points.
+#'
+#' \code{help_euc_distance} calculates the straight-line distance between
+#' two points.
+#'
+#' This is a helper function for \code{calculate_exposure}.
+#'
+#' @param long Longitude (x) of second point
+#' @param lat Latitude (y) of second point
+#' @param origin_long Longitude (x) of first point
+#' @param origin_lat Latitude (y) of first point
+#'
+#' @return A data frame with one row and three columns: \code{long} and
+#' \code{lat} give the second point's coordinates, and \code{dist} gives the
+#' euclidian distance from these coordinates from the origin.
+#'
+#' @example{
+#' help_euc_distance(-120, 36, 120.5, 37.5)
+#' }
+#' @export
+help_euc_distance <- function(long, lat, origin_long, origin_lat) {
+
+  x <- abs(lat - origin_lat)
+  y <- abs(long - origin_long)
+  dist <- sqrt((x^2) + (y^2))
+  out <- data.frame(long = long, lat = lat, dist = dist)
+
+  return(out)
+
+}
+
 
 

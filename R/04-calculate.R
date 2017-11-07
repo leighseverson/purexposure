@@ -111,6 +111,7 @@
 #' exposure_list <- calculate_exposure(clean_pur,
 #'                                     location = "13883 Lassen Ave, Helm, CA 93627",
 #'                                     radius = 3000)
+#' names(exposure_list)
 #' exposure_list$county_plot
 #'
 #' # specify time intervals
@@ -134,23 +135,21 @@
 #' chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
 #'                            find_chemical_codes(2000, "aldehyde")) %>%
 #'    dplyr::rename(chemical_class = chemical)
-#' clean_pur3 <- pull_clean_pur(1995, "fresno",
-#'                              chemicals = chemical_class_df$chemname,
-#'                              sum_application = TRUE,
-#'                              sum = "chemical_class",
-#'                              chemical_class = chemical_class_df)
-#' exp_list4 <- calculate_exposure(clean_pur3,
-#'                                 location = "13883 Lassen Ave, Helm, CA 93627",
-#'                                 radius = 1500,
-#'                                 chemicals = "chemical_class")
+#' exp_list4 <- pull_clean_pur(1995, "fresno",
+#'                             chemicals = chemical_class_df$chemname,
+#'                             sum_application = TRUE,
+#'                             sum = "chemical_class",
+#'                             chemical_class = chemical_class_df) %>%
+#'    calculate_exposure(location = "13883 Lassen Ave, Helm, CA 93627",
+#'                       radius = 1500,
+#'                       chemicals = "chemical_class")
 #' exp_list4$meta_data
 #'
 #' # incorporate aerial/ground application information
-#' clean_pur4 <- pull_clean_pur(2000, "yolo")
-#' exp_list5 <- calculate_exposure(clean_pur4,
-#'                                 location = "-121.9018, 38.7646",
-#'                                 radius = 2500,
-#'                                 aerial_ground = TRUE)
+#' exp_list5 <- pull_clean_pur(2000, "yolo") %>%
+#'    calculate_exposure(location = "-121.9018, 38.7646",
+#'    radius = 2500,
+#'    aerial_ground = TRUE)
 #' exp_list5$exposure
 #' }
 #' @importFrom magrittr %>%
@@ -236,7 +235,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 
-      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, euc_distance,
+      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_euc_distance,
                                 origin_long = range$max_long,
                                 origin_lat = range$max_lat) %>%
         dplyr::filter(long > range$max_long & lat > range$max_lat) %>%
@@ -255,7 +254,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 
-      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, euc_distance,
+      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_euc_distance,
                                 origin_long = range$max_long,
                                 origin_lat = range$max_lat) %>%
         dplyr::filter(long > range$max_long & lat > range$max_lat) %>%
@@ -316,9 +315,9 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                                    date <= lubridate::ymd(max(time_df$end_date)))
 
   if ("section" %in% colnames(clean_pur_df)) {
-    out_list <- help_filter_df(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
+    out_list <- help_filter_pls(MTRS, "MTRS", which_pls, shp, buffer, df, clean_pur_df)
   } else {
-    out_list <- help_filter_df(MTR, "MTR", which_pls, shp, buffer, df, clean_pur_df)
+    out_list <- help_filter_pls(MTR, "MTR", which_pls, shp, buffer, df, clean_pur_df)
   }
 
   pur_filt <- out_list$pur_filt
@@ -326,7 +325,8 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   pls_percents <- out_list$pls_intersections
   pls_int <- out_list$pls_int
 
-  out <- purrr::map2(time_df$start_date, time_df$end_date,
+  out <- purrr::map2(time_df$start_date,
+                     time_df$end_date,
                      help_calculate_exposure, aerial_ground, chemicals,
                      clean_pur_df, location, pls_percents, pur_filt,
                      radius)

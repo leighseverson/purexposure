@@ -12,9 +12,9 @@
 #'   with a \code{county_cd}, \code{county_name}, or \code{county_code} column. If
 #'   you provide a data frame, a plot for every county with data in that dataset
 #'   will be output.
-#' @param one_plot TRUE / FALSE. If you provided multiple counties, whether you
-#'   would like county outlines plotted in the same plot (TRUE), or if you would
-#'   like separate plots returned in a list (FALSE). The default is TRUE
+#' @param separate_plots TRUE / FALSE. If you provided multiple counties, whether you
+#'   would like county outlines plotted in the same plot (FALSE), or if you would
+#'   like separate plots returned in a list (TRUE). The default is FALSE.
 #' @param fill_color A character string giving either a ggplot2 color or a
 #'   hex color code ("#0000FF", for example). The default is "red".
 #' @param alpha A number in [0,1] specifying the transparency of the fill
@@ -28,10 +28,11 @@
 #' \dontrun{
 #' plot_county_locations("fresno")
 #'
-#' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"), verbose = FALSE)
+#' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 #' plot_county_locations(pur_df)
 #'
-#' plot_list <- plot_county_locations(c("san bernardino", "ventura"), one_plot = TRUE)
+#' plot_list <- plot_county_locations(c("san bernardino", "ventura"),
+#'                                    separate_plots = TRUE)
 #' names(plot_list)
 #' plot_list[[1]]
 #' plot_list[[2]]
@@ -40,7 +41,7 @@
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @export
-plot_county_locations <- function(counties_or_df, one_plot = TRUE,
+plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
                                  fill_color = "red", alpha = 0.5) {
 
   ca_shp <- purexposure::california_shp
@@ -87,7 +88,7 @@ plot_county_locations <- function(counties_or_df, one_plot = TRUE,
                                      color = "transparent", fill = fill_color, alpha =
                                        alpha)
 
-  if (!one_plot) {
+  if (separate_plots) {
 
     if (length(counties) > 1) {
       out <- list()
@@ -141,8 +142,9 @@ plot_county_locations <- function(counties_or_df, one_plot = TRUE,
 #' @param pls Optional. Either "section" or "township". If your
 #'   \code{clean_pur_df} data frame has both a \code{section} and
 #'   \code{township} column, the \code{pls} argument specifies which pls unit
-#'   you would like to plot application for. If you pulled data specifying
-#'   \code{unit = "township"}, application will be plotted by township.
+#'   you would like to plot application for (the default in this case is
+#'   "section"). If you pulled data specifying \code{unit = "township"},
+#'   application will be plotted by township.
 #' @param color_by Either "amount" (the default) or "percentile". Specifies
 #'   whether you would like application amounts to be colored according to
 #'   amount, resulting in a gradient legend, or by the percentile that they fall
@@ -186,17 +188,19 @@ plot_county_locations <- function(counties_or_df, one_plot = TRUE,
 #' @examples
 #' \dontrun{
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>% plot_county_application()
+#' names(tulare_list)
 #'
 #' # plot all active ingredients
-#' pur_df <- pull_clean_pur(2000:2001, "fresno", verbose = F)
-#' fresno_list <- plot_county_application(pur_df, color_by = "percentile",
+#' fresno_df <- pull_clean_pur(2000:2001, "fresno")
+#' freno_list <- plot_county_application(fresno_df,
+#'                                       color_by = "percentile",
 #'                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 #' fresno_list$map
 #' head(fresno_list$data)
 #' fresno_list$cutoff_values
 #'
 #' # map a specific active ingredient
-#' fresno_list2 <- plot_county_application(pur_df, pls = "township",
+#' fresno_list2 <- plot_county_application(fresno_df, pls = "township",
 #'                                        chemicals = "sulfur",
 #'                                        fill_option = "plasma")
 #' fresno_list2$map
@@ -226,8 +230,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                    percentile = c(0.25, 0.5, 0.75),
                                    start_date = NULL, end_date = NULL,
                                    chemicals = "all", fill_option = "viridis",
-                                   crop = FALSE,
-                                   alpha = 1) {
+                                   crop = FALSE, alpha = 1) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
@@ -236,7 +239,11 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
       section_township <- "township"
     }
   } else {
-    section_township <- tolower(pls)
+    if ("section" %in% colnames(clean_pur_df)) {
+      section_township <- tolower(pls)
+    } else {
+      section_township <- "township"
+    }
   }
 
   if (!"county_code" %in% colnames(clean_pur_df)) {
@@ -461,17 +468,15 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' @examples
 #' \dontrun{
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>%
-#'    calculate_exposure(location = "-119.3473, 36.2077",
-#'                       radius = 3500) %>%
+#'    calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) %>%
 #'    plot_exposure()
 #' names(tulare_list)
 #' tulare_list$maps
 #' tulare_list$pls_data
 #' tulare_list$exposure
-#' tulare_list$cutoff_values
 #'
 #' # return one plot, pls_data data frame, exposure row, and cutoff_values
-#' data frame for each exposure combination
+#' # data frame for each exposure combination
 #'
 #' dalton_list <- pull_clean_pur(2000, "modoc") %>%
 #'     calculate_exposure(location = "-121.4182, 41.9370",
@@ -481,7 +486,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'     plot_exposure(fill_option = "plasma")
 #' do.call("rbind", dalton_list$exposure)
 #' # one map for each exposure value (unique combination of chemicals,
-#' dates, and aerial/ground application)
+#' # dates, and aerial/ground application)
 #' dalton_list$maps[[1]]
 #' dalton_list$maps[[2]]
 #' dalton_list$maps[[3]]
@@ -491,7 +496,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' # exposure to a particular active ingredient
 #' # plot amounts instead of percentile categories
-#' chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium")) %>%
+#' chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) %>%
 #'      dplyr::rename(chemical_class = chemical)
 #'
 #' santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
@@ -524,9 +529,9 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' @importFrom magrittr %>%
 #' @export
 plot_exposure <- function(exposure_list,  color_by = "amount",
-                         buffer_or_county = "county",
-                         percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
-                         alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
+                          buffer_or_county = "county",
+                          percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
+                          alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
 
   buffer_df <- exposure_list$buffer_plot_df
 
@@ -586,9 +591,9 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 
   out_maps <- list()
   for (i in 1:nrow(pls_data)) {
-    map <- help_map_exp(pls_data$start_date[1], pls_data$end_date[1],
-                        pls_data$chemicals[1], pls_data$aerial_ground[1],
-                        pls_data$none_recorded[1], pls_data$data_pls[[1]],
+    map <- help_map_exp(pls_data$start_date[i], pls_data$end_date[i],
+                        pls_data$chemicals[i], pls_data$aerial_ground[i],
+                        pls_data$none_recorded[i], pls_data$data_pls[[i]],
                         gradient, location_longitude, location_latitude,
                         buffer_df, buffer2, buffer, buffer_or_county, alpha,
                         clean_pur, pls_labels, pls_labels_size, percentile,

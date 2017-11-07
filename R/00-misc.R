@@ -66,37 +66,6 @@ spdf_to_df <- function(spdf) {
 
 }
 
-#' Calculate euclidean distance between two points.
-#'
-#' \code{euc_distance} calculates the straight-line distance between
-#' two points.
-#'
-#' This is a helper function for \code{calculate_exposure}.
-#'
-#' @param long Longitude (x) of second point
-#' @param lat Latitude (y) of second point
-#' @param origin_long Longitude (x) of first point
-#' @param origin_lat Latitude (y) of first point
-#'
-#' @return A data frame with one row and three columns: \code{long} and
-#' \code{lat} give the second point's coordinates, and \code{dist} gives the
-#' euclidian distance from these coordinates from the origin.
-#'
-#' @example{
-#' euc_distance(-120, 36, 120.5, 37.5)
-#' }
-#' @export
-euc_distance <- function(long, lat, origin_long, origin_lat) {
-
-  x <- abs(lat - origin_lat)
-  y <- abs(long - origin_long)
-  dist <- sqrt((x^2) + (y^2))
-  out <- data.frame(long = long, lat = lat, dist = dist)
-
-  return(out)
-
-}
-
 #' Return a character vector from a tibble with one column.
 #'
 #' \code{tibble_to_vector} takes a tibble with one column and returns the

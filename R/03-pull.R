@@ -198,7 +198,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     (N or S), range (01-47), range direction (E or W) and section number
 #'     (01-36). This column is not included if
 #'     \code{sum_application = TRUE} and \code{unit = "township"}.}
-#'     \item{township}{A string 7 characters long indicating the township
+#'     \item{township}{A string seven characters long indicating the township
 #'     of application. PLS townships are uniquely identified by a combination of
 #'     base line meridian (S, M, or H), township (01-48), township direction
 #'     (N or S), range (01-47), and range direction (E or W).}

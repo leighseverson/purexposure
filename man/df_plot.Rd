@@ -20,8 +20,8 @@ SpatialPolygonDataFrame object.
 }
 \examples{
 \dontrun{
-shp <- pull_spdf("san diego", "township")
-df <- spdf_to_df(shp)
-df_plot(df)
+pull_spdf("san diego", "township") \%>\%
+   spdf_to_df() \%>\%
+   df_plot()
 }
 }

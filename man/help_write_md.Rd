@@ -10,9 +10,10 @@ help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
 includes data for the county of your location (before running
-\code{pull_clean_pur}, you can use the \code{find_location_county}
-function to figure this out), the time period, and the active ingredients
-or chemical classes for which you want to calculate exposure.}
+\code{pull_clean_pur}, you can use the
+\code{find_location_county} function to figure this out), the time period,
+and the active ingredients or chemical classes for which you want to
+calculate exposure.}
 
 \item{pls_percents}{A data frame}
 

@@ -30,5 +30,4 @@ find_counties(c("contra costa", "45"))
 
 find_counties(c("01", "03", "el dorado"), return = "names")
 find_counties(c("contra costa", "45"), return = "names")
-find_counties("fresno")
 }
