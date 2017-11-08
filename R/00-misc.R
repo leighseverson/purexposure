@@ -92,14 +92,10 @@ tibble_to_vector <- function(tib) {
 
 }
 
-#' Include alpha in ggplot2::scale_fill_gradientn().
-#'
-#' This function adds an `alpha` argument to scale_fill_gradientn() from the
-#' ggplot2 package.
-#' @export
 scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
                                   na.value = "grey50", guide = "colourbar", colors,
                                   alpha = NULL) {
+  # Include alpha in ggplot2::scale_fill_gradientn()
   colours <- if (missing(colours)) colors else colours
 
   ggplot2::continuous_scale("fill", "gradientn",
@@ -107,12 +103,8 @@ scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
                             na.value = na.value, guide = guide, ...)
 }
 
-#' Include alpha option in scales::gradient_n_pal().
-#'
-#' This function adds an "alpha" argument from gradient_n_pal() from the scales
-#' package.
-#' @export
 gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL) {
+  # Include alpha option in scales::gradient_n_pal().
   if (!identical(space, "Lab")) {
     warning("Non Lab interpolation is deprecated", call. = FALSE)
   }

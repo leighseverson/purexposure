@@ -1,16 +1,50 @@
-#' Read in PUR county dataset for a year.
-#'
-#' Once a year of PUR data has been downloaded, this function reads in a
-#' selected county's dataset.
-#'
-#' This is a helper function for \code{pull_pur_file}.
-#'
-#' @param code_or_file A PUR county code or a file name for a county's dataset.
-#' @param type Either "codes" or "files", specifying the type of argument supplied
-#' to \code{code_or_file}.
-#' @inheritParams pull_pur_file
-#'
-#' @return A data frame of raw PUR data for a single county and year.
+#' @importFrom magrittr %>%
+help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
+
+  current_dir <- getwd()
+
+  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                year, ".zip")
+  file <- paste0("pur", year, ".zip")
+
+  dir <- tempdir()
+  setwd(dir)
+
+  if (download_progress) {
+    quiet <- FALSE
+  } else {
+    quiet <- TRUE
+  }
+
+  download.file(url, destfile = file, mode = "wb", quiet = quiet)
+  unzip(file, exdir = dir)
+
+  sm_year <- substr(year, 3, 4)
+
+  if (!"all" %in% counties) {
+
+    codes <- find_counties(counties)
+
+    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
+                                       year = year) %>%
+      dplyr::arrange(applic_dt, county_cd)
+
+  } else {
+
+    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+
+    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
+                                       year = year) %>%
+      dplyr::arrange(applic_dt, county_cd)
+
+  }
+
+  setwd(current_dir)
+
+  return(counties_in_year)
+
+}
+
 help_read_in_counties <- function(code_or_file, type, year) {
 
   sm_year <- substr(year, 3, 4)
@@ -60,27 +94,6 @@ help_read_in_counties <- function(code_or_file, type, year) {
 
 }
 
-#' Find California county code or name
-#'
-#' Given a county, \code{help_find_code} returns either the PUR
-#' county code or name.
-#'
-#' This is a helper function for \code{find_counties}.
-#'
-#' @param county A character string giving either a county name or
-#'  two digit PUR county code. Not case sensitive. California names and county
-#'  codes as they appear in PUR datasets can be found in the \code{county_codes}
-#'  dataset available with this package.
-#' @param return Either "codes" to return county code (the default) or "names"
-#'  to return county name.
-#'
-#' @return If \code{return = "codes"}, a two-character string giving
-#'   the corresponding PUR county codes. If \code{return = "names"}, a county
-#'   name.
-#'
-#' @examples
-#' help_find_code("01", return = "names")
-#' help_find_code("contra costa", return = "codes")
 #' @importFrom magrittr %>%
 help_find_code <- function(county, return = "codes") {
 
@@ -139,21 +152,6 @@ help_find_code <- function(county, return = "codes") {
 
 }
 
-#' Sum application by section, township, chemical, and method of application.
-#'
-#' \code{help_sum_application} sums application of a PUR dataset by chemicals,
-#' PLS unit, and aerial/ground application.
-#'
-#' This is a helper function for \code{pull_clean_pur}.
-#'
-#' @inheritParams pull_clean_pur
-#' @param df A data frame from \code{pull_clean_pur} before summing has taken
-#' place
-#' @param section_townships A section_townships data frame
-#' @param ... grouping variables
-#'
-#' @return A data frame. The number of columns is dependent on the grouping
-#' variables supplied to the \code{...} argument.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 help_sum_application <- function(df, sum, unit, aerial_ground,
@@ -209,18 +207,6 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
 
 }
 
-#' Remove columns with all missing values.
-#'
-#' Given a quoted column name and its data frame, \code{help_remove_cols} determines
-#' if that column has all missing values or not.
-#'
-#' This is a helper function for \code{help_sum_application}.
-#'
-#' @param col_quote A quoted column name
-#' @param df A data frame
-#'
-#' @return A data frame with two columns: \code{col} gives the column name, and
-#' \code{all_missing} is a logical value.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 help_remove_cols <- function(col_quote, df) {
@@ -234,33 +220,6 @@ help_remove_cols <- function(col_quote, df) {
 
 }
 
-#' Find PLS units intersecting with a buffer.
-#'
-#' \code{help_filter_pls} filters a SpatialPolygonsDataFrame to include only PLS
-#' units intersecting with a buffer, and filters the data frame returned from
-#' \code{pull_clean_pur} to include only those sections or townships.
-#'
-#' This is a helper function for \code{calculate_exposure}.
-#'
-#' @inheritParams calculate_exposure
-#' @param pls Either \code{MTRS} (sections) or \code{MTR} (townships). Not quoted
-#' @param pls_quote Either \code{"MTRS"} or \code{"MTR"}
-#' @param which_pls A vector of character string PLS units
-#' @param shp A county's shapefile
-#' @param buffer A data frame with buffer coordinates
-#' @param df A data frame
-#'
-#' @return A list with four elements:
-#' \describe{
-#'   \item{pur_filt}{A cleaned PUR data frame filtered to PLS units intersecting
-#'   with a buffer.}
-#'   \item{comb_df_filt}{A spatial data frame with intersecting PLS units and
-#'   a buffer.}
-#'   \item{pls_intersections}{A data frame with two columns: \code{pls} and
-#'   \code{percent}, the corresponding percent intersection with the buffer.}
-#'   \item{pls_int}{A character vector with all PLS units intersecting with the
-#'   buffer.}
-#' }
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
@@ -356,19 +315,6 @@ help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
 
 }
 
-#' Find summed applied active ingredients.
-#'
-#' \code{help_sum_ai} finds the summed amount of applied active ingredients by
-#' section or township, chemical class, and aerial/ground application.
-#'
-#' This is a helper function for \code{help_calculate_exposure}.
-#'
-#' @param ... A list of variables to group by. Options include \code{section},
-#' \code{township}, \code{chemical_class}, and \code{aerial_ground}. Not quoted
-#' @inheritParams help_calculate_exposure
-#'
-#' @return A data frame a \code{kg} column and one to three additional columns,
-#' depending on the grouping variables.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
@@ -385,21 +331,6 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 
 }
 
-#' Return a \code{meta_data} data frame.
-#'
-#' \code{help_write_md} returns a data frame to be output as the \code{meta_data}
-#' element in the list returned from \code{calculate_exposure}.
-#'
-#' This is a helper function for \code{help_calculate_exposure}.
-#'
-#' @inheritParams help_calculate_exposure
-#' @param mtrs_mtr Either \code{MTRS} or \code{MTR}. Not quoted
-#' @param section_township Either \code{section} or \code{township}. Not quoted
-#' @param pur_out A data frame
-#' @param buffer_area A numeric value
-#'
-#' @return A data frame with the twelve columns in the
-#' \code{calculate_exposure$meta_data} data frame.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @importFrom rlang :=
@@ -482,21 +413,6 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
 
 }
 
-#' Return a single exposure value for each combination of conditions.
-#'
-#' \code{help_calc_exp} returns a data frame with exposure values (kg/m^2) by
-#' chemicals (including \code{chemicals = "all"}) or by chemicals and aerial/ground
-#' application.
-#'
-#' This is a helper function for \code{help_calculate_exposure}.
-#'
-#' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
-#' quoted
-#' @param exp A data frame
-#' @inheritParams help_calculate_exposure
-#
-#' @return A data frame with exposure values in kg/m^2 at a location for each
-#' relevant condition.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 help_calc_exp <- function(exp, buffer_area, ...) {
@@ -511,23 +427,6 @@ help_calc_exp <- function(exp, buffer_area, ...) {
 
 }
 
-#' Return a data frame with exposure values and other related data.
-#'
-#' For a single date range, \code{help_return_exposure} returns a data frame with
-#' exposure values calculated from \code{help_calc_exp} as well as other relevant
-#' data. This one row data frame is combined with data frames for other date
-#' ranges and then returned as the \code{exposure} element from a
-#' \code{calculate_exposure} list.
-#'
-#' This is a helper function for \code{help_calculate_exposure}.
-#'
-#' @param ... Either \code{chemicals} or \code{chemicals, aerial_ground}. Not
-#'   quoted.
-#' @inheritParams help_calculate_exposure
-#' @inheritParams help_calc_exp
-#'
-#' @return A data frame with one row and the columns found in the
-#' \code{calculate_exposure$exposure} data frame.
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!!
 help_return_exposure <- function(start_date, end_date, location, radius,
@@ -564,22 +463,6 @@ help_return_exposure <- function(start_date, end_date, location, radius,
 
 }
 
-#' Return exposure data for a single start and end date.
-#'
-#' For a single date range, \code{help_calculate_exposure} returns the
-#' \code{exposure} and \code{meta_data} data frames to be output in the
-#' \code{calculate_exposure} list as a nested data frame.
-#'
-#' This is a helper function for \code{calculate_exposure}.
-#'
-#' @inheritParams calculate_exposure
-#' @param pls_percents A data frame
-#' @param pur_filt A data frame
-#'
-#' @return A nested data frame with two columns: The \code{row_out} column
-#' contains the \code{exposure} data frame for the date range, and
-#' \code{meta_data} contains the \code{meta_data} data frame for the date range.
-#'
 #' @importFrom magrittr %>%
 help_calculate_exposure <- function(start_date, end_date, aerial_ground,
                                     chemicals, clean_pur_df, location,
@@ -651,34 +534,6 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
 
 }
 
-#' Return a map for a given exposure estimate.
-#'
-#' For a unique combination of time periods, chemicals, and application methods,
-#' \code{help_map_exp} returns a plot showing amounts of pesticides applied for PLS
-#' units intersecting with the buffer.
-#'
-#' This is a helper function for \code{plot_exposure}.
-#'
-#' @inheritParams plot_exposure
-#' @inheritParams calculate_exposure
-#' @param data_pls A data frame
-#' @param gradient A character vector of hex color codes
-#' @param location_longitude A numeric longitude value
-#' @param location_latitude A numeric latitude value
-#' @param buffer_or_county "buffer" or "county"
-#' @param buffer_df A data frame
-#' @param buffer2 A data frame
-#' @param buffer A gpc.poly object
-#' @param clean_pur A \code{clean_pur_df} data frame
-#'
-#' @return A list with three elements:
-#' \describe{
-#'   \item{plot}{An exposure plot}
-#'   \item{data}{A data frame with information about each PLS unit}
-#'   \item{cutoff_values}{A data frame with cutoff values returned if
-#'   \code{color_by = "percentile"}}
-#' }
-#'
 #' @importFrom magrittr %>%
 help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
                      none_recorded, data_pls,
@@ -947,23 +802,6 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 
 }
 
-#' Categorize a continuous scale by percentile cutpoints.
-#'
-#' Given a data frame with a column with a continuous numeric variable,
-#' \code{help_categorize} returns the data frame with a new column categorizing
-#' that continuous variable by percentile cutpoints.
-#'
-#' This is a helper function for \code{help_map_exp}.
-#'
-#' @inheritParams help_map_exp
-#' @param section_data A data frame with a continuous numeric variable named "kg"
-#' @param buffer_or_county Should cutpoints be determined by "county" or "buffer"?
-#' @param clean_pur A \code{pull_clean_pur} data frame
-#' @param s_t "section" or "township"
-#'
-#' @return The input \code{section_data} data frame with an additional column
-#' named \code{category}.
-#'
 #' @importFrom magrittr %>%
 help_categorize <- function(section_data, buffer_or_county,
                            start_date = NULL, end_date = NULL,
@@ -1110,100 +948,6 @@ help_categorize <- function(section_data, buffer_or_county,
 
 }
 
-#' Pull raw PUR file for a single year and a county or counties.
-#'
-#' \code{help_pull_pur} pulls the raw PUR dataset for a particular year and
-#' saves datasets for specified counties in a data frame.
-#'
-#' This is a helper function for \code{pull_raw_pur}.
-#'
-#' @inheritParams pull_raw_pur
-#' @param year A four-digit numeric year in the range of
-#'   1990 to 2015. Indicates the year for which you would like to pull PUR
-#'   datasets.
-#' @param counties A character vector giving either county names or two digit
-#'  county codes. Not case sensitive. California names and county codes as they
-#'  appear in PUR datasets can be found in the county_codes dataset available
-#'  with this package. For example, to return data for Alameda county, enter
-#'  either "alameda" or "01" for the county argument. \code{counties = "all"}
-#'  will pull data for all 58 California counties.
-#'
-#' @return A data frame with 33 columns. Counties are indicated by
-#'   \code{county_cd}; the year for which data was pulled is indicated by
-#'   \code{applic_dt}.
-#'
-#' @section Note:
-#' If this function returns an error (because the FTP site is down, for
-#' example), check your working directory. You may want to change it back from a
-#' temporary directory.
-#'
-#' @example
-#' \dontrun{
-#' raw_file <- help_pull_pur(1999, c("40", "ventura", "yuba"))
-#' }
-#' @importFrom magrittr %>%
-#' @export
-help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
-
-  current_dir <- getwd()
-
-  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
-                year, ".zip")
-  file <- paste0("pur", year, ".zip")
-
-  dir <- tempdir()
-  setwd(dir)
-
-  if (download_progress) {
-    quiet <- FALSE
-  } else {
-    quiet <- TRUE
-  }
-
-  download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  unzip(file, exdir = dir)
-
-  sm_year <- substr(year, 3, 4)
-
-  if (!"all" %in% counties) {
-
-    codes <- find_counties(counties)
-
-    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
-
-  } else {
-
-    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
-
-    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
-
-  }
-
-  setwd(current_dir)
-
-  return(counties_in_year)
-
-}
-
-#' Pull a chemical code based on its name.
-#'
-#' This function uses grep to return \code{chemname} values that match an input
-#' search term.
-#'
-#' This is a helper function for \code{find_chemical_codes}.
-#'
-#' @param chemical A string giving search term of a
-#'   chemical to match with active ingredients present in pesticides applied
-#'   in the given year.
-#' @param df A chemical table data frame.
-#'
-#' @return A data frame with three columns: \code{chem_code}, \code{chemname},
-#' and \code{chemical}.
-#'
 #' @importFrom magrittr %>%
 help_find_chemical <- function(chemical, df) {
 
@@ -1224,21 +968,6 @@ help_find_chemical <- function(chemical, df) {
 
 }
 
-#' Pull a chemical code based on its name.
-#'
-#' This function uses grep to return \code{chemname} values that match an input
-#' search term.
-#'
-#' This is a helper function for \code{find_chemical_codes}.
-#'
-#' @param chemical A string giving search term of a
-#'   chemical to match with active ingredients present in pesticides applied
-#'   in the given year.
-#' @param df A chemical table data frame.
-#'
-#' @return A data frame with three columns: \code{chem_code}, \code{chemname},
-#' and \code{chemical}.
-#'
 #' @importFrom magrittr %>%
 help_find_product <- function(product, df) {
 
@@ -1259,27 +988,7 @@ help_find_product <- function(product, df) {
 
 }
 
-#' Calculate euclidean distance between two points.
-#'
-#' \code{help_euc_distance} calculates the straight-line distance between
-#' two points.
-#'
-#' This is a helper function for \code{calculate_exposure}.
-#'
-#' @param long Longitude (x) of second point
-#' @param lat Latitude (y) of second point
-#' @param origin_long Longitude (x) of first point
-#' @param origin_lat Latitude (y) of first point
-#'
-#' @return A data frame with one row and three columns: \code{long} and
-#' \code{lat} give the second point's coordinates, and \code{dist} gives the
-#' euclidian distance from these coordinates from the origin.
-#'
-#' @example{
-#' help_euc_distance(-120, 36, 120.5, 37.5)
-#' }
-#' @export
-help_euc_distance <- function(long, lat, origin_long, origin_lat) {
+help_calc_distance <- function(long, lat, origin_long, origin_lat) {
 
   x <- abs(lat - origin_lat)
   y <- abs(long - origin_long)

@@ -235,7 +235,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 
-      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_euc_distance,
+      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_calc_distance,
                                 origin_long = range$max_long,
                                 origin_lat = range$max_lat) %>%
         dplyr::filter(long > range$max_long & lat > range$max_lat) %>%
@@ -254,7 +254,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 
-      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_euc_distance,
+      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_calc_distance,
                                 origin_long = range$max_long,
                                 origin_lat = range$max_lat) %>%
         dplyr::filter(long > range$max_long & lat > range$max_lat) %>%

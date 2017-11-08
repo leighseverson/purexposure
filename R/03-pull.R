@@ -32,7 +32,7 @@
 #'   "pur[year].zip" file between 1990 and 2015 found here:
 #'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
 #'   \item{If this function returns an error (because the FTP site is down, for
-#'   example), check your working directory. You may want to change it back from
+#'   example), check your working directory. You may need to change it back from
 #'   a temporary directory.}
 #' }
 #'
@@ -170,7 +170,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   comprehensive classifications of active ingredients.
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
-#'   "O" = other.) The default is FALSE.
+#'   "O" = other.) The default is TRUE.
 #' @param raw_pur_df A raw PUR data frame. Optional. If you've already downloaded
 #'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 #'   \code{pull_clean_pur} from downloading the same data again.
@@ -240,8 +240,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     Pesticide Regulation. This file is saved as "cd_doc.pdf" in
 #'     any "pur[year].zip" file between 1990 and 2015 found here:
 #'     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
-#'     \item{If this function returns an error, check your working directory.
-#'     You may want to change it back from a temporary directory.}
+#'     \item{If this function returns an error (because the FTP site is down,
+#'     for example), check your working directory. You may need to change it
+#'     back from a temporary directory.}
 #' }
 #'
 #' @examples
