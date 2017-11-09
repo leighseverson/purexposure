@@ -474,6 +474,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
       chem_year <- chem_year %>% dplyr::mutate(year = as.character(years[i]))
       out_chem_list[[i]] <- chem_year
     }
+
     out_chem_df <- dplyr::bind_rows(out_chem_list)
 
     df <- df %>% dplyr::mutate(applic_dt = lubridate::ymd(applic_dt),
