@@ -552,7 +552,6 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
   }
 
   gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
-  gradient <- c("#FFFFFF", gradient)
 
   location_longitude <- unique(exposure_list$exposure$longitude)
   location_latitude <- unique(exposure_list$exposure$latitude)
