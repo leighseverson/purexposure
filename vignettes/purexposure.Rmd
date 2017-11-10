@@ -12,7 +12,6 @@ vignette: >
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 library(purexposure)
-library(dplyr)
 ```
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
@@ -30,6 +29,12 @@ The `purexposure` package has four main categories of functions: `find_*`, `pull
 ```{r eval = FALSE}
 devtools::install_github("leighseverson/purexposure")
 library(purexposure)
+```
+
+Many examples in this vignette also use functions from the `dplyr` package.
+
+```{r message = FALSE}
+library(dplyr)
 ```
 
 ## Overview of PUR datasets 
@@ -218,7 +223,7 @@ There is one record per active ingredient per township per day. Alternatively, `
 ```{r}
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) %>%
-  dplyr::rename(chemical_class = chemical)
+  rename(chemical_class = chemical)
 head(chemical_class_df, 2)
 tail(chemical_class_df, 2)
 ```
@@ -263,28 +268,122 @@ The `calculate_exposure` function calculates exposure to applied pesticides at a
 
 Exposure is calculated by summing the amount of applied pesticides in the fraction of sections or townships that are overlapped by the buffer described by `radius`. For example, if a radius covers 50% of section A, 25% of section B, 25% of section C, and 30% of section D, the pesticides applied in those section are multiplied by 0.5, 0.25, 0.25, and 0.3, respectively. The time period over which application is summed is determined by the `time_period` argument. If `time_period` is `NULL`, application is summed over the date range of the `clean_pur_df` dataset. `time_period` takes strings of units of time (`"2 weeks"` or `"6 months"`, for example) and calculates exposure separately using that unit of time as a break point. The first time period will always begin on the first day of the year. If the `clean_pur_df` dataset has data from February through August, for example, and `time_period` is set to `"6 months"`, exposure will be calculated separately for January through June and July through December. 
 
-If the input `clean_pur_df` data frame has a `chemical_class` column and the `chemicals` argument in `calculate_exposure` is set to `"chemical_class"`, 
+If the input `clean_pur_df` data frame has a `chemical_class` column and the `chemicals` argument in `calculate_exposure` is set to `"chemical_class"`, exposure will be calculated for each unique value of the `chemical_class` column. 
 
+For example, this call calculates exposure in 2015 in a 1,500 m radius buffer extending from Sun Empire Elementary School for all active ingredients present in applied pesticides: 
 
-
-For example, to calculate exposure at Sun Empire Elementary for the year 2015: 
-
-```{r}
+```{r eval = FALSE, echo = 1:3}
 sun_empire <- pull_clean_pur(2015, "fresno") %>% 
   calculate_exposure(location = "2649 North Modoc Ave., Kerman, CA", 
                      radius = 1500) 
+sun_empire$clean_pur_df <- sun_empire$clean_pur_df[1:2,]
+sun_empire$buffer_plot_df <- df_plot(sun_empire$buffer_plot_df)
+sun_empire$county_plot <- NULL
+save(sun_empire, file = "data/sun_empire.RData") 
+```
+
+`calculate_exposure` returns a list with five elements: 
+
+```{r echo = FALSE}
+load("data/sun_empire.RData")
+```
+
+```{r eval = FALSE}
+names(sun_empire)
+```
+```{r echo = FALSE}
+c("exposure", "meta_data", "buffer_plot_df", "county_plot", "clean_pur_df")
+```
+
+The first is the `exposure` data frame. There will be one row per exposure value ($\frac{kg}{m^2}$): 
+
+```{r}
+sun_empire$exposure
+```
+
+The cumulative estimated exposure calculated for the year 2015 for a 1,500 m radius buffer extending from Sun Empire Elementary is about 0.0038 $\frac{kg}{m^2}$. 
+
+The second is a `meta_data` data frame, with one row per section or township that intersects with the specified buffer. The values in the `meta_data` data frame can be used to re-calculate exposure. The `pls` column will give information on the township level if the `clean_pur_df` was summed by township; otherwise, it will give information on the section level. The `chemicals` column specifies either "all" or a chemical class, and  `percent` gives the percent intersection of each PLS unit with the buffer. `kg` gives the kilograms of pesticides applied in that PLS unit for the given active ingredients and time period, and `kg_intersection` gives the values `kg` multiplied by `percent`, or the amount of pesticides applied within the specified buffer. `start_date` and `end_date` give time periods over which application was summed. The values of `aerial_ground` would be nonmissing if the `aerial_ground` argument is set to `TRUE`. The `none_recorded` column is `TRUE` if there were not records of application for the specified PLS unit, active ingredients, and time period. Other columns are `location`, `radius` and `area`, which gives the area of the specified buffer in $m^2$. 
+
+```{r}
+sun_empire$meta_data
+```
+
+To make the process of calculating exposure more clear, we can re-calculate exposure by multiplying `percent` by `kg` to get `kg_intersection` for each section, then summing across all sections and dividing by the buffer area: 
+
+```{r}
+sun_empire$meta_data %>% 
+  mutate(kg_intersection = percent*kg) %>% 
+  group_by(chemicals, start_date, end_date, aerial_ground) %>% 
+  summarise(sum = sum(kg_intersection), 
+            area = first(area)) %>% 
+  mutate(exposure = sum/area) %>% 
+  select(exposure, 1:4)
+```
+
+The `buffer_plot_df` element of the `calculate_exposure` list is a data frame with spatial plotting data for the buffer and overlapping PLS units. Using `df_plot`, we can get a rough idea of the area for which exposure was calculated. The `plot_exposure` function, explained further below, returns a similar plot with more information. 
+
+```{r eval = FALSE}
+df_plot(sun_empire$buffer_plot_df)
+```
+```{r echo = FALSE, fig.align = "center"}
+sun_empire$buffer_plot_df
+```
+
+The `county_plot` element shows the specified buffer in context of the entire county: 
+
+```{r eval = FALSE}
+sun_empire$county_plot
+```
+```{r echo = FALSE, fig.align = "center", out.width = "550pt", out.height = "400pt"}
+knitr::include_graphics("figures/sun_empire_county_plot.png")
+```
+
+And the `clean_pur_df` element is the same data frame input to the `clean_pur_df` argument: 
+
+```{r}
+sun_empire$clean_pur_df %>% head(2)
+```
+
+If we wanted to calculate exposure for the same location in four month increments, we can specify `time_period = "4 months"`. 
+
+```{r eval = FALSE, echo = 1:4}
+sun_empire2 <- pull_clean_pur(2015, "fresno") %>% 
+  calculate_exposure(location = "2649 North Modoc Ave., Kerman, CA", 
+                     radius = 1500,
+                     time_period = "4 months") 
+se_exposure <- sun_empire2$exposure
+save(se_exposure, file = "data/se_exposure.RData")
+```
+```{r echo = FALSE}
+load("data/se_exposure.RData")
+```
+```{r eval = FALSE}
+sun_empire2$exposure
+```
+```{r echo = FALSE}
+se_exposure
 ```
 
 
-
-
-takes advantage of the reporting structure of PUR datasets to calculate exposure based on the amount of pesticides applied in PLS units overlapping with a buffer that extends from 
-
-- use one of the example datasets from above 
-- go through each element of the returned list 
-- only run once (run for all, and for a time period (this is optional), but explain that you could run for chemical classes as well.)
+In this case, there is one exposure value calculated for each four-month increment in the year 2015. There would similarly be different exposure values calculated for different values of `chemical_class` (if the `clean_pur_df` had a `chemical_class` column and `chemicals` was set to `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an `aerial_ground` column and `aerial_ground` was set to `TRUE`).
 
 ### `plot_*` functions: visualize application of and exposure to applied pesticides 
+
+#### Visualize exposure 
+
+The `plot_exposure` function returns a list with four elements. 
+
+```{r}
+plot_sun_empire <- plot_exposure(sun_empire)
+```
+
+
+#### Visualize application 
+
+**By PLS unit** 
+
+**Time series** 
 
 - map_ functions: related to county plots, PLS units 
 - plot_ functions: timeseries (application and exposure) 
