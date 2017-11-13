@@ -197,13 +197,13 @@ unique(nevada_sulfur$chemname)
 
 There are several records for active ingredients matching the search term `methylene` for 2003 that were applied across California in 2000 (`find_chemical_codes(2000, "sulfur")`); however, only two of these were applied in Nevada county in 2000. If you're using the `chemicals` argument to filter a PUR dataset, you may want to do additional filtering (for example, if you were only interested "sulfur" active ingredients and not "lime-sulfur").
 
-Application method (`aerial_ground`), which indicates if pesticides were applied aerially (`A`), by ground (`B`) or with another method (`O`), can be retained or discarded with the `aerial_ground` argument set to `TRUE` or `FALSE`. This choice becomes more important when summing applied active ingredients and calculating exposure; both situations are discussed further down. 
+Application method (`aerial_ground`), which indicates if pesticides were applied aerially (`A`), by ground (`B`) or with another method (`O`), can be retained or discarded with the `aerial_ground` argument set to `TRUE` or `FALSE`. This choice becomes more important when summing applied active ingredients and calculating exposure; both situations are discussed further below. 
 
 By default, cleaned PUR datasets often have many records per day. There are a few different options for how to sum application so that there is one record per active ingredient or chemical class, PLS unit (section or township), and potentially per method of application (aerial, ground, or other). The `sum_application`, `unit`, `sum`, `aerial_ground`, and `chemical_class` arguments are all relevant here. 
 
 When `sum_application` is set to `TRUE`, the `unit` argument indicates what Public Land Survey (PLS) unit you would like to sum application by (`"section"`, the default, or `"township"`). If `aerial_ground` is set to `TRUE`, records will be summed by each method of application as well. The `sum` argument can be set to `"all"`, the default, or `"chemical_class"`. `"all"` indicates that you would like to sum all active ingredients present in the dataset (which could be filtered using the `chemicals` argument) to give a daily value of kilograms of pesticides applied per PLS unit. For example, we can pull data for 2010 in Tulare county, summed by active ingredient and township: 
 
-```{r eval = FALSE, echo = 1:3}
+```{r eval = FALSE, echo = 1:4}
 tulare <- pull_clean_pur(2010, "tulare", 
                          sum_application = TRUE, 
                          unit = "township", 
@@ -330,7 +330,7 @@ df_plot(sun_empire$buffer_plot_df)
 sun_empire$buffer_plot_df
 ```
 
-The `county_plot` element shows the specified buffer in context of the entire county: 
+The `county_plot` element shows the specified buffer in the context of the entire county: 
 
 ```{r eval = FALSE}
 sun_empire$county_plot
@@ -365,23 +365,108 @@ sun_empire2$exposure
 se_exposure
 ```
 
-
-In this case, there is one exposure value calculated for each four-month increment in the year 2015. There would similarly be different exposure values calculated for different values of `chemical_class` (if the `clean_pur_df` had a `chemical_class` column and `chemicals` was set to `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an `aerial_ground` column and `aerial_ground` was set to `TRUE`).
+In this case, there is one exposure value calculated for each four-month increment in the year 2015. There can similarly be different exposure values calculated for different values of `chemical_class` (if the `clean_pur_df` had a `chemical_class` column and `chemicals` was set to `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an `aerial_ground` column and `aerial_ground` was set to `TRUE`).
 
 ### `plot_*` functions: visualize application of and exposure to applied pesticides 
 
 #### Visualize exposure 
 
-The `plot_exposure` function returns a list with four elements. 
+The `plot_exposure` function returns a list with three elements: `maps`, `pls_data`, and `exposure`. `pls_data` and `exposure` data frames correspond to the `meta_dat` and `exposure` data frames returned by `calculate_exposure`. For each exposure value that is calculated, there is a separate map, PLS data frame (with one row per section or township), and exposure data frame (with one row). 
 
-```{r}
+The first argument of plot_exposure is a list returned by `calculate_exposure`. 
+
+```{r eval = FALSE}
 plot_sun_empire <- plot_exposure(sun_empire)
+names(plot_sun_empire)
 ```
 
+```{r echo = FALSE}
+c("maps", "pls_data", "exposure")
+```
+
+If we input the `sun_county` exposure list, the `pls_data` and `exposure` data frames will be identical to the `meta_data` and `exposure` data frames returned from `calculate_exposure`. The `maps` element gives a plot of the location, specified buffer, and PLS units colored according to the amount of pesticide applied. 
+
+There are a few different ways to visualise the same data on a `maps` plot. The default of the `color_by` argument is `"amount"`, specifying a scale legend, and that of the `buffer_or_county` argument is `"county"`, indicating that colors should be scaled according to the range of application for the same time period and active ingredients for the entire county: 
+
+```{r eval = FALSE}
+plot_sun_empire$maps
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figures/se_map1.png")
+```
+
+Alternatively, pesticide application can be colored according to the percentile it falls into (`color_by = "percentile"`). The number of cutpoints can be specified with the `percentile` argument. The default is `c(0.25, 0.5, 0.75): 
+
+```{r echo = 1, eval = FALSE}
+plot_exposure(sun_empire, color_by = "percentile")$maps
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figures/se_map2.png")
+```
+
+
+If `color_by = "percentile"`, a fourth element is returned called `"cutoff_values"`, a data frame with two columns (`percentile` and `kg`) that gives the cutoff value of kilograms of pesticide applied for each percentile. 
+
+```{r echo = 1, eval = FALSE}
+plot_exposure(sun_empire, color_by = "percentile")$cutoff_values
+se_cv <- plot_exposure(sun_empire, color_by = "percentile")$cutoff_values
+save(se_cv, file = "data/se_cv.RData")
+```
+```{r echo = FALSE}
+load("data/se_cv.RData")
+```
+```{r echo = FALSE}
+se_cv
+```
+
+In this case, sections with $\leq$ 1,352.539 kilograms of pesticides applied in the portion that intersects with the specified buffer will fall under the lowest percentile category ("`<= 25th percentile"`). 
+
+If you'd like fill colors of pesticide application to be scaled according to the PLS units plotted, you can specify `buffer_or_county` to be `"buffer"`: 
+
+```{r eval = FALSE}
+plot_exposure(sun_empire, buffer_or_county = "buffer")$maps
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figures/se_map3.png")
+```
+
+There are a few other arguments that can change the appearance of the returned plot in other ways. `fill_option` takes any palette from the `colormap` package. `alpha` sets the transparency of fill colors, and is set by defaut to `0.7`. You can also include section or township labels with `pls_labels` set to `TRUE`. `pls_labels_size` controls the size of these lables (the deafult is `4`). For example: 
+
+```{r eval = FALSE}
+plot_exposure(sun_empire, fill_option = "density", alpha = 0.5, pls_labels = TRUE, 
+              pls_labels_size = 3.5)$maps
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figures/se_map4.png")
+```
+
+In the example above, when we caclulated an exposure values for four-month time periods, the `exposure` element of the `calculate_exposure` list had three rows: 
+
+```{r eval = FALSE}
+sun_empire2$exposure
+```
+```{r echo = FALSE}
+se_exposure
+```
+
+If we input the `sun_empire2` list into plot_exposure, one map, PLS data frame, and exposure row is output in the form of a separate list element for each exposure value. 
+
+```{r echo = 1:3, eval = FALSE}
+plot_sun_empire2 <- plot_exposure(sun_empire2, color_by = "percentile")
+maps <- plot_sun_empire2$maps
+multiplot(maps[[1]], maps[[2]], maps[[3]], cols = 2)
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("figures/se_plots.png")
+```
+
+The first `plot_sun_empire2$maps` element corresponds to `plot_sun_empire2$pls_data[[1]]`, `plot_sun_empire2$exposure[[1]]`, and `plot_sun_empire2$cutoff_values[[1]]`. 
 
 #### Visualize application 
 
 **By PLS unit** 
+
+
 
 **Time series** 
 

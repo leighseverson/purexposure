@@ -86,7 +86,7 @@ A list with five elements:
    take aerial/ground application into account, \code{none_recorded}, logical
    for whether any pesticide application was recorded for the specified section
    or township, date range, and chemicals, \code{location}, and \code{radius}.}
-   \item{buffer_plot}{A data frame with 24 columns. Contains spatial plotting
+   \item{buffer_plot_df}{A data frame with 24 columns. Contains spatial plotting
    data for the buffer and overlapping sections or townships. You can use the
    \code{df_plot} function to quickly plot and get a rough idea of the
    area for which exposure was calculated, before moving on to other

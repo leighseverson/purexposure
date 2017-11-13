@@ -64,7 +64,7 @@ comprehensive classifications of active ingredients.}
 
 \item{aerial_ground}{TRUE / FALSE indicating if you would like to
 retain aerial/ground application data ("A" = aerial, "G" = ground, and
-"O" = other.) The default is FALSE.}
+"O" = other.) The default is TRUE.}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
