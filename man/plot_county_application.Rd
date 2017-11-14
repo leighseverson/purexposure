@@ -58,7 +58,7 @@ a specific active ingredient present in the \code{chemname} column of the
 \item{crop}{TRUE / FALSE for whether you would like your plot zoomed in on
 sections or townships with recorded application data.}
 
-\item{alpha}{A number in [0,1] specifying the transperency of fill colors.
+\item{alpha}{A number in [0,1] specifying the transparency of fill colors.
 Numbers closer to 0 will result in more transparency. The default is 1.}
 }
 \value{

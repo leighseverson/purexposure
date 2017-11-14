@@ -33,7 +33,7 @@ which results in four categories: < 25th percentile, >= 25th to < 50th,
 \url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
 
-\item{alpha}{A number in [0,1] specifying the transperency of fill colors.
+\item{alpha}{A number in [0,1] specifying the transparency of fill colors.
 Numbers closer to 0 will result in more transparency. The default is 0.7.}
 
 \item{pls_labels}{TRUE / FALSE for whether you would like sections or townships

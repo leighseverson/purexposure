@@ -4,7 +4,7 @@
 \alias{plot_application_timeseries}
 \title{Plot time series of active ingredients in applied pesticides.}
 \usage{
-plot_application_timeseries(clean_pur_df, facet = FALSE, y_axis = "fixed")
+plot_application_timeseries(clean_pur_df, facet = FALSE, axes = "fixed")
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned from \code{pull_clean_pur}.}
@@ -14,7 +14,7 @@ plots to be faceted by unqiue \code{chemname} or \code{chemical_class}
 column values. If \code{facet = FALSE} (the default), all active ingredients
 present in the dataset will be summed per day.}
 
-\item{y_axis}{A character string passed on to the \code{scales} argument of
+\item{axes}{A character string passed on to the \code{scales} argument of
 \code{ggplot2::facet_wrap} (\code{"fixed"}, \code{"free"}, \code{"free_x"},
 or \code{"free_y"}). The default is \code{"fixed"}.}
 }

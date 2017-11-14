@@ -17,8 +17,8 @@ and the active ingredients or chemical classes for which you want to
 calculate exposure.}
 
 \item{location}{A length-one character string. Either a California address
-including street name, city, state, and zip code, or a pair of coordinates
-in the form "longitude, latitude".}
+including street name, city, state, and 5-digit zip code, or a pair of
+coordinates in the form "longitude, latitude".}
 
 \item{radius}{A numeric value greater than zero that gives the radius in meters
 defining the buffer around your location in which you would like to

@@ -171,7 +171,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   \code{colormap::colormaps}.
 #' @param crop TRUE / FALSE for whether you would like your plot zoomed in on
 #'   sections or townships with recorded application data.
-#' @param alpha A number in [0,1] specifying the transperency of fill colors.
+#' @param alpha A number in [0,1] specifying the transparency of fill colors.
 #'   Numbers closer to 0 will result in more transparency. The default is 1.
 #'
 #' @return A list with three elements:
@@ -254,6 +254,12 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   # pull county shapefile
   if (is.null(county)) {
     code <- unique(clean_pur_df$county_code)
+    if (length(code) > 1) {
+      counties <- paste(find_counties(code, "names"), collapse = ", ")
+      stop(paste0("Your clan_pur_df data frame has data for more than one ",
+                  "county (", counties, "). You can specify which county to ",
+                  "plot data for with the county argument."))
+    }
   } else {
     code <- find_counties(county)
   }
@@ -444,7 +450,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'   to be labeled with their PLS ID. The default is \code{FALSE}.
 #' @param pls_labels_size A number specifying the size of PLS labels. The default
 #'   is 4.
-#' @param alpha A number in [0,1] specifying the transperency of fill colors.
+#' @param alpha A number in [0,1] specifying the transparency of fill colors.
 #'   Numbers closer to 0 will result in more transparency. The default is 0.7.
 #'
 #' @return A list with the following elements:
@@ -643,7 +649,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 #'   plots to be faceted by unqiue \code{chemname} or \code{chemical_class}
 #'   column values. If \code{facet = FALSE} (the default), all active ingredients
 #'   present in the dataset will be summed per day.
-#' @param y_axis A character string passed on to the \code{scales} argument of
+#' @param axes A character string passed on to the \code{scales} argument of
 #'   \code{ggplot2::facet_wrap} (\code{"fixed"}, \code{"free"}, \code{"free_x"},
 #'   or \code{"free_y"}). The default is \code{"fixed"}.
 #'
@@ -659,7 +665,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 #' }
 #' @export
 plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
-                                        y_axis = "fixed") {
+                                        axes = "fixed") {
 
   if (facet) {
     if ("chemname" %in% colnames(clean_pur_df)) {
@@ -686,10 +692,10 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
   if (facet) {
     if ("chemname" %in% colnames(clean_pur_df)) {
       plot <- plot +
-        ggplot2::facet_wrap(~chemname, scales = y_axis)
+        ggplot2::facet_wrap(~chemname, scales = axes)
     } else if ("chemical_class" %in% colnames(clean_pur_df)) {
       plot <- plot +
-        ggplot2::facet_wrap(~chemical_class, scales = y_axis )
+        ggplot2::facet_wrap(~chemical_class, scales = axes )
     }
   }
 

@@ -8,8 +8,8 @@ find_location_county(location, return = "name", latlon_out = NULL)
 }
 \arguments{
 \item{location}{A length-one character string. Either a California address
-including street name, city, state, and zip code, or a pair of coordinates
-in the form "longitude, latitude".}
+including street name, city, state, and 5-digit zip code, or a pair of
+coordinates in the form "longitude, latitude".}
 
 \item{return}{Either "name" to return county name (the default) or "code"
 to return county code.}

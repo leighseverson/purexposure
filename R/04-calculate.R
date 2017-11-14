@@ -5,8 +5,8 @@
 #' estimate of exposure in kg of active ingredient per m^2.
 #'
 #' @param location A length-one character string. Either a California address
-#'   including street name, city, state, and zip code, or a pair of coordinates
-#'   in the form "longitude, latitude".
+#'   including street name, city, state, and 5-digit zip code, or a pair of
+#'   coordinates in the form "longitude, latitude".
 #' @param clean_pur_df A data frame returned by \code{pull_clean_pur} that
 #'   includes data for the county of your location (before running
 #'   \code{pull_clean_pur}, you can use the
