@@ -34,16 +34,16 @@ PUR data sets can be pulled by years in the range \[1990, 2015\].
 
 PUR data sets are organized and pulled by county. Application is recorded by township and section, which are units of land resulting from the Public Land Survey System (PLSS). The PLSS is used to subdivide and describe land in the United States, and is regulated by the Bureau of Land Management. Most midwestern, some southern, and all western states are included in the PLSS. There are several initial points from which PLSS surveys begin from. The line running north-south through the initial points is called the Principle Meridian, and the east-west line running through the points is called the base line. California contains three of these initial points, and three Principle Meridians: Humboldt (H), Mount Diablo (M), and San Bernardino (S).
 
-<img src="vignettes/figures/calneva.jpg" alt="Base Lines and Meridian lines in California. Source: https://www.blm.gov/cadastral/meridians/Caleneva.htm" width="250pt" height="400pt" />
+<img src="vignettes/figures/calneva.jpg" alt="Base Lines and Meridian lines in California." width="250pt" height="400pt" />
 <p class="caption">
-Base Lines and Meridian lines in California. Source: <https://www.blm.gov/cadastral/meridians/Caleneva.htm>
+Base Lines and Meridian lines in California.
 </p>
 
 Townships are six-mile-square areas that are identified by a combination of the location north or south of the base line, and range, the location east or west of the principle meridian. Townships are divided into 36 one-mile-square sections. California townships are uniquely identified by a combination of Principle Meridian (H, M, or S), location north or south of the base line (01-48), base line direction (N or S), location east or west of the Principle Meridian (01-47), and Principle Meridian direction (E or W). Sections are identified by the same combination, with the addition of the section number (01-36). For example, one township in California is identified by "M15S24E", and a section within that township is identified by "M15S24E01". The diagram below shows an example of a township (outlined in blue) and one of the 36 sections within that township (outlined in red).
 
-<img src="vignettes/figures/section_townships.png" alt="Sectional map of a township showing adjoining sections. Source: https://www.blm.gov/or/pubroom/files/land-descript-diag.pdf" width="250pt" height="250pt" />
+<img src="vignettes/figures/section_townships.png" alt="Sectional map of a township showing adjoining sections." width="250pt" height="250pt" />
 <p class="caption">
-Sectional map of a township showing adjoining sections. Source: <https://www.blm.gov/or/pubroom/files/land-descript-diag.pdf>
+Sectional map of a township showing adjoining sections.
 </p>
 
 Main functions in the `purexposure` package
