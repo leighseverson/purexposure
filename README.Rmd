@@ -6,6 +6,7 @@ output: github_document
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 library(purexposure)
+library(dplyr)
 ```
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -25,12 +26,6 @@ The `purexposure` package has four main categories of functions: `find_*`, `pull
 ```{r eval = FALSE}
 devtools::install_github("leighseverson/purexposure")
 library(purexposure)
-```
-
-Many examples in this vignette also use functions from the `dplyr` package.
-
-```{r message = FALSE}
-library(dplyr)
 ```
 
 ## Overview of PUR datasets 

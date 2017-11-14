@@ -11,12 +11,6 @@ devtools::install_github("leighseverson/purexposure")
 library(purexposure)
 ```
 
-Many examples in this vignette also use functions from the `dplyr` package.
-
-``` r
-library(dplyr)
-```
-
 Overview of PUR datasets
 ------------------------
 
