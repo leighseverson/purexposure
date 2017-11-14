@@ -299,7 +299,7 @@ fresno_clean <- pull_clean_pur(2004, "fresno", raw_pur_df = fresno_raw)
 
 If you happen to get an error after a call to either `pull_raw_pur` or `pull_clean_pur` (because you choose to stop the function while it's running, or if the FTP site is down, for example), check your working directory. You'll probably want to change it back from a temporary directory.
 
-### `calculate_exposure` to applied pesticides
+### 3. `calculate_exposure` to applied pesticides
 
 The `calculate_exposure` function calculates exposure to applied pesticides at a particular location for a given buffer extending from the location, time period, and group of active ingredients. The required arguments are `clean_pur_df`, a data frame returned from `pull_clean_pur`, `location`, which can be an address or a coordinate pair, and radius, which gives the radius of the buffer extending from the location in meters.
 
@@ -422,7 +422,7 @@ sun_empire2$exposure
 
 In this case, there is one exposure value calculated for each four-month increment in the year 2015. There can similarly be different exposure values calculated for different values of `chemical_class` (if the `clean_pur_df` had a `chemical_class` column and `chemicals` was set to `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an `aerial_ground` column and `aerial_ground` was set to `TRUE`).
 
-### `plot_*` functions: visualize application of and exposure to applied pesticides
+### 4. `plot_*` functions: visualize application of and exposure to applied pesticides
 
 #### Visualize exposure
 
