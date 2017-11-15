@@ -645,7 +645,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
 #' shapefile.
 #'
-#' @inheritParams find_counties
+#' @param county A character string giving either a county name or
+#'  two digit PUR county code. Not case sensitive. California names and county
+#'  codes as they appear in PUR datasets can be found in the \code{county_codes}
+#'  dataset available with this package.
 #' @param section_township Either "section" (the default) or "township".
 #'   Specifies whether you would like to pull a section- or township-level
 #'   SpatialPolygonsDataFrame.

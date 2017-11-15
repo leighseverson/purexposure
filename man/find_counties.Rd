@@ -7,13 +7,13 @@
 find_counties(counties, return = "codes")
 }
 \arguments{
-\item{return}{Either "codes" to return county codes (the default) or "names"
-to return county names.}
-
-\item{county}{A vector of character strings giving either a county names or
+\item{counties}{A vector of character strings giving either a county names or
 two digit PUR county codes. Not case sensitive. California names and county
 codes as they appear in PUR datasets can be found in the \code{county_codes}
 dataset available with this package.}
+
+\item{return}{Either "codes" to return county codes (the default) or "names"
+to return county names.}
 }
 \value{
 If \code{return = "codes"}, a vector of two-character strings giving

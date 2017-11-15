@@ -1,3 +1,18 @@
+utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
+                         "aer_gnd_ind", "aerial_ground", "all_missing", "applic_dt",
+                         "area", "base_ln_mer", "category", "chem_code", "chemical",
+                         "chemical_class", "chemicals", "chemname", "comtrs",
+                         "county_cd", "county_code", "county_name", "data", "dist",
+                         "end_date", "error_flag", "exposure", "group", "group_by",
+                         "id", "kg", "kg_chm_used", "kg_intersection", "kg_perday",
+                         "lat", "lbs_chm_used", "lbs_per_acre", "location", "long",
+                         "max_lat", "max_long", "none_recorded", "outlier",
+                         "perc_fill", "percent", "prodno", "prodstat_ind",
+                         "product_name", "radius", "range_dir", "scale_fill", "sd",
+                         "section", "signlwrd_ind", "start_date", "township",
+                         "township_pad", "tship_dir", "unit_treated", "use_no",
+                         "x", "y", "year"))
+
 #' Plot data frame spatial objects.
 #'
 #' \code{df_plot} plots a data frame spatial object. (A

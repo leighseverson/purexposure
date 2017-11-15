@@ -7,8 +7,8 @@
 pull_spdf(county, section_township = "section", download_progress = FALSE)
 }
 \arguments{
-\item{county}{A vector of character strings giving either a county names or
-two digit PUR county codes. Not case sensitive. California names and county
+\item{county}{A character string giving either a county name or
+two digit PUR county code. Not case sensitive. California names and county
 codes as they appear in PUR datasets can be found in the \code{county_codes}
 dataset available with this package.}
 
