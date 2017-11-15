@@ -389,7 +389,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     dplyr::mutate(year = as.character(lubridate::year(lubridate::ymd(applic_dt)))) %>%
     dplyr::group_by(chem_code, year) %>%
     dplyr::summarize(mean = mean(lbs_per_acre, na.rm = TRUE),
-                     sd = sd(lbs_per_acre, na.rm = TRUE)) %>%
+                     sd = stats::sd(lbs_per_acre, na.rm = TRUE)) %>%
     dplyr::mutate(calc_max = mean + 2*sd)
 
   ## filter active ingredients, add chemname column
@@ -702,9 +702,9 @@ pull_spdf <- function(county, section_township = "section",
     quiet <- TRUE
   }
 
-  download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
+  utils::download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
 
-  unzip(file, exdir = temp_dir)
+  utils::unzip(file, exdir = temp_dir)
 
   shp_file <- list.files()[grepl(".shp", list.files()) &
                              !grepl(".xml", list.files())]
@@ -781,8 +781,8 @@ pull_product_table <- function(year, download_progress = FALSE) {
   }
 
   setwd(dir)
-  download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  unzip(file, exdir = dir)
+  utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
+  utils::unzip(file, exdir = dir)
 
   suppressWarnings(suppressMessages(
     product_file <- readr::read_csv("product.txt") %>%

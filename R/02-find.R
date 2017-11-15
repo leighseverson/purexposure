@@ -120,7 +120,7 @@ find_product_name <- function(year, products = "all", download_progress = FALSE)
 #' Given a vector of counties, \code{find_counties} returns either PUR
 #' county codes or names.
 #'
-#' @param county A vector of character strings giving either a county names or
+#' @param counties A vector of character strings giving either a county names or
 #'  two digit PUR county codes. Not case sensitive. California names and county
 #'  codes as they appear in PUR datasets can be found in the \code{county_codes}
 #'  dataset available with this package.
