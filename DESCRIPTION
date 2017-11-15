@@ -31,7 +31,7 @@ Imports:
     magrittr (>= 1.5),
     utils (>= 3.4.1),
     colormap (>= 0.1.9000),
-    grDevices (<= 3.4.1),
+    grDevices (>= 3.4.1),
     methods (>= 3.4.1),
     zoo (>= 1.8.0),
     stats (>= 3.4.1),
