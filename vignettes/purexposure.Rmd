@@ -21,13 +21,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-
 The California Department of Pesticide Regulation publishes free copies of Pesticide Use Reports online through the California Pesticide Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The `purexposure` package makes it easy to download Pesticide Use Report (PUR) raw data, output reports in a tidy format, calculate exposure to applied pesticides, and visualize application for counties or more specific locations. 
 
 The `purexposure` package has four main categories of functions: `find_*`, `pull_*`, `calculate_*`, and `plot_*`. `find_*` functions are designed to explore both pesticide products and active ingredients present in applied pesticides, return county names or codes as they are used in PUR data sets, and find the county of a particular location. `pull_*` functions pull raw or cleaned PUR data sets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `plot_*` functions return visualizations of application and exposure.  
 
 `purexposure` currently exists in a development version on GitHub. You can install and load the package with the following code: 
-
 ```{r eval = FALSE}
 devtools::install_github("leighseverson/purexposure")
 library(purexposure)
@@ -66,7 +64,6 @@ knitr::include_graphics("figures/section_townships.png")
 By default, the package works with all recorded active ingredients in the specified counties and date range. However, if you're interested in analyzing application of a specific active ingredient or chemical class of active ingredients, the `find_chemical_codes` function is useful as a starting point to see what active ingredients were present in applied pesticides in a given year. 
 
 For example, too see how active ingredients matching "methyl bromide" or "abietic" were recorded in the year 2000, we would run: 
-
 ```{r}
 find_chemical_codes(year = 2000, chemicals = c("methyl bromide", "abietic"))
 ```
@@ -121,11 +118,8 @@ purexposure::county_codes %>% slice(1:3)
 
 The `find_location_county` function takes a California address or coordinate pair (longitude, latitude) and returns the county of that location. 
 
-```{r eval = FALSE}
+```{r}
 find_location_county("12906 South Fowler Ave., Selma, CA 93662")
-```
-```{r echo = FALSE}
-"Fresno"
 ```
 
 This function is useful later on if you want to pull PUR data to calculate exposure at a particular location. 
@@ -240,24 +234,23 @@ fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE,
                                  unit = "section", sum = "chemical_class", 
                                  chemical_class = chemical_class_df, 
                                  aerial_ground = FALSE)
-unique_classes <- unique(fresno_classes$chemical_class)
-save(unique_classes, file = "data/unique_classes.RData")
-fresno_classes <- fresno_classes[1:3, ]
+fresno_classes <- rbind(fresno_classes[1:3, ], 
+                        filter(fresno_classes, (chemical_class == "methylene") | 
+                                 (chemical_class == "aldehyde" & 
+                                    section == "M13S21E36" & 
+                                    date == lubridate::ymd("2008-01-12"))))
 save(fresno_classes, file = "data/fresno_classes.RData")
 ```
 ```{r echo = FALSE}
-load("data/unique_classes.RData")
 load("data/fresno_classes.RData")
 ```
 ```{r}
 head(fresno_classes, 3)
 ```
-```{r eval = FALSE}
+```{r}
 unique(fresno_classes$chemical_class)
 ```
-```{r echo = FALSE}
-unique_classes
-```
+
 
 By default, `pull_clean_pur` will print a downloading progress bar for each year of data that you are pulling. You can turn this off by setting the `download_progress` argument to `FALSE`. 
 
@@ -284,7 +277,7 @@ sun_empire <- pull_clean_pur(2015, "fresno") %>%
   calculate_exposure(location = "2649 North Modoc Ave., Kerman, CA", 
                      radius = 1500) 
 sun_empire$clean_pur_df <- sun_empire$clean_pur_df[1:2,]
-sun_empire$county_plot <- NULL
+sun_empire$county_plot <- "null"
 save(sun_empire, file = "data/sun_empire.RData") 
 sun_empire_plot <- df_plot(sun_empire$buffer_plot_df)
 ```
@@ -294,12 +287,8 @@ sun_empire_plot <- df_plot(sun_empire$buffer_plot_df)
 ```{r echo = FALSE}
 load("data/sun_empire.RData")
 ```
-
-```{r eval = FALSE}
+```{r}
 names(sun_empire)
-```
-```{r echo = FALSE}
-c("exposure", "meta_data", "buffer_plot_df", "county_plot", "clean_pur_df")
 ```
 
 The first is the `exposure` data frame. There will be one row per exposure value ($\frac{kg}{m^2}$): 
@@ -359,17 +348,17 @@ sun_empire2 <- pull_clean_pur(2015, "fresno") %>%
   calculate_exposure(location = "2649 North Modoc Ave., Kerman, CA", 
                      radius = 1500,
                      time_period = "4 months") 
-se_exposure <- sun_empire2$exposure
-save(se_exposure, file = "data/se_exposure.RData")
+sun_empire2$meta_data <- "null"
+sun_empire2$buffer_plot_df <- "null"
+sun_empire2$county_plot <- "null"
+sun_empire2$clean_pur_df <- "null"
+save(sun_empire2, file = "data/sun_empire2.RData")
 ```
 ```{r echo = FALSE}
-load("data/se_exposure.RData")
+load("data/sun_empire2.RData")
 ```
-```{r eval = FALSE}
+```{r}
 sun_empire2$exposure
-```
-```{r echo = FALSE}
-se_exposure
 ```
 
 In this case, there is one exposure value calculated for each four-month increment in the year 2015. There can similarly be different exposure values calculated for different values of `chemical_class` (if the `clean_pur_df` had a `chemical_class` column and `chemicals` was set to `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an `aerial_ground` column and `aerial_ground` was set to `TRUE`).
@@ -382,14 +371,20 @@ The `plot_exposure` function returns a list with three elements: `maps`, `pls_da
 
 The first argument of plot_exposure is a list returned by `calculate_exposure`. 
 
-```{r eval = FALSE}
+```{r echo = 1, eval = FALSE}
 plot_sun_empire <- plot_exposure(sun_empire)
+plot_sun_empire$maps <- "null"
+plot_sun_empire$pls_data <- "null"
+plot_sun_empire$exposure <- "null"
+save(plot_sun_empire, file = "data/plot_sun_empire.RData")
+```
+```{r echo = FALSE}
+load("data/plot_sun_empire.RData")
+```
+```{r}
 names(plot_sun_empire)
 ```
 
-```{r echo = FALSE}
-c("maps", "pls_data", "exposure")
-```
 
 If we input the `sun_county` exposure list, the `pls_data` and `exposure` data frames will be identical to the `meta_data` and `exposure` data frames returned from `calculate_exposure`. The `maps` element gives a plot of the location, specified buffer, and PLS units colored according to the amount of pesticide applied. 
 
@@ -411,19 +406,20 @@ plot_exposure(sun_empire, color_by = "percentile")$maps
 knitr::include_graphics("figures/se_map2.png")
 ```
 
-
 If `color_by = "percentile"`, a fourth list element is returned called `"cutoff_values"`, a data frame with two columns (`percentile` and `kg`) that gives the cutoff value of kilograms of pesticide applied for each percentile. 
 
 ```{r echo = 1, eval = FALSE}
-plot_exposure(sun_empire, color_by = "percentile")$cutoff_values
-se_cv <- plot_exposure(sun_empire, color_by = "percentile")$cutoff_values
-save(se_cv, file = "data/se_cv.RData")
+plot_se_percentile <- plot_exposure(sun_empire, color_by = "percentile")
+plot_se_percentile$maps <- "null"
+plot_se_percentile$pls_data <- "null"
+plot_se_percentile$exposure <- "null"
+save(plot_se_percentile, file = "data/plot_se_percentile.RData")
 ```
 ```{r echo = FALSE}
-load("data/se_cv.RData")
+load("data/plot_se_percentile.RData")
 ```
-```{r echo = FALSE}
-se_cv
+```{r}
+plot_se_percentile$cutoff_values
 ```
 
 In this case, sections with $\leq$ 1,352.539 kilograms of pesticides applied in the portion that intersects with the specified buffer will fall under the lowest percentile category ("`<= 25th percentile"`). 
@@ -455,9 +451,6 @@ The plots above visualize a single exposure value. When you specify in your call
 ```{r eval = FALSE}
 sun_empire2$exposure
 ```
-```{r echo = FALSE}
-se_exposure
-```
 
 In this case, separate list elements are returned from `plot_exposure` for each exposure value. If we input the `sun_empire2` list into `plot_exposure`, one map, PLS data frame, and exposure row is output in the form of a separate list element for each exposure value. `maps[[1]]` visualizes exposure for January 1st through April 30th, `maps[[2]]` for May 1st through August 31st, and `maps[[3]]` for September 1st through December 31st. 
 
@@ -481,7 +474,6 @@ The `plot_county_locations` function plots a county's location in California. Th
 ```{r eval = FALSE}
 plot_county_locations(fresno_clean)
 ```
-
 ```{r echo = FALSE, fig.align = "center"}
 knitr::include_graphics("figures/ca_plot.png")
 ```
@@ -494,14 +486,17 @@ The `plot_county_application` function returns a list. The first element (`map`)
 
 The first argument of `plot_county_application` should be a data frame returned by `pull_clean_pur`. 
 
-```{r echo = 1:2, eval = FALSE}
+```{r echo = 1, eval = FALSE}
 fresno <- plot_county_application(fresno_clean)
-names(fresno)
-fresno_data <- fresno$data[1:2, ]
-save(fresno_data, file = "data/fresno_data.RData")
+fresno$data <- fresno$data[1:2, ]
+fresno$map <- "null"
+save(fresno, file = "data/fresno.RData")
 ```
 ```{r echo = FALSE}
-c("map", "data")
+load("data/fresno.RData")
+```
+```{r}
+names(fresno)
 ```
 ```{r eval = FALSE}
 fresno$map
@@ -509,15 +504,8 @@ fresno$map
 ```{r echo = FALSE, fig.align = "center"}
 knitr::include_graphics("figures/fresno_application.png")
 ```
-
-```{r eval = FALSE}
-head(fresno, 2)
-```
-```{r echo = FALSE}
-load("data/fresno_data.RData")
-```
-```{r echo = FALSE}
-fresno_data
+```{r}
+head(fresno$data, 2)
 ```
 
 There are additional arguments you can pass to `plot_county_application` to change the appearance of the returned map. You can choose to map by township by specifying `pls = "township"`, choose to scale colors by amount or percentile with `color_by`, specify `percentile` break points, choose the date range that you would like to plot with `start_date` and `end_date`, and choose certain `chemicals` to plot. You can also change the color palette with `fill_option` (you can specify any palette from the `colormap` package), `crop` the plot to PLS units with recorded application, and change the transparency of colors with `alpha`. 
