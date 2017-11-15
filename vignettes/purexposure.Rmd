@@ -167,7 +167,7 @@ The `pull_clean_pur` function pulls and cleans PUR data. You can similarly pull 
 fresno_clean <- pull_clean_pur(2004, "fresno")
 fresno_clean <- fresno_clean[1:2,]
 save(fresno_clean, file = "data/fresno_clean.RData")
-```
+``` 
 ```{r echo = FALSE}
 load("data/fresno_clean.RData")
 ```
