@@ -1,6 +1,6 @@
 Package: purexposure
 Title: Pull and Calculate Exposure to CA Pesticide Use Registry Records
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: person("Rachel", "Severson", email = "rachel.severson@colostate.edu", 
                   role = c("aut", "cre"))
 Description: Pulls and cleans California Pesticide Use Report (PUR) datasets 

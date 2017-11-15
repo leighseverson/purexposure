@@ -9,7 +9,7 @@ There were no ERRORs or WARNINGs.
 
 There was 1 NOTE:
 
-* Version contains large components (0.0.0.9000)
+* New submission
 
 ## Downstream dependencies
 
