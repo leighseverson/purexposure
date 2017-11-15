@@ -2,7 +2,6 @@
 title: "Using the `purexposure` package"
 author: "Rachel Severson"
 date: "`r Sys.Date()`"
-bibliography: bibliography.bib
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
@@ -12,13 +11,16 @@ vignette: >
 
 ```{r echo = FALSE, message = FALSE, warning = FALSE}
 library(purexposure)
+library(dplyr)
 ```
-```{r, echo = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  error = TRUE
+  comment = "#>",
+  fig.path = "vignettes"
 )
 ```
+
 
 The California Department of Pesticide Regulation publishes free copies of Pesticide Use Reports online through the California Pesticide Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The `purexposure` package makes it easy to download Pesticide Use Report (PUR) raw data, output reports in a tidy format, calculate exposure to applied pesticides, and visualize application for counties or more specific locations. 
 
@@ -29,12 +31,6 @@ The `purexposure` package has four main categories of functions: `find_*`, `pull
 ```{r eval = FALSE}
 devtools::install_github("leighseverson/purexposure")
 library(purexposure)
-```
-
-Many examples in this vignette also use functions from the `dplyr` package.
-
-```{r message = FALSE}
-library(dplyr)
 ```
 
 ## Overview of PUR datasets 
@@ -53,13 +49,13 @@ PUR data sets can be pulled by years in the range [1990, 2015].
 
 PUR data sets are organized and pulled by county. Application is recorded by township and section, which are units of land resulting from the Public Land Survey System (PLSS). The PLSS is used to subdivide and describe land in the United States, and is regulated by the Bureau of Land Management. Most midwestern, some southern, and all western states are included in the PLSS. There are several initial points from which PLSS surveys begin from. The line running north-south through the initial points is called the Principle Meridian, and the east-west line running through the points is called the base line. California contains three of these initial points, and three Principle Meridians: Humboldt (H), Mount Diablo (M), and San Bernardino (S). 
 
-```{r echo = FALSE, out.width = "250pt", out.height = "400pt", fig.cap = "Base Lines and Meridian lines in California. Source: https://www.blm.gov/cadastral/meridians/Caleneva.htm"}
+```{r echo = FALSE, out.width = "250pt", out.height = "400pt", fig.cap = "Base Lines and Meridian lines in California."}
 knitr::include_graphics("figures/calneva.jpg")
 ```
 
 Townships are six-mile-square areas that are identified by a combination of the location north or south of the base line, and range, the location east or west of the principle meridian. Townships are divided into 36 one-mile-square sections. California townships are uniquely identified by a combination of Principle Meridian (H, M, or S), location north or south of the base line (01-48), base line direction (N or S), location east or west of the Principle Meridian (01-47), and Principle Meridian direction (E or W). Sections are identified by the same combination, with the addition of the section number (01-36). For example, one township in California is identified by "M15S24E", and a section within that township is identified by "M15S24E01". The diagram below shows an example of a township (outlined in blue) and one of the 36 sections within that township (outlined in red). 
 
-```{r echo = FALSE, fig.align = "center", out.width = "250pt", out.height = "250pt", fig.cap = "Sectional map of a township showing adjoining sections. Source: https://www.blm.gov/or/pubroom/files/land-descript-diag.pdf"}
+```{r echo = FALSE, fig.align = "center", out.width = "250pt", out.height = "250pt", fig.cap = "Sectional map of a township showing adjoining sections."}
 knitr::include_graphics("figures/section_townships.png")
 ```
 
@@ -167,7 +163,7 @@ The `pull_clean_pur` function pulls and cleans PUR data. You can similarly pull 
 fresno_clean <- pull_clean_pur(2004, "fresno")
 fresno_clean <- fresno_clean[1:2,]
 save(fresno_clean, file = "data/fresno_clean.RData")
-``` 
+```
 ```{r echo = FALSE}
 load("data/fresno_clean.RData")
 ```
@@ -179,7 +175,7 @@ Pesticide application is recorded by active ingredient (`chem_code` and `chemnam
 
 **Outliers**
 
-The `outlier` column is a logical value indicating whether the record has been flagged as an outlier, in which case `kg_chm_used` has been replaced with a calculated maximum rate of application. The algorithm used to identify and correct erroneously high records of application was developed based on methods used by @Gunier2001. 
+The `outlier` column is a logical value indicating whether the record has been flagged as an outlier, in which case `kg_chm_used` has been replaced with a calculated maximum rate of application. The algorithm used to identify and correct erroneously high records of application was developed based on methods used by Gunier et al. (2001). 
 
 For each active ingredient and each year, a calculated maximum rate of application was calculated as mean pounds per acre plus two standard deviations. Rates were calculated from pounds applied by dividing the raw `lbs_chm_used` column by either the `acre_treated` column as is for `unit_treated == "A"` (acres), or by the `acre_treated` column multiplied by $\scriptsize2.29568\times10^{-5}$ for `unit_treated == "S"` (square feet). 
 
@@ -337,7 +333,7 @@ The `buffer_plot_df` element of the `calculate_exposure` list is a data frame wi
 ```{r eval = FALSE}
 df_plot(sun_empire$buffer_plot_df)
 ```
-```{r echo = FALSE, fig.align = "center"}
+```{r test, echo = FALSE, fig.align = "center"}
 knitr::include_graphics("figures/sun_empire_plot.png")
 ```
 
@@ -589,3 +585,5 @@ You can browse the source code for this package here: https://github.com/leighse
 If you find a bug, please report it here: https://github.com/leighseverson/purexposure/issues. 
 
 ## References
+
+Gunier, Robert B., Martha E. Harnly, Peggy Reynolds, Andrew Hertz, and Julie Von Behren. 2001. “Agricultural pesticide use of California: Pesticide prioritization, use densities, and population distributions for a childhood cancer study.” Environmental Health Perspectives 109 (10): 1071–8. doi:10.1289/ehp.011091071.

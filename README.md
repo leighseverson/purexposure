@@ -846,7 +846,7 @@ names(fresno)
 fresno$map
 ```
 
-<img src="vignettes/figures/fresno_application.png" width="503" style="display: block; margin: auto;" />
+<img src="vignettes/figures/fresno_application.png" width="886" style="display: block; margin: auto;" />
 
 ``` r
 head(fresno, 2)
