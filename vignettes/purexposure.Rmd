@@ -179,7 +179,7 @@ Pesticide application is recorded by active ingredient (`chem_code` and `chemnam
 
 **Outliers**
 
-The `outlier` column is a logical value indicating whether the record has been flagged as an outlier, in which case `kg_chm_used` has been replaced with a calculated maximum rate of application. The algorithm used to identify and correct erroneously high records of application were developed based on methods used by @Gunier2001. 
+The `outlier` column is a logical value indicating whether the record has been flagged as an outlier, in which case `kg_chm_used` has been replaced with a calculated maximum rate of application. The algorithm used to identify and correct erroneously high records of application was developed based on methods used by @Gunier2001. 
 
 For each active ingredient and each year, a calculated maximum rate of application was calculated as mean pounds per acre plus two standard deviations. Rates were calculated from pounds applied by dividing the raw `lbs_chm_used` column by either the `acre_treated` column as is for `unit_treated == "A"` (acres), or by the `acre_treated` column multiplied by $\scriptsize2.29568\times10^{-5}$ for `unit_treated == "S"` (square feet). 
 

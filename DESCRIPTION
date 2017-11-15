@@ -7,6 +7,7 @@ Description: Pulls and cleans California Pesticide Use Report (PUR) datasets
     to visualize and calculate application of and exposure to active ingredients 
     present in applied pesticides. This work was supported by a grant from the 
     National Institutes of Health (K22ES023815). 
+Date: 2017-11-15
 Depends: R (>= 3.4.1)
 License: GPL-2
 Encoding: UTF-8
@@ -32,7 +33,8 @@ Imports:
     colormap (>= 0.1.9000),
     grDevices (<= 3.4.1),
     methods (>= 3.4.1),
-    zoo (>= 1.8.0)
+    zoo (>= 1.8.0),
+    stats (>= 3.4.1)
 RoxygenNote: 6.0.1
 Suggests: 
     testthat,

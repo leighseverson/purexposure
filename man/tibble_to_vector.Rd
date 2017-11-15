@@ -20,3 +20,9 @@ values in that column as a character vector.
 This is a helper function for \code{pull_raw_pur}, \code{pull_clean_pur},
 and \code{pur_filt_df}.
 }
+\examples{
+\dontrun{
+tibble::tibble(x = 1:3) \%>\% tibble_to_vector()
+}
+
+}

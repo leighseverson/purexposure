@@ -49,7 +49,6 @@ df_plot <- function(df) {
 #' df_plot(df2)
 #' }
 #' @importFrom magrittr %>%
-#' @export
 spdf_to_df <- function(spdf) {
 
   df <- suppressMessages(sp::merge(broom::tidy(spdf), as.data.frame(spdf),
@@ -78,12 +77,12 @@ spdf_to_df <- function(spdf) {
 #'
 #' @return A character vector.
 #'
-#' @example{
+#' @examples
+#' \dontrun{
 #' tibble::tibble(x = 1:3) %>% tibble_to_vector()
 #' }
 #'
 #' @importFrom magrittr %>%
-#' @export
 tibble_to_vector <- function(tib) {
 
   vec <- tib %>% dplyr::pull(1) %>% as.character()
