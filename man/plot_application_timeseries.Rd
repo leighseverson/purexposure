@@ -10,7 +10,7 @@ plot_application_timeseries(clean_pur_df, facet = FALSE, axes = "fixed")
 \item{clean_pur_df}{A data frame returned from \code{pull_clean_pur}.}
 
 \item{facet}{TRUE / FALSE for whether you would like time series
-plots to be faceted by unqiue \code{chemname} or \code{chemical_class}
+plots to be faceted by unique \code{chemname} or \code{chemical_class}
 column values. If \code{facet = FALSE} (the default), all active ingredients
 present in the dataset will be summed per day.}
 

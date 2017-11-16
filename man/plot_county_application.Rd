@@ -44,7 +44,7 @@ application for the entire date range in your \code{clean_pur_df} data frame.}
 range that you would like to plot application for. The default is to plot
 application for the entire date range in your \code{clean_pur_df} data frame.}
 
-\item{chemicals}{Either "all" (the default) to plot summed active ingredents
+\item{chemicals}{Either "all" (the default) to plot summed active ingredients
 present in your \code{clean_pur_df} data frame, a chemical class present in
 the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 a specific active ingredient present in the \code{chemname} column of the

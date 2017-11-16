@@ -54,7 +54,7 @@ A list with the following elements:
   \code{kg_intersection}, \code{kg} multiplied by \code{percent} (this is the
   value that is plotted), \code{start_date}, \code{end_date}, \code{chemicals},
   \code{aerial_ground}, which give the time period, chemicals, and application
-  method for each plot/exposure estiamte, \code{none_recorded}, \code{location},
+  method for each plot/exposure estimate, \code{none_recorded}, \code{location},
   \code{radius} (m), and \code{area} (m^2).}
   \item{cutoff_values}{A list of data frames with two columns: \code{percentile} and
   \code{kg} giving the cutoff values for each percentile. Only returned if
@@ -64,7 +64,7 @@ A list with the following elements:
 \description{
 \code{plot_exposure} returns a plot of pesticide application in the PLS units
 intersected by a buffer for each combination of time period, applied active
-ingredients, and applicaiton method relevant for the exposure values returned
+ingredients, and application method relevant for the exposure values returned
 from \code{calculate_exposure}.
 }
 \examples{

@@ -114,7 +114,7 @@ A data frame with 13 columns:
     \item{aerial_ground}{A character giving the application method.
     "A" = aerial, "G" = ground, and "O" = other. Not included
     if \code{aerial_ground = FALSE}.}
-    \item{use_no}{A character string identifing unique application of an
+    \item{use_no}{A character string identifying unique application of an
     active ingredient across years. This value is a combination of the raw PUR
     \code{use_no} column and the year of application. Will have values of
     \code{NA} if \code{sum_appliction = TRUE}.}

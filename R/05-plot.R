@@ -160,7 +160,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' @param end_date Optional. "yyyy-mm-dd" giving an ending date for the date
 #'   range that you would like to plot application for. The default is to plot
 #'   application for the entire date range in your \code{clean_pur_df} data frame.
-#' @param chemicals Either "all" (the default) to plot summed active ingredents
+#' @param chemicals Either "all" (the default) to plot summed active ingredients
 #'   present in your \code{clean_pur_df} data frame, a chemical class present in
 #'   the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 #'   a specific active ingredient present in the \code{chemname} column of the
@@ -437,7 +437,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' \code{plot_exposure} returns a plot of pesticide application in the PLS units
 #' intersected by a buffer for each combination of time period, applied active
-#' ingredients, and applicaiton method relevant for the exposure values returned
+#' ingredients, and application method relevant for the exposure values returned
 #' from \code{calculate_exposure}.
 #'
 #' @inheritParams plot_county_application
@@ -464,7 +464,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'   \code{kg_intersection}, \code{kg} multiplied by \code{percent} (this is the
 #'   value that is plotted), \code{start_date}, \code{end_date}, \code{chemicals},
 #'   \code{aerial_ground}, which give the time period, chemicals, and application
-#'   method for each plot/exposure estiamte, \code{none_recorded}, \code{location},
+#'   method for each plot/exposure estimate, \code{none_recorded}, \code{location},
 #'   \code{radius} (m), and \code{area} (m^2).}
 #'   \item{cutoff_values}{A list of data frames with two columns: \code{percentile} and
 #'   \code{kg} giving the cutoff values for each percentile. Only returned if
@@ -646,7 +646,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 #'
 #' @param clean_pur_df A data frame returned from \code{pull_clean_pur}.
 #' @param facet TRUE / FALSE for whether you would like time series
-#'   plots to be faceted by unqiue \code{chemname} or \code{chemical_class}
+#'   plots to be faceted by unique \code{chemname} or \code{chemical_class}
 #'   column values. If \code{facet = FALSE} (the default), all active ingredients
 #'   present in the dataset will be summed per day.
 #' @param axes A character string passed on to the \code{scales} argument of
