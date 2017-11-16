@@ -712,9 +712,9 @@ pull_spdf <- function(county, section_township = "section",
   shp_file <- list.files()[grepl(".shp", list.files()) &
                              !grepl(".xml", list.files())]
 
-  shp <- rgdal::readOGR(shp_file,
-                        layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
-                        verbose = FALSE)
+  # shp <- rgdal::readOGR(shp_file,
+  #                       layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
+  #                       verbose = FALSE)
   shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
 
   setwd(current_dir)
