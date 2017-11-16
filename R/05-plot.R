@@ -361,7 +361,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   legend_label <- paste0("Applied Pesticides\n(kg/", section_township, ")")
 
-#  colormaps_vec <- unlist(colormap::colormaps)
+  colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
   if (!fill_option %in% colormaps_vec) {
@@ -369,7 +369,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                 "colormap package."))
   }
 
-#  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
   gradient <- c("#FFFFFF", gradient)
 
   plot <- ggmap::ggmap(location) +
@@ -549,7 +549,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 
   # each $data row is input into function below to return a plot.
 
-#  colormaps_vec <- unlist(colormap::colormaps)
+  colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
   if (!fill_option %in% colormaps_vec) {
@@ -557,7 +557,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
                 "colormap package."))
   }
 
-#  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
 
   location_longitude <- unique(exposure_list$exposure$longitude)
   location_latitude <- unique(exposure_list$exposure$latitude)
