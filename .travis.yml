@@ -4,6 +4,18 @@ language: R
 sudo: false
 cache: packages
 
-## Use patched devtools
-r_github_packages:
-  - hadley/devtools@efa894ffa
+matrix: # don't test osx + r-devel
+   include:
+   - os: linux
+     r: oldrel
+     dist: trusty
+   - os: linux
+     r: release
+     dist: trusty
+   - os: linux
+     r: devel
+     dist: trusty
+   - os: osx
+     r: release
+   - os: osx
+     r: oldrel
