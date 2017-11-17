@@ -578,4 +578,4 @@ If you find a bug, please report it here: https://github.com/leighseverson/purex
 
 ## References
 
-Gunier, Robert B., Martha E. Harnly, Peggy Reynolds, Andrew Hertz, and Julie Von Behren. 2001. “Agricultural pesticide use of California: Pesticide prioritization, use densities, and population distributions for a childhood cancer study.” Environmental Health Perspectives 109 (10): 1071–8. doi:10.1289/ehp.011091071.
+Gunier, Robert B., Martha E. Harnly, Peggy Reynolds, Andrew Hertz, and Julie Von Behren. 2001. “Agricultural pesticide use of California: Pesticide prioritization, use densities, and population distributions for a childhood cancer study.” Environmental Health Perspectives 109 (10): 1071–8.
