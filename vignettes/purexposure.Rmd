@@ -118,9 +118,13 @@ purexposure::county_codes %>% slice(1:3)
 
 The `find_location_county` function takes a California address or coordinate pair (longitude, latitude) and returns the county of that location. 
 
-```{r}
+```{r eval = FALSE}
 find_location_county("12906 South Fowler Ave., Selma, CA 93662")
 ```
+```{r echo = FALSE}
+"Fresno"
+```
+
 
 This function is useful later on if you want to pull PUR data to calculate exposure at a particular location. 
 
