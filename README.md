@@ -1,5 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+[![Travis-CI Build Status](https://travis-ci.org/leighseverson/purexposure.svg?branch=master)](https://travis-ci.org/leighseverson/purexposure)
+
 The California Department of Pesticide Regulation publishes free copies
 of Pesticide Use Reports online through the California Pesticide
 Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The
