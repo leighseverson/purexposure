@@ -8,7 +8,7 @@ Description: Pulls and cleans California Pesticide Use Report (PUR) data sets
     present in applied pesticides. This work was supported by a grant from the 
     National Institutes of Health (K22ES023815). 
 Date: 2017-11-15
-Depends: R (>= 3.3.3)
+Depends: R (>= 3.4.1)
 License: GPL-2
 Encoding: UTF-8
 LazyData: TRUE
@@ -28,11 +28,11 @@ Imports:
     rlang (>= 0.1.2.9000),
     rgeos (>= 0.3.23),
     magrittr (>= 1.5),
-    utils (>= 3.3.3),
-    grDevices (>= 3.3.3),
-    methods (>= 3.3.3),
+    utils,
+    grDevices,
+    methods,
     zoo (>= 1.8.0),
-    stats (>= 3.3.3),
+    stats,
     raster (>= 2.5.8),
     readr (>= 1.1.1),
     scales (>= 0.5.0),
