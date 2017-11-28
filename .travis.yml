@@ -2,11 +2,6 @@
 
 language: R
 
-r:
-  - release
-  - oldrel
-  - devel
-
 # cache: packages
 
 sudo: required
