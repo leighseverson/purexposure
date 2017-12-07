@@ -406,7 +406,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
       }
     }
 
-    # cols_out <- c(cols_out, "#FFFFFF")
+    cols_out <- c(cols_out, "#FFFFFF")
     names(cols_out) <- categories
 
     plot <- plot  +
