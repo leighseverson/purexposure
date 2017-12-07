@@ -311,14 +311,14 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
     pur_df2 <- pur_df %>%
       dplyr::filter(county_code == code) %>%
       dplyr::group_by(section) %>%
-      dplyr::rename(pls = section) %>%
+      plyr::rename(c("section" = "pls")) %>%
       dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE)) %>%
       dplyr::mutate(kg = ifelse(is.na(kg), 0, kg))
   } else {
     pur_df2 <- pur_df %>%
       dplyr::filter(county_code == code) %>%
       dplyr::group_by(township) %>%
-      dplyr::rename(pls = township) %>%
+      plyr::rename(c("township" = "pls")) %>%
       dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE)) %>%
       dplyr::mutate(kg = ifelse(is.na(kg), 0, kg))
   }
@@ -344,9 +344,9 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   }
 
   if (section_township == "section") {
-    county_df <- county_df %>% dplyr::rename(pls = MTRS)
+    county_df <- county_df %>% plyr::rename(c("MTRS" = "pls"))
   } else if (section_township == "township") {
-    county_df <- county_df %>% dplyr::rename(pls = MTR)
+    county_df <- county_df %>% plyr::rename(c("MTR" = "pls"))
   }
 
   pur_spatial <- pur_df3 %>% dplyr::left_join(county_df, by = "pls")
@@ -579,7 +579,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
     dplyr::full_join(pls_data, by = c("start_date", "end_date", "aerial_ground",
                                       "chemicals")) %>%
     dplyr::ungroup() %>%
-    dplyr::rename(data_pls = data) %>%
+    plyr::rename(c("data" = "data_pls")) %>%
     dplyr::mutate(none_recorded = NA)
 
   for (i in 1:nrow(pls_data)) {
