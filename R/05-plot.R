@@ -349,6 +349,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
     county_df <- county_df %>% plyr::rename(c("MTR" = "pls"))
   }
 
+  colnames(pur_df3)[1] <- "pls"
   pur_spatial <- pur_df3 %>% dplyr::left_join(county_df, by = "pls")
 
   long_range <- grDevices::extendrange(county_df$long)
@@ -370,7 +371,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   }
 
   gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
-  gradient <- c("#FFFFFF", gradient)
+  # gradient <- c("#FFFFFF", gradient)
 
   plot <- ggmap::ggmap(location) +
     ggplot2::geom_polygon(data = county_df, ggplot2::aes(x = long, y = lat, group = group),
@@ -405,7 +406,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
       }
     }
 
-    cols_out <- c(cols_out, "#FFFFFF")
+    # cols_out <- c(cols_out, "#FFFFFF")
     names(cols_out) <- categories
 
     plot <- plot  +
