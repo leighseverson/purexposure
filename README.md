@@ -259,7 +259,7 @@ downloaded manually from CDPR’s FTP server in a few ways:
 For documentation of raw PUR data, you can reference the Pesticide Use
 Report Data User Guide & Documentation document published by the CA
 Department of Pesticide Regulation. The file is saved as “cd\_doc.pdf in
-any”pur\[year\].zip" file between 1990 and 2015 found here:
+any ”pur\[year\].zip" file between 1990 and 2015 found here:
 <ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>.
 
 #### Cleaned data
@@ -426,7 +426,7 @@ tail(chemical_class_df, 2)
 ```
 
 You may need to do some additional filtering if the results returned by
-`find_chemical_codes` (which relies on “grep” for pattern matching) do
+`find_chemical_codes` (which relies on `grep` for pattern matching) do
 not give the appropriate active ingredients for your chemical class of
 interest. In the case of the `chemical_class` data frame above, there
 would be at most three summed values per day and per PLS unit, one for

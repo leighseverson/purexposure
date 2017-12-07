@@ -186,7 +186,7 @@ By default, application records are organized by active ingredient, section, tow
 The `chemicals` argument uses the `find_chemical_code` function to filter by the `chemname` column. You can filter by listing search terms in the `chemicals` argument: 
 
 ```{r echo = 1, eval = FALSE}
-nevada_sulfur <- pull_clean_pur(years = 2000, counties = c("nevada"), chemicals = "sulfur")
+nevada_sulfur <- pull_clean_pur(years = 2000, counties = "nevada", chemicals = "sulfur")
 nevada_sulfur <- nevada_sulfur[1:2,]
 save(nevada_sulfur, file = "data/nevada_sulfur.RData")
 ```
@@ -226,12 +226,12 @@ There is one record per active ingredient per township per day. Alternatively, `
 ```{r}
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) %>%
-  rename(chemical_class = chemical)
+  plyr::rename(c("chemical" = "chemical_class"))
 head(chemical_class_df, 2)
 tail(chemical_class_df, 2)
 ```
 
-You may need to do some additional filtering if the results returned by `find_chemical_codes` (which relies on "grep" for pattern matching) do not give the appropriate active ingredients for your chemical class of interest. In the case of the `chemical_class` data frame above, there would be at most three summed values per day and per PLS unit, one for all active ingredients falling under the class "methylene", one for all active ingredients falling under the class "aldehyde", and one for "other" with all active ingredients that don't fit into the two specified classes.  
+You may need to do some additional filtering if the results returned by `find_chemical_codes` (which relies on `grep` for pattern matching) do not give the appropriate active ingredients for your chemical class of interest. In the case of the `chemical_class` data frame above, there would be at most three summed values per day and per PLS unit, one for all active ingredients falling under the class "methylene", one for all active ingredients falling under the class "aldehyde", and one for "other" with all active ingredients that don't fit into the two specified classes.  
 
 ```{r eval = FALSE, echo = 1:4}
 fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE, 
