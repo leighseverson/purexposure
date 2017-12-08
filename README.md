@@ -1,7 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-[![Travis-CI Build Status](https://travis-ci.org/leighseverson/purexposure.svg?branch=master)](https://travis-ci.org/leighseverson/purexposure)
+[![Travis-CI Build
+Status](https://travis-ci.org/leighseverson/purexposure.svg?branch=master)](https://travis-ci.org/leighseverson/purexposure)
 
 The California Department of Pesticide Regulation publishes free copies
 of Pesticide Use Reports online through the California Pesticide
@@ -30,14 +31,14 @@ devtools::install_github("leighseverson/purexposure")
 library(purexposure)
 ```
 
-Many examples in this vignette also use functions from the `dplyr` package: 
+Many examples in this vignette also use functions from the `dplyr`
+package:
 
 ``` r
 library(dplyr)
 ```
 
-Overview of PUR datasets
-------------------------
+## Overview of PUR datasets
 
 ### Units of application
 
@@ -73,12 +74,10 @@ PLSS surveys begin from. The line running north-south through the
 initial points is called the Principle Meridian, and the east-west line
 running through the points is called the base line. California contains
 three of these initial points, and three Principle Meridians: Humboldt
-(H), Mount Diablo (M), and San Bernardino (S).
+(H), Mount Diablo (M), and San Bernardino
+(S).
 
-<img src="vignettes/figures/calneva.jpg" alt="Base Lines and Meridian lines in California." width="250pt" height="400pt" />
-<p class="caption">
-Base Lines and Meridian lines in California.
-</p>
+<img src="vignettes/figures/calneva.jpg" title="Base Lines and Meridian lines in California." alt="Base Lines and Meridian lines in California." width="250pt" height="400pt" />
 
 Townships are six-mile-square areas that are identified by a combination
 of the location north or south of the base line, and range, the location
@@ -92,17 +91,14 @@ with the addition of the section number (01-36). For example, one
 township in California is identified by “M15S24E”, and a section within
 that township is identified by “M15S24E01”. The diagram below shows an
 example of a township (outlined in blue) and one of the 36 sections
-within that township (outlined in red).
+within that township (outlined in
+red).
 
-<img src="vignettes/figures/section_townships.png" alt="Sectional map of a township showing adjoining sections." width="250pt" height="250pt" />
-<p class="caption">
-Sectional map of a township showing adjoining sections.
-</p>
+<img src="vignettes/figures/section_townships.png" title="Sectional map of a township showing adjoining sections." alt="Sectional map of a township showing adjoining sections." width="250pt" height="250pt" style="display: block; margin: auto;" />
 
-Main functions in the `purexposure` package
--------------------------------------------
+## Main functions in the `purexposure` package
 
-### 1. `find_*` functions: search for active ingredients, product names, and counties
+### 1\. `find_*` functions: search for active ingredients, product names, and counties
 
 By default, the package works with all recorded active ingredients in
 the specified counties and date range. However, if you’re interested in
@@ -112,7 +108,8 @@ starting point to see what active ingredients were present in applied
 pesticides in a given year.
 
 For example, too see how active ingredients matching “methyl bromide” or
-“abietic” were recorded in the year 2000, we would run:
+“abietic” were recorded in the year 2000, we would
+run:
 
 ``` r
 find_chemical_codes(year = 2000, chemicals = c("methyl bromide", "abietic"))
@@ -147,15 +144,15 @@ Regulation (DPR)’s [Summary of Pesticide Use Report Data, Indexed by
 Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf).
 Chemical classes available in the Summary include:
 
--   chemicals known to cause reproductive toxicity,
--   chemicals known to cause cancer,
--   cholinesterase-inhibiting pesticides (organophosphate and carbamate
+  - chemicals known to cause reproductive toxicity,
+  - chemicals known to cause cancer,
+  - cholinesterase-inhibiting pesticides (organophosphate and carbamate
     active ingredients),
--   pesticides on DPR’s ground water protection list,
--   pesticides on DPR’s toxic air contaminants list,
--   fumigant pesticides,
--   oil pesticides, and
--   biopesticides.
+  - pesticides on DPR’s ground water protection list,
+  - pesticides on DPR’s toxic air contaminants list,
+  - fumigant pesticides,
+  - oil pesticides, and
+  - biopesticides.
 
 You can use active ingredients listed under the relevant class to
 include in the `chemicals` argument of `find_chemical_codes` to find if
@@ -214,14 +211,13 @@ location.
 
 ``` r
 find_location_county("12906 South Fowler Ave., Selma, CA 93662")
+#> [1] "Fresno"
 ```
-
-    #> [1] "Fresno"
 
 This function is useful later on if you want to pull PUR data to
 calculate exposure at a particular location.
 
-### 2. `pull_*` functions: pull raw or cleaned PUR data sets
+### 2\. `pull_*` functions: pull raw or cleaned PUR data sets
 
 #### Raw data
 
@@ -265,7 +261,7 @@ downloaded manually from CDPR’s FTP server in a few ways:
 For documentation of raw PUR data, you can reference the Pesticide Use
 Report Data User Guide & Documentation document published by the CA
 Department of Pesticide Regulation. The file is saved as “cd\_doc.pdf in
-any ”pur\[year\].zip" file between 1990 and 2015 found here:
+any”pur\[year\].zip" file between 1990 and 2015 found here:
 <ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>.
 
 #### Cleaned data
@@ -313,8 +309,8 @@ application was calculated as mean pounds per acre plus two standard
 deviations. Rates were calculated from pounds applied by dividing the
 raw `lbs_chm_used` column by either the `acre_treated` column as is for
 `unit_treated == "A"` (acres), or by the `acre_treated` column
-multiplied by $\\scriptsize2.29568\\times10^{-5}$ for
-`unit_treated == "S"` (square feet).
+multiplied by \(\scriptsize2.29568\times10^{-5}\) for `unit_treated ==
+"S"` (square feet).
 
 If the pounds per acre applied on a particular day exceeded the
 calculated maximum rate of application for the relevant year and active
@@ -333,10 +329,11 @@ format of the cleaned data with additional arguments to
 
 The `chemicals` argument uses the `find_chemical_code` function to
 filter by the `chemname` column. You can filter by listing search terms
-in the `chemicals` argument:
+in the `chemicals`
+argument:
 
 ``` r
-nevada_sulfur <- pull_clean_pur(years = 2000, counties = c("nevada"), chemicals = "sulfur")
+nevada_sulfur <- pull_clean_pur(years = 2000, counties = "nevada", chemicals = "sulfur")
 ```
 
 ``` r
@@ -405,17 +402,17 @@ tulare %>% arrange(township) %>% slice(1:3)
 There is one record per active ingredient per township per day.
 Alternatively, `sum = "chemical_class"` indicates that you would like to
 group certain active ingredients together to give a daily value for each
-chemical class that those active ingredients fall into. If
-`sum = "chemical_class"`, the active ingredients that belong to each
-class are specified with the `chemical_class` argument, which takes a
-data frame with three columns: `chem_code`, `chem_name`, and
-`chemical_class`. For example, a data frame input to the
-`chemical_class` argument might look like this:
+chemical class that those active ingredients fall into. If `sum =
+"chemical_class"`, the active ingredients that belong to each class are
+specified with the `chemical_class` argument, which takes a data frame
+with three columns: `chem_code`, `chem_name`, and `chemical_class`. For
+example, a data frame input to the `chemical_class` argument might look
+like this:
 
 ``` r
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) %>%
-  rename(chemical_class = chemical)
+  plyr::rename(c("chemical" = "chemical_class"))
 head(chemical_class_df, 2)
 #> # A tibble: 2 x 3
 #>   chem_code                             chemname chemical_class
@@ -439,7 +436,8 @@ would be at most three summed values per day and per PLS unit, one for
 all active ingredients falling under the class “methylene”, one for all
 active ingredients falling under the class “aldehyde”, and one for
 “other” with all active ingredients that don’t fit into the two
-specified classes.
+specified
+classes.
 
 ``` r
 fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE, 
@@ -461,9 +459,8 @@ head(fresno_classes, 3)
 
 ``` r
 unique(fresno_classes$chemical_class)
+#> [1] "other"     "aldehyde"  "methylene"
 ```
-
-    #> [1] "other"     "aldehyde"  "methylene"
 
 By default, `pull_clean_pur` will print a downloading progress bar for
 each year of data that you are pulling. You can turn this off by setting
@@ -484,7 +481,7 @@ running, or if the FTP site is down, for example), check your working
 directory. You’ll probably want to change it back from a temporary
 directory.
 
-### 3. `calculate_exposure` to applied pesticides
+### 3\. `calculate_exposure` to applied pesticides
 
 The `calculate_exposure` function calculates exposure to applied
 pesticides at a particular location for a given buffer extending from
@@ -531,13 +528,12 @@ sun_empire <- pull_clean_pur(2015, "fresno") %>%
 
 ``` r
 names(sun_empire)
+#> [1] "exposure"       "meta_data"      "buffer_plot_df" "county_plot"   
+#> [5] "clean_pur_df"
 ```
 
-    #> [1] "exposure"       "meta_data"      "buffer_plot_df" "county_plot"   
-    #> [5] "clean_pur_df"
-
 The first is the `exposure` data frame. There will be one row per
-exposure value ($\\frac{kg}{m^2}$):
+exposure value (\(\frac{kg}{m^2}\)):
 
 ``` r
 sun_empire$exposure
@@ -551,7 +547,7 @@ sun_empire$exposure
 
 The cumulative estimated exposure calculated for the year 2015 for a
 1,500 m radius buffer extending from Sun Empire Elementary is about
-0.0038 $\\frac{kg}{m^2}$.
+0.0038 \(\frac{kg}{m^2}\).
 
 The second is a `meta_data` data frame, with one row per section or
 township that intersects with the specified buffer. The values in the
@@ -570,7 +566,7 @@ summed. The values of `aerial_ground` will be non-missing if the
 `TRUE` if there were not records of application for the specified PLS
 unit, active ingredients, and time period. Other columns are `location`,
 `radius` and `area` (giving the area of the specified buffer in
-*m*<sup>2</sup>).
+\(m^2\)).
 
 ``` r
 sun_empire$meta_data %>% slice(1:3)
@@ -608,16 +604,18 @@ The `buffer_plot_df` element of the `calculate_exposure` list is a data
 frame with spatial plotting data for the buffer and overlapping PLS
 units. Using `df_plot`, we can get a rough idea of the area for which
 exposure was calculated. The `plot_exposure` function, explained further
-below, returns a similar plot with more information.
+below, returns a similar plot with more
+information.
 
 ``` r
 df_plot(sun_empire$buffer_plot_df)
 ```
 
-<img src="vignettes/figures/sun_empire_plot.png" width="432" style="display: block; margin: auto;" />
+<img src="vignettes/figures/sun_empire_plot.png" style="display: block; margin: auto;" />
 
 The `county_plot` element shows the specified buffer in the context of
-the entire county:
+the entire
+county:
 
 ``` r
 sun_empire$county_plot
@@ -651,25 +649,25 @@ sun_empire2 <- pull_clean_pur(2015, "fresno") %>%
 
 ``` r
 sun_empire2$exposure
+#> # A tibble: 3 x 9
+#>       exposure chemicals start_date   end_date aerial_ground
+#>          <dbl>     <chr>     <date>     <date>         <lgl>
+#> 1 1.909774e-03       all 2015-01-01 2015-04-30            NA
+#> 2 1.834621e-03       all 2015-05-01 2015-08-31            NA
+#> 3 7.241166e-05       all 2015-09-01 2015-12-31            NA
+#> # ... with 4 more variables: location <chr>, radius <dbl>,
+#> #   longitude <dbl>, latitude <dbl>
 ```
-
-    #> # A tibble: 3 x 9
-    #>       exposure chemicals start_date   end_date aerial_ground
-    #>          <dbl>     <chr>     <date>     <date>         <lgl>
-    #> 1 1.909774e-03       all 2015-01-01 2015-04-30            NA
-    #> 2 1.834621e-03       all 2015-05-01 2015-08-31            NA
-    #> 3 7.241166e-05       all 2015-09-01 2015-12-31            NA
-    #> # ... with 4 more variables: location <chr>, radius <dbl>,
-    #> #   longitude <dbl>, latitude <dbl>
 
 In this case, there is one exposure value calculated for each four-month
 increment in the year 2015. There can similarly be different exposure
 values calculated for different values of `chemical_class` (if the
 `clean_pur_df` had a `chemical_class` column and `chemicals` was set to
 `"chemical_class"`) and `aerial_ground` (if the `clean_pur_df` had an
-`aerial_ground` column and `aerial_ground` was set to `TRUE`).
+`aerial_ground` column and `aerial_ground` was set to
+`TRUE`).
 
-### 4. `plot_*` functions: visualize application of and exposure to applied pesticides
+### 4\. `plot_*` functions: visualize application of and exposure to applied pesticides
 
 #### Visualize exposure
 
@@ -685,10 +683,12 @@ The first argument of plot\_exposure is a list returned by
 
 ``` r
 plot_sun_empire <- plot_exposure(sun_empire)
-names(plot_sun_empire)
 ```
 
-    #> [1] "maps"     "pls_data" "exposure"
+``` r
+names(plot_sun_empire)
+#> [1] "maps"     "pls_data" "exposure"
+```
 
 If we input the `sun_county` exposure list, the `pls_data` and
 `exposure` data frames will be identical to the `meta_data` and
@@ -701,24 +701,26 @@ plot. The default of the `color_by` argument is `"amount"`, specifying a
 scale legend, and that of the `buffer_or_county` argument is `"county"`,
 indicating that colors should be scaled according to the range of
 application for the same time period and active ingredients for the
-entire county:
+entire
+county:
 
 ``` r
 plot_sun_empire$maps
 ```
 
-<img src="vignettes/figures/se_map1.png" width="461" style="display: block; margin: auto;" />
+<img src="vignettes/figures/se_map1.png" style="display: block; margin: auto;" />
 
 Alternatively, pesticide application can be colored according to the
 percentile it falls into (`color_by = "percentile"`). The number of
 cut-points can be specified with the `percentile` argument. The default
-is `c(0.25, 0.5, 0.75)`:
+is
+`c(0.25, 0.5, 0.75)`:
 
 ``` r
 plot_exposure(sun_empire, color_by = "percentile")$maps
 ```
 
-<img src="vignettes/figures/se_map2.png" width="461" style="display: block; margin: auto;" />
+<img src="vignettes/figures/se_map2.png" style="display: block; margin: auto;" />
 
 If `color_by = "percentile"`, a fourth list element is returned called
 `"cutoff_values"`, a data frame with two columns (`percentile` and `kg`)
@@ -726,18 +728,21 @@ that gives the cutoff value of kilograms of pesticide applied for each
 percentile.
 
 ``` r
-plot_exposure(sun_empire, color_by = "percentile")$cutoff_values
+plot_se_percentile <- plot_exposure(sun_empire, color_by = "percentile")
 ```
 
-    #> [[1]]
-    #>   percentile       kg
-    #> 1       0.25 1352.539
-    #> 2       0.50 4783.970
-    #> 3       0.75 9963.748
+``` r
+plot_se_percentile$cutoff_values
+#> [[1]]
+#>   percentile       kg
+#> 1       0.25 1352.539
+#> 2       0.50 4783.970
+#> 3       0.75 9963.748
+```
 
-In this case, sections with ≤ 1,352.539 kilograms of pesticides applied
-in the portion that intersects with the specified buffer will fall under
-the lowest percentile category (“`<= 25th percentile"`).
+In this case, sections with \(\leq\) 1,352.539 kilograms of pesticides
+applied in the portion that intersects with the specified buffer will
+fall under the lowest percentile category (“`<= 25th percentile"`).
 
 By default, fill colors of pesticide application are scaled according to
 the range of application across the entire county for the appropriate
@@ -750,7 +755,7 @@ over the PLS units plotted, you can specify `buffer_or_county` to be
 plot_exposure(sun_empire, buffer_or_county = "buffer")$maps
 ```
 
-<img src="vignettes/figures/se_map3.png" width="461" style="display: block; margin: auto;" />
+<img src="vignettes/figures/se_map3.png" style="display: block; margin: auto;" />
 
 There are a few other arguments that can change the appearance of the
 returned plot in other ways. `fill_option` takes any palette from the
@@ -767,7 +772,7 @@ plot_exposure(sun_empire,
               pls_labels_size = 3.5)$maps
 ```
 
-<img src="vignettes/figures/se_map4.png" width="461" style="display: block; margin: auto;" />
+<img src="vignettes/figures/se_map4.png" style="display: block; margin: auto;" />
 
 The plots above visualize a single exposure value. When you specify in
 your call to `calculate_exposure` that you would like to calculate
@@ -779,15 +784,6 @@ rows:
 sun_empire2$exposure
 ```
 
-    #> # A tibble: 3 x 9
-    #>       exposure chemicals start_date   end_date aerial_ground
-    #>          <dbl>     <chr>     <date>     <date>         <lgl>
-    #> 1 1.909774e-03       all 2015-01-01 2015-04-30            NA
-    #> 2 1.834621e-03       all 2015-05-01 2015-08-31            NA
-    #> 3 7.241166e-05       all 2015-09-01 2015-12-31            NA
-    #> # ... with 4 more variables: location <chr>, radius <dbl>,
-    #> #   longitude <dbl>, latitude <dbl>
-
 In this case, separate list elements are returned from `plot_exposure`
 for each exposure value. If we input the `sun_empire2` list into
 `plot_exposure`, one map, PLS data frame, and exposure row is output in
@@ -796,7 +792,8 @@ visualizes exposure for January 1st through April 30th, `maps[[2]]` for
 May 1st through August 31st, and `maps[[3]]` for September 1st through
 December 31st.
 
-(Note: Code for the `multiplot` function below can be found here: <http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/>)
+(**Note:** Code for the `multiplot` function below can be found here:
+<http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/>)
 
 ``` r
 plot_sun_empire2 <- plot_exposure(sun_empire2, color_by = "percentile")
@@ -804,7 +801,7 @@ maps <- plot_sun_empire2$maps
 multiplot(maps[[1]], maps[[2]], maps[[3]], cols = 2)
 ```
 
-<img src="vignettes/figures/se_plots.png" width="655" style="display: block; margin: auto;" />
+<img src="vignettes/figures/se_plots.png" style="display: block; margin: auto;" />
 
 Other `plot_exposure` list elements are organized in the same way. For
 example, the first `plot_sun_empire2$maps` element corresponds to
@@ -825,7 +822,7 @@ or `county_code` column (returned from `pull_raw_pur` or
 plot_county_locations(fresno_clean)
 ```
 
-<img src="vignettes/figures/ca_plot.png" width="334" style="display: block; margin: auto;" />
+<img src="vignettes/figures/ca_plot.png" style="display: block; margin: auto;" />
 
 You can change the county color with `fill_color`, and change
 transparency with `alpha`. If you’d like to plot multiple counties, you
@@ -840,34 +837,35 @@ The `plot_county_application` function returns a list. The first element
 data frame with two columns (`pls`, giving either section or township
 IDs, and `kg`, giving the plotted values of pesticides). `cutoff_values`
 is a data frame with `percentile` and `kg` values, and is only returned
-if application is plotted by percentile (specified with
-`color_by = "percentile"`).
+if application is plotted by percentile (specified with `color_by =
+"percentile"`).
 
 The first argument of `plot_county_application` should be a data frame
 returned by `pull_clean_pur`.
 
 ``` r
 fresno <- plot_county_application(fresno_clean)
-names(fresno)
 ```
 
-    #> [1] "map"  "data"
+``` r
+names(fresno)
+#> [1] "map"  "data"
+```
 
 ``` r
 fresno$map
 ```
 
-<img src="vignettes/figures/fresno_application.png" width="886" style="display: block; margin: auto;" />
+<img src="vignettes/figures/fresno_application.png" style="display: block; margin: auto;" />
 
 ``` r
-head(fresno, 2)
+head(fresno$data, 2)
+#> # A tibble: 2 x 2
+#>         pls       kg
+#>       <chr>    <dbl>
+#> 1 M10S13E28 1583.268
+#> 2 M10S13E32 1480.584
 ```
-
-    #> # A tibble: 2 x 2
-    #>         pls       kg
-    #>       <chr>    <dbl>
-    #> 1 M10S13E28 1583.268
-    #> 2 M10S13E32 1480.584
 
 There are additional arguments you can pass to `plot_county_application`
 to change the appearance of the returned map. You can choose to map by
@@ -887,7 +885,7 @@ plot_county_application(fresno_clean, pls = "township",
                         crop = TRUE)$map
 ```
 
-<img src="vignettes/figures/fresno_plot2.png" width="503" style="display: block; margin: auto;" />
+<img src="vignettes/figures/fresno_plot2.png" style="display: block; margin: auto;" />
 
 If your `clean_pur_df` data frame has data for more than one county, you
 specify which `county` you would like to plot data for.
@@ -897,13 +895,14 @@ specify which `county` you would like to plot data for.
 The `plot_application_timeseries` function takes a data frame returned
 from `pull_clean_pur` as its first argument, and returns a time series
 plot of application summed by day. This plot shows total amounts of
-pesticides applied per day in Fresno County in 2004:
+pesticides applied per day in Fresno County in
+2004:
 
 ``` r
 plot_application_timeseries(fresno_clean)
 ```
 
-<img src="vignettes/figures/timeseries1.png" width="712" style="display: block; margin: auto;" />
+<img src="vignettes/figures/timeseries1.png" style="display: block; margin: auto;" />
 
 By setting `facet` to be `TRUE`, the plot will be faceted by unique
 values of either `chemname` or `chemical_class`, depending on which is
@@ -915,7 +914,7 @@ fresno_clean %>%
   plot_application_timeseries(facet = TRUE)
 ```
 
-<img src="vignettes/figures/timeseries2.png" width="712" style="display: block; margin: auto;" />
+<img src="vignettes/figures/timeseries2.png" style="display: block; margin: auto;" />
 
 You can also change the axes scaling with `axes`, which passes its value
 to the ggplot2 function `facet_wrap`.
@@ -926,7 +925,7 @@ fresno_clean %>%
   plot_application_timeseries(facet = TRUE, axes = "free_y")
 ```
 
-<img src="vignettes/figures/timeseries3.png" width="712" style="display: block; margin: auto;" />
+<img src="vignettes/figures/timeseries3.png" style="display: block; margin: auto;" />
 
 `plot_application_timeseries` returns a `ggplot2` plot, which means you
 can add additional `ggplot2` arguments:
@@ -936,7 +935,7 @@ plot_application_timeseries(fresno_clean) +
   ggplot2::theme_classic()
 ```
 
-<img src="vignettes/figures/timeseries4.png" width="712" style="display: block; margin: auto;" />
+<img src="vignettes/figures/timeseries4.png" style="display: block; margin: auto;" />
 
 ### Source code and bugs
 
@@ -946,8 +945,7 @@ You can browse the source code for this package here:
 If you find a bug, please report it here:
 <https://github.com/leighseverson/purexposure/issues>.
 
-References
-----------
+## References
 
 Gunier, Robert B., Martha E. Harnly, Peggy Reynolds, Andrew Hertz, and
 Julie Von Behren. 2001. “Agricultural pesticide use of California:
