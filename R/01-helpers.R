@@ -1,5 +1,5 @@
 #' @importFrom magrittr %>%
-help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
+help_pull_pur <- function(year, counties = "all", quiet = FALSE) {
 
   current_dir <- getwd()
 
@@ -9,12 +9,6 @@ help_pull_pur <- function(year, counties = "all", download_progress = TRUE) {
 
   dir <- tempdir()
   setwd(dir)
-
-  if (download_progress) {
-    quiet <- FALSE
-  } else {
-    quiet <- TRUE
-  }
 
   utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
   utils::unzip(file, exdir = dir)

@@ -16,9 +16,9 @@
 #' @param verbose TRUE / FALSE indicating whether you would like a single message
 #'   printed indicating which counties and years you are pulling data for. The
 #'   default value is TRUE.
-#' @param download_progress TRUE / FALSE indicating whether you would like a
+#' @param quiet TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for each year of PUR data that
-#'   is downloaded. The default value is TRUE.
+#'   is downloaded. The default value is FALSE.
 #'
 #' @return A data frame with 33 columns. Different years and counties for which
 #'   data was pulled are indicated by \code{applic_dt} and \code{county_cd},
@@ -44,7 +44,7 @@
 #' @importFrom magrittr %>%
 #' @export
 pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
-                         download_progress = TRUE) {
+                         quiet = FALSE) {
 
   if ("all" %in% tolower(years)) {
     years <- 1990:2015
@@ -112,12 +112,12 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
   if (!"all" %in% counties) {
 
     raw_df <- purrr::map_dfr(years, help_pull_pur, counties = counties,
-                             download_progress = download_progress)
+                             quiet = quiet)
 
   } else {
 
     raw_df <- purrr::map_dfr(years, help_pull_pur, counties = "all",
-                             download_progress = download_progress)
+                             quiet = quiet)
 
   }
 
@@ -289,12 +289,12 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            aerial_ground = TRUE, verbose = TRUE,
-                           download_progress = TRUE,
+                           quiet = FALSE,
                            raw_pur_df = NULL) {
 
   if (is.null(raw_pur_df)) {
     raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
-                           download_progress = download_progress)
+                           quiet = quiet)
   } else {
 
     check <- colnames(raw_pur_df) == c("use_no", "prodno", "chem_code",
@@ -652,9 +652,9 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' @param section_township Either "section" (the default) or "township".
 #'   Specifies whether you would like to pull a section- or township-level
 #'   SpatialPolygonsDataFrame.
-#' @param download_progress TRUE / FALSE indicating whether you would like a
+#' @param quiet TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for the shapefile that is downloaded.
-#'   The default value is FALSE
+#'   The default value is FALSE.
 #'
 #' @return A SpatialPolygonsDataFrame object.
 #'
@@ -670,15 +670,15 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #'
 #' @examples
 #' \dontrun{
-#' trinity_shp <- pull_spdf("trinity", download_progress = TRUE)
+#' trinity_shp <- pull_spdf("trinity")
 #' plot(trinity_shp)
 #'
-#' del_norte_shp <- pull_spdf("08", "township", download_progress = TRUE)
+#' del_norte_shp <- pull_spdf("08", "township")
 #' plot(del_norte_shp)
 #' }
 #' @export
 pull_spdf <- function(county, section_township = "section",
-                      download_progress = FALSE) {
+                      quiet = FALSE) {
 
   if (county != "Statewide") {
     county_name <- find_counties(county, return = "names")
@@ -698,12 +698,6 @@ pull_spdf <- function(county, section_township = "section",
   setwd(temp_dir)
 
   invisible(suppressMessages(suppressWarnings(file.remove(list.files(temp_dir)))))
-
-  if (download_progress) {
-    quiet <- FALSE
-  } else {
-    quiet <- TRUE
-  }
 
   utils::download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
 
@@ -729,7 +723,7 @@ pull_spdf <- function(county, section_township = "section",
 #' Table for a particular year.
 #'
 #' @param year A four digit year in the range of 1990 to 2015.
-#' @param download_progress TRUE / FALSE indicating whether you would like a
+#' @param quiet TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for the product table that is downloaded.
 #'   The default value is FALSE.
 #'
@@ -769,19 +763,13 @@ pull_spdf <- function(county, section_township = "section",
 #' }
 #' @importFrom magrittr %>%
 #' @export
-pull_product_table <- function(year, download_progress = FALSE) {
+pull_product_table <- function(year, quiet = FALSE) {
 
   url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
                 year, ".zip")
   file <- paste0("pur", year, ".zip")
   current_dir <- getwd()
   dir <- tempdir()
-
-  if (download_progress) {
-    quiet <- FALSE
-  } else {
-    quiet <- TRUE
-  }
 
   setwd(dir)
   utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)

@@ -97,9 +97,9 @@ find_chemical_codes <- function(year, chemicals = "all") {
 #' prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 #' }
 #' @export
-find_product_name <- function(year, products = "all", download_progress = FALSE) {
+find_product_name <- function(year, products = "all", quiet = FALSE) {
 
-  prod_df <- pull_product_table(year, download_progress = download_progress)
+  prod_df <- pull_product_table(year, quiet = quiet)
 
   for (i in 1:length(products)) {
     df <- help_find_product(products[i], prod_df)
