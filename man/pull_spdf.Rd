@@ -4,7 +4,7 @@
 \alias{pull_spdf}
 \title{Pull California county SpatialPolygonsDataFrame.}
 \usage{
-pull_spdf(county, section_township = "section", download_progress = FALSE)
+pull_spdf(county, section_township = "section", quiet = FALSE)
 }
 \arguments{
 \item{county}{A character string giving either a county name or
@@ -16,9 +16,9 @@ dataset available with this package.}
 Specifies whether you would like to pull a section- or township-level
 SpatialPolygonsDataFrame.}
 
-\item{download_progress}{TRUE / FALSE indicating whether you would like a
+\item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the shapefile that is downloaded.
-The default value is FALSE}
+The default value is FALSE.}
 }
 \value{
 A SpatialPolygonsDataFrame object.
@@ -44,10 +44,10 @@ a temporary directory.
 
 \examples{
 \dontrun{
-trinity_shp <- pull_spdf("trinity", download_progress = TRUE)
+trinity_shp <- pull_spdf("trinity")
 plot(trinity_shp)
 
-del_norte_shp <- pull_spdf("08", "township", download_progress = TRUE)
+del_norte_shp <- pull_spdf("08", "township")
 plot(del_norte_shp)
 }
 }

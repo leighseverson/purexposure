@@ -7,7 +7,7 @@
 pull_clean_pur(years = "all", counties = "all", chemicals = "all",
   sum_application = FALSE, unit = "section", sum = "all",
   chemical_class = NULL, aerial_ground = TRUE, verbose = TRUE,
-  download_progress = TRUE, raw_pur_df = NULL)
+  quiet = FALSE, raw_pur_df = NULL)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -70,9 +70,9 @@ retain aerial/ground application data ("A" = aerial, "G" = ground, and
 printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
-\item{download_progress}{TRUE / FALSE indicating whether you would like a
+\item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that
-is downloaded. The default value is TRUE.}
+is downloaded. The default value is FALSE.}
 
 \item{raw_pur_df}{A raw PUR data frame. Optional. If you've already downloaded
 a raw PUR data frame using \code{pull_raw_pur}, this argument prevents

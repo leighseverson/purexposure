@@ -5,7 +5,7 @@
 \title{Pull raw PUR data by counties and years.}
 \usage{
 pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
-  download_progress = TRUE)
+  quiet = FALSE)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
@@ -24,9 +24,9 @@ all 58 California counties.}
 printed indicating which counties and years you are pulling data for. The
 default value is TRUE.}
 
-\item{download_progress}{TRUE / FALSE indicating whether you would like a
+\item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for each year of PUR data that
-is downloaded. The default value is TRUE.}
+is downloaded. The default value is FALSE.}
 }
 \value{
 A data frame with 33 columns. Different years and counties for which

@@ -294,7 +294,7 @@ method of application (`aerial_ground`) and product number (`prodno`).
 Raw PUR data sets are recorded in units of pounds, and cleaned data sets
 convert applied pesticides to units of kilograms by dividing pounds of
 active ingredient applied by 2.20562. The `use_no` variable uniquely
-identifies pesticide product uses across years.
+identifies pesticide product uses.
 
 **Outliers**
 

@@ -5,7 +5,7 @@
 \title{Find Pesticide Product names and registration numbers from PUR Product Lookup
 Tables.}
 \usage{
-find_product_name(year, products = "all", download_progress = FALSE)
+find_product_name(year, products = "all", quiet = FALSE)
 }
 \arguments{
 \item{year}{A four digit year in the range of 1990 to 2015.}
@@ -15,7 +15,7 @@ pesticide product names that you would like to search for. Not case
 sensitive. The default is "all", which will return all pesticide products
 applied for a given year.}
 
-\item{download_progress}{TRUE / FALSE indicating whether you would like a
+\item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the product table that is downloaded.
 The default value is FALSE.}
 }

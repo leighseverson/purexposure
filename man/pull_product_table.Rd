@@ -4,12 +4,12 @@
 \alias{pull_product_table}
 \title{Pull PUR Product Table.}
 \usage{
-pull_product_table(year, download_progress = FALSE)
+pull_product_table(year, quiet = FALSE)
 }
 \arguments{
 \item{year}{A four digit year in the range of 1990 to 2015.}
 
-\item{download_progress}{TRUE / FALSE indicating whether you would like a
+\item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the product table that is downloaded.
 The default value is FALSE.}
 }
