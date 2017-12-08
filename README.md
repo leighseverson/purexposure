@@ -30,6 +30,12 @@ devtools::install_github("leighseverson/purexposure")
 library(purexposure)
 ```
 
+Many examples in this vignette also use functions from the `dplyr` package: 
+
+``` r
+library(dplyr)
+```
+
 Overview of PUR datasets
 ------------------------
 
@@ -789,6 +795,8 @@ the form of a separate list element for each exposure value. `maps[[1]]`
 visualizes exposure for January 1st through April 30th, `maps[[2]]` for
 May 1st through August 31st, and `maps[[3]]` for September 1st through
 December 31st.
+
+(Note: Code for the `multiplot` function below can be found here: <http://www.cookbook-r.com/Graphs/Multiple_graphs_on_one_page_(ggplot2)/>)
 
 ``` r
 plot_sun_empire2 <- plot_exposure(sun_empire2, color_by = "percentile")
