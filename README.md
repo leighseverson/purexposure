@@ -10,7 +10,16 @@ Information Portal ([CalPIP](http://calpip.cdpr.ca.gov/main.cfm)). The
 `purexposure` package makes it easy to download Pesticide Use Report
 (PUR) raw data, output reports in a tidy format, calculate exposure to
 applied pesticides, and visualize application for counties or more
-specific locations.
+specific locations. For example, you can use the package to produce
+plots like this one:
+
+``` r
+fresno <- pull_clean_pur(1995:1998, "Fresno") %>% 
+  plot_county_application()
+fresno$map
+```
+
+<img src="vignettes/figures/fresno_example.png" title="Applied pesticides in Fresno, California from 1995 through 1998." alt="Applied pesticides in Fresno, California from 1995 through 1998." width="400pt" height="300pt" style="display: block; margin: auto;" />
 
 The `purexposure` package has four main categories of functions:
 `find_*`, `pull_*`, `calculate_*`, and `plot_*`. `find_*` functions are
@@ -77,7 +86,7 @@ three of these initial points, and three Principle Meridians: Humboldt
 (H), Mount Diablo (M), and San Bernardino
 (S).
 
-<img src="vignettes/figures/calneva.jpg" title="Base Lines and Meridian lines in California." alt="Base Lines and Meridian lines in California." width="250pt" height="400pt" />
+<img src="vignettes/figures/calneva.jpg" title="Base Lines and Meridian lines in California." alt="Base Lines and Meridian lines in California." width="250pt" height="400pt" style="display: block; margin: auto;" />
 
 Townships are six-mile-square areas that are identified by a combination
 of the location north or south of the base line, and range, the location
