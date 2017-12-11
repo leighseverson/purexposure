@@ -681,13 +681,25 @@ pull_spdf <- function(county, section_township = "section",
                       quiet = FALSE) {
 
   if (county != "Statewide") {
-    county_name <- find_counties(county, return = "names")
-    county_name <- stringr::str_replace(county_name, " ", "_")
 
-    shp_url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/",
-                      county_name, "/", county_name, "_", section_township,
-                      "s.zip")
-    file <- paste0(county_name, "_", section_township, "s.zip")
+    county_name <- find_counties(county, return = "names")
+    county_name_underscore <- stringr::str_replace(county_name, " ", "_")
+
+    if (county_name == "Los Angeles") {
+      shp_url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/",
+                        "Los_Angeles/LosAngeles_", section_township, "s.zip")
+      file <- paste0("LosAngeles_", section_township, "s.zip")
+    } else if (county_name == "San Luis Obispo") {
+      shp_url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/",
+                        county_name_underscore, "/SLO_", section_township, "s.zip")
+      file <- paste0("SLO_", section_township, "s.zip")
+    } else {
+      shp_url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/",
+                        county_name_underscore, "/", county_name_underscore, "_",
+                        section_township, "s.zip")
+      file <- paste0(county_name_underscore, "_", section_township, "s.zip")
+    }
+
   } else {
     shp_url <- "ftp://transfer.cdpr.ca.gov/pub/outgoing/grndwtr/Statewide/mtrnet.zip"
     file <- "mtrnet.zip"
