@@ -14,13 +14,14 @@ pull_clean_pur(years = "all", counties = "all", chemicals = "all",
 1990 to 2015. Indicates the years for which you would like to pull PUR
 datasets. \code{years == "all"} will pull data from 1990 through 2015.}
 
-\item{counties}{A vector of character strings giving either a county name or
-a two digit county code for each county. Not case sensitive. California names
-and county codes as they appear in PUR datasets can be found in the
-\code{county_codes} dataset available with this package. For example, to
-return data for Alameda county, enter either "alameda" or "01" for the
-\code{counties} argument. \code{counties = "all"} will return data for
-all 58 California counties.}
+\item{counties}{A vector of character strings giving either a county name,
+two digit PUR county codes, or six-digit FIPS county codes for each county.
+Not case sensitive. California names, county codes as they appear in PUR
+datasets, and FIPS county codes can be found in the \code{county_codes}
+dataset available with this package. For example, to return data for
+Alameda county, enter either "alameda", "01", or "06001" for the
+\code{counties} argument. \code{counties = "all"} will return data for all
+58 California counties (this will take a while to run).}
 
 \item{chemicals}{A string or vector of strings giving search terms of
 chemicals to match with active ingredients present in pesticides applied in
@@ -79,7 +80,7 @@ a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 \code{pull_clean_pur} from downloading the same data again.}
 }
 \value{
-A data frame with 13 columns:
+A data frame with 14 columns:
   \describe{
     \item{chem_code}{An integer value giving the PUR chemical code
     for the active ingredient applied. Not included if
@@ -108,7 +109,9 @@ A data frame with 13 columns:
     (N or S), range (01-47), and range direction (E or W).}
     \item{county_name}{A character string giving the county name where
     application took place.}
-    \item{county_code}{A string two characters long giving the PUR county
+    \item{pur_code}{A string two characters long giving the PUR county
+    code where application took place.}
+    \item{fips_code}{A string six characters long giving the FIPS county
     code where application took place.}
     \item{date}{The date of application (yyyy-mm-dd).}
     \item{aerial_ground}{A character giving the application method.
@@ -160,9 +163,9 @@ Public Land Survey (PLS) section or township.
 \examples{
 \dontrun{
 df <- pull_clean_pur(years = 2000:2001,
-                      counties = c("01", "nevada", "riverside"),
-                      chemicals = "methylene",
-                      aerial_ground = TRUE)
+                     counties = c("06001", "29", "riverside"),
+                     chemicals = "methylene",
+                     aerial_ground = TRUE)
 
 # filter to active ingredients present in particular products
 prod_nos <- find_product_name(2003, "insecticide") \%>\%
@@ -174,7 +177,7 @@ df2 <- pull_clean_pur(2003, "10") \%>\%
 
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2009:2010,
-                      counties = c("01", "nevada", "riverside"),
+                      counties = c("01", "29", "riverside"),
                       unit = "township",
                       sum_application = TRUE)
 

@@ -2,16 +2,16 @@
 #'
 #' \code{plot_county_locations} returns one or multiple plots with county
 #' locations in California given either a vector of county names or codes,
-#' or a PUR data frame with a \code{county_cd}, \code{county_name}, or
-#' \code{county_code} column (A data frame returned from either
+#' or a PUR data frame with a \code{county_cd}, \code{county_name},
+#' \code{pur_code}, or \code{fips_code} column (A data frame returned from either
 #' \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 #'
-#' @param counties_or_df A character vector of county names or county codes.
-#'   You can use the \code{county_codes} dataset included with this package to
-#'   check out PUR county names and codes. This argument can also be a data frame
-#'   with a \code{county_cd}, \code{county_name}, or \code{county_code} column. If
-#'   you provide a data frame, a plot for every county with data in that dataset
-#'   will be output.
+#' @param counties_or_df A character vector of county names, pur codes, or fips
+#'   codes. You can use the \code{county_codes} dataset included with this
+#'   package to check out PUR county names and codes. This argument can also be
+#'   a data frame with a \code{county_cd}, \code{county_name}, \code{pur_code},
+#'   or \code{fips_code} column. If you provide a data frame, a plot for every
+#'   county with data in that dataset will be output.
 #' @param separate_plots TRUE / FALSE. If you provided multiple counties, whether you
 #'   would like county outlines plotted in the same plot (FALSE), or if you would
 #'   like separate plots returned in a list (TRUE). The default is FALSE.
@@ -57,19 +57,22 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
   }
 
   if (is.data.frame(counties_or_df)) {
-    check <- any(c("county_cd", "county_name", "county_code") %in%
+    check <- any(c("county_cd", "county_name", "pur_code", "fips_code") %in%
                      colnames(counties_or_df))
     if (!check) {
       stop(paste0("The counties_or_df data frame should have either a county_cd,",
-                  " county_name, or county_code column.\nThis data frame should be",
-                  " returned from either pull_pur_file(), pull_raw_pur(), or",
-                  " pull_clean_pur()."))
+                  " county_name, pur_code, or fips_code column.\nThis data",
+                  " frame should be returned from either pull_pur_file(),",
+                  " pull_raw_pur(), or pull_clean_pur()."))
     }
-      county_col <- grep("county_code", colnames(counties_or_df), value = TRUE)
+      county_col <- grep("county_cd", colnames(counties_or_df), value = TRUE)
       if (length(county_col) == 0) {
         county_col <- grep("county_name", colnames(counties_or_df), value = TRUE)
         if (length(county_col) == 0) {
-          county_col <- grep("county_cd", colnames(counties_or_df), value = TRUE)
+          county_col <- grep("pur_code", colnames(counties_or_df), value = TRUE)
+          if (length(county_col) == 0) {
+            county_col <- grep("fips_code", colnames(counties_or_df), value = TRUE)
+          }
         }
       }
       counties <- counties_or_df %>%
@@ -246,14 +249,14 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
     }
   }
 
-  if (!"county_code" %in% colnames(clean_pur_df)) {
+  if (!"pur_code" %in% colnames(clean_pur_df)) {
     stop(paste0("The clean_pur_df argument should be an unaltered data frame ",
                 "returned from the pull_clean_pur() function."))
   }
 
   # pull county shapefile
   if (is.null(county)) {
-    code <- unique(clean_pur_df$county_code)
+    code <- unique(clean_pur_df$pur_code)
     if (length(code) > 1) {
       counties <- paste(find_counties(code, "names"), collapse = ", ")
       stop(paste0("Your clan_pur_df data frame has data for more than one ",
@@ -309,14 +312,14 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   if (section_township == "section") {
     pur_df2 <- pur_df %>%
-      dplyr::filter(county_code == code) %>%
+      dplyr::filter(pur_code == code) %>%
       dplyr::group_by(section) %>%
       plyr::rename(c("section" = "pls")) %>%
       dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE)) %>%
       dplyr::mutate(kg = ifelse(is.na(kg), 0, kg))
   } else {
     pur_df2 <- pur_df %>%
-      dplyr::filter(county_code == code) %>%
+      dplyr::filter(pur_code == code) %>%
       dplyr::group_by(township) %>%
       plyr::rename(c("township" = "pls")) %>%
       dplyr::summarise(kg = sum(kg_chm_used, na.rm = TRUE)) %>%

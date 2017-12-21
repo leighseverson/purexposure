@@ -8,12 +8,12 @@ plot_county_locations(counties_or_df, separate_plots = FALSE,
   fill_color = "red", alpha = 0.5)
 }
 \arguments{
-\item{counties_or_df}{A character vector of county names or county codes.
-You can use the \code{county_codes} dataset included with this package to
-check out PUR county names and codes. This argument can also be a data frame
-with a \code{county_cd}, \code{county_name}, or \code{county_code} column. If
-you provide a data frame, a plot for every county with data in that dataset
-will be output.}
+\item{counties_or_df}{A character vector of county names, pur codes, or fips
+codes. You can use the \code{county_codes} dataset included with this
+package to check out PUR county names and codes. This argument can also be
+a data frame with a \code{county_cd}, \code{county_name}, \code{pur_code},
+or \code{fips_code} column. If you provide a data frame, a plot for every
+county with data in that dataset will be output.}
 
 \item{separate_plots}{TRUE / FALSE. If you provided multiple counties, whether you
 would like county outlines plotted in the same plot (FALSE), or if you would
@@ -33,8 +33,8 @@ List element names correspond to county names.
 \description{
 \code{plot_county_locations} returns one or multiple plots with county
 locations in California given either a vector of county names or codes,
-or a PUR data frame with a \code{county_cd}, \code{county_name}, or
-\code{county_code} column (A data frame returned from either
+or a PUR data frame with a \code{county_cd}, \code{county_name},
+\code{pur_code}, or \code{fips_code} column (A data frame returned from either
 \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 }
 \examples{

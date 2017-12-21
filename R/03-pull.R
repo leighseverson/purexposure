@@ -6,13 +6,14 @@
 #' @param years A four-digit numeric year or vector of years in the range of
 #'   1990 to 2015. Indicates the years for which you would like to pull PUR
 #'   datasets. \code{years == "all"} will pull data from 1990 through 2015.
-#' @param counties A vector of character strings giving either a county name or
-#'   a two digit county code for each county. Not case sensitive. California names
-#'   and county codes as they appear in PUR datasets can be found in the
-#'   \code{county_codes} dataset available with this package. For example, to
-#'   return data for Alameda county, enter either "alameda" or "01" for the
-#'   \code{counties} argument. \code{counties = "all"} will return data for
-#'   all 58 California counties.
+#' @param counties A vector of character strings giving either a county name,
+#'   two digit PUR county codes, or six-digit FIPS county codes for each county.
+#'   Not case sensitive. California names, county codes as they appear in PUR
+#'   datasets, and FIPS county codes can be found in the \code{county_codes}
+#'   dataset available with this package. For example, to return data for
+#'   Alameda county, enter either "alameda", "01", or "06001" for the
+#'   \code{counties} argument. \code{counties = "all"} will return data for all
+#'   58 California counties (this will take a while to run).
 #' @param verbose TRUE / FALSE indicating whether you would like a single message
 #'   printed indicating which counties and years you are pulling data for. The
 #'   default value is TRUE.
@@ -38,7 +39,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
+#' df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
 #' df2 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 #' }
 #' @importFrom magrittr %>%
@@ -175,7 +176,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 #'   \code{pull_clean_pur} from downloading the same data again.
 #'
-#' @return A data frame with 13 columns:
+#' @return A data frame with 14 columns:
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
 #'     for the active ingredient applied. Not included if
@@ -204,7 +205,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     (N or S), range (01-47), and range direction (E or W).}
 #'     \item{county_name}{A character string giving the county name where
 #'     application took place.}
-#'     \item{county_code}{A string two characters long giving the PUR county
+#'     \item{pur_code}{A string two characters long giving the PUR county
+#'     code where application took place.}
+#'     \item{fips_code}{A string six characters long giving the FIPS county
 #'     code where application took place.}
 #'     \item{date}{The date of application (yyyy-mm-dd).}
 #'     \item{aerial_ground}{A character giving the application method.
@@ -248,9 +251,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @examples
 #' \dontrun{
 #' df <- pull_clean_pur(years = 2000:2001,
-#'                       counties = c("01", "nevada", "riverside"),
-#'                       chemicals = "methylene",
-#'                       aerial_ground = TRUE)
+#'                      counties = c("06001", "29", "riverside"),
+#'                      chemicals = "methylene",
+#'                      aerial_ground = TRUE)
 #'
 #' # filter to active ingredients present in particular products
 #' prod_nos <- find_product_name(2003, "insecticide") %>%
@@ -262,7 +265,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'
 #' # Sum application by active ingredients
 #' df3 <- pull_clean_pur(years = 2009:2010,
-#'                       counties = c("01", "nevada", "riverside"),
+#'                       counties = c("01", "29", "riverside"),
 #'                       unit = "township",
 #'                       sum_application = TRUE)
 #'
@@ -312,8 +315,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                       "record_id")
 
     if (!all(check)) {
-      stop(paste0("The raw_pur_df data frame should be returned from ",
-                  "pull_raw_pur() and should have 33 columns."))
+      stop(paste0("The raw_pur_df data frame should be an unaltered data frame ",
+                  "returned from pull_raw_pur() with 33 columns."))
     }
 
     unique_years <- raw_pur_df %>%
@@ -493,17 +496,18 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                       lbs_per_acre > calc_max), TRUE, FALSE),
                   lbs_chm_used = ifelse(lbs_per_acre > calc_max,
                                         calc_max*acre_treated, lbs_chm_used)) %>%
-    plyr::rename(c("county_cd" = "county_code")) %>%
+    plyr::rename(c("county_cd" = "pur_code")) %>%
     dplyr::ungroup()
 
   county <- purexposure::county_codes
 
   out <- county %>%
-    dplyr::right_join(df2, by = "county_code") %>%
+    dplyr::right_join(df2, by = "pur_code") %>%
     dplyr::mutate(use_no = paste0(use_no, "_", lubridate::year(applic_dt)),
                   kg_chm_used = lbs_chm_used/2.20562) %>%
     dplyr::select(chem_code, chemname, kg_chm_used, MTRS, MTR, county_name,
-                  county_code, applic_dt, aer_gnd_ind, use_no, outlier, prodno) %>%
+                  pur_code, fips_code, applic_dt, aer_gnd_ind, use_no, outlier,
+                  prodno) %>%
     plyr::rename(c("MTRS" = "section",
                    "MTR" = "township",
                    "applic_dt" = "date",
@@ -543,28 +547,28 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
           out <- help_sum_application(out, "all", "section", TRUE,
                                     section_townships,
                                     chem_code,
-                                    chemname, section, county_name, county_code,
-                                    date, aerial_ground)
+                                    chemname, section, county_name, pur_code,
+                                    fips_code, date, aerial_ground)
         } else {
           out <- help_sum_application(out, "all", "section", FALSE,
                                     section_townships,
                                     chem_code,
-                                    chemname, section, county_name, county_code,
-                                    date)
+                                    chemname, section, county_name, pur_code,
+                                    fips_code, date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
           out <- help_sum_application(out, "all", "township", TRUE,
                                     section_townships,
                                     chem_code,
-                                    chemname, township, county_name, county_code,
-                                    date, aerial_ground)
+                                    chemname, township, county_name, pur_code,
+                                    fips_code, date, aerial_ground)
         } else {
           out <- help_sum_application(out, "all", "township", FALSE,
                                     section_townships,
                                     chem_code,
-                                    chemname, township, county_name, county_code,
-                                    date)
+                                    chemname, township, county_name, pur_code,
+                                    fips_code, date)
         }
       }
     } else if (sum == "chemical_class") {
@@ -601,13 +605,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, section, county_name,
-                                    county_code, date, aerial_ground)
+                                    pur_code, fips_code, date, aerial_ground)
         } else {
           out <- help_sum_application(out, "chemical_class", "section", FALSE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, section, county_name,
-                                    county_code, date)
+                                    pur_code, fips_code, date)
         }
       } else if (unit == "township") {
         if (aerial_ground) {
@@ -615,13 +619,13 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, township, county_name,
-                                    county_code, date, aerial_ground)
+                                    pur_code, fips_code, date, aerial_ground)
         } else {
           out <- help_sum_application(out, "chemical_class", "township", FALSE,
                                     section_townships,
                                     chemical_class = chemical_class,
                                     chemical_class, township, county_name,
-                                    county_code, date)
+                                    pur_code, fips_code, date)
           }
       }
     }
@@ -645,10 +649,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
 #' shapefile.
 #'
-#' @param county A character string giving either a county name or
-#'  two digit PUR county code. Not case sensitive. California names and county
-#'  codes as they appear in PUR datasets can be found in the \code{county_codes}
-#'  dataset available with this package.
+#' @param county A character string giving either a county name, two digit PUR
+#'  county code, or six-digit FIPS county code. Not case sensitive. California
+#'  names and county codes as they appear in PUR datasets can be found in the
+#'  \code{county_codes} dataset available with this package.
 #' @param section_township Either "section" (the default) or "township".
 #'   Specifies whether you would like to pull a section- or township-level
 #'   SpatialPolygonsDataFrame.

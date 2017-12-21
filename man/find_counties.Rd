@@ -4,30 +4,34 @@
 \alias{find_counties}
 \title{Find California county codes or names.}
 \usage{
-find_counties(counties, return = "codes")
+find_counties(counties, return = "pur_codes")
 }
 \arguments{
-\item{counties}{A vector of character strings giving either a county names or
-two digit PUR county codes. Not case sensitive. California names and county
-codes as they appear in PUR datasets can be found in the \code{county_codes}
-dataset available with this package.}
+\item{counties}{A vector of character strings giving either a county names,
+two digit PUR county codes, or six-digit FIPS county codes. Not case
+sensitive. California names and county codes as they appear in PUR datasets
+can be found in the \code{county_codes} dataset available with this package.}
 
-\item{return}{Either "codes" to return county codes (the default) or "names"
-to return county names.}
+\item{return}{Either "pur_codes" to return PUR county codes (the default),
+"fips_codes" to return FIPS county codes, or "names" to return county names.}
 }
 \value{
-If \code{return = "codes"}, a vector of two-character strings giving
-  the corresponding PUR county codes. If \code{return = "names"}, a vector
-  of county names.
+If \code{return = "pur_codes"}, a vector of two-character strings giving
+  the corresponding PUR county codes. If \code{return = "fips_codes"}, a vector
+  of six-digit character strings giving the corresponding FIPS county codes.
+  If \code{return = "names"}, a vector of county names.
 }
 \description{
 Given a vector of counties, \code{find_counties} returns either PUR
 county codes or names.
 }
 \examples{
-find_counties(c("01", "03", "el dorado"))
+find_counties(c("01", "06005", "el dorado"))
 find_counties(c("contra costa", "45"))
 
-find_counties(c("01", "03", "el dorado"), return = "names")
+find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
+find_counties(c("contra costa", "45"), return = "fips_codes")
+
+find_counties(c("01", "06005", "el dorado"), return = "names")
 find_counties(c("contra costa", "45"), return = "names")
 }

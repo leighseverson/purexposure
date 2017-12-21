@@ -12,13 +12,14 @@ pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
 1990 to 2015. Indicates the years for which you would like to pull PUR
 datasets. \code{years == "all"} will pull data from 1990 through 2015.}
 
-\item{counties}{A vector of character strings giving either a county name or
-a two digit county code for each county. Not case sensitive. California names
-and county codes as they appear in PUR datasets can be found in the
-\code{county_codes} dataset available with this package. For example, to
-return data for Alameda county, enter either "alameda" or "01" for the
-\code{counties} argument. \code{counties = "all"} will return data for
-all 58 California counties.}
+\item{counties}{A vector of character strings giving either a county name,
+two digit PUR county codes, or six-digit FIPS county codes for each county.
+Not case sensitive. California names, county codes as they appear in PUR
+datasets, and FIPS county codes can be found in the \code{county_codes}
+dataset available with this package. For example, to return data for
+Alameda county, enter either "alameda", "01", or "06001" for the
+\code{counties} argument. \code{counties = "all"} will return data for all
+58 California counties (this will take a while to run).}
 
 \item{verbose}{TRUE / FALSE indicating whether you would like a single message
 printed indicating which counties and years you are pulling data for. The
@@ -53,7 +54,7 @@ A data frame with 33 columns. Different years and counties for which
 
 \examples{
 \dontrun{
-df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "01"))
+df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
 df2 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 }
 }

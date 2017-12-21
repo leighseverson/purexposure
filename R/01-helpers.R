@@ -89,7 +89,7 @@ help_read_in_counties <- function(code_or_file, type, year) {
 }
 
 #' @importFrom magrittr %>%
-help_find_code <- function(county, return = "codes") {
+help_find_code <- function(county, return = "pur_codes") {
 
   code_df <- purexposure::county_codes
 
@@ -105,9 +105,13 @@ help_find_code <- function(county, return = "codes") {
     } else {
       error <- NULL
 
-      code <- as.character(code_df %>%
+      pur_code <- as.character(code_df %>%
                              dplyr::filter(county_name == county_nm) %>%
-                             dplyr::select(county_code))
+                             dplyr::select(pur_code))
+
+      fips_code <- as.character(code_df %>%
+                                  dplyr::filter(county_name == county_nm) %>%
+                                  dplyr::select(fips_code))
 
       name <- strsplit(tolower(county_nm), " ")[[1]]
       name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
@@ -116,29 +120,63 @@ help_find_code <- function(county, return = "codes") {
 
   } else {
 
-    county_cd <- county
-    code <- grep(county_cd, code_df$county_code, value = TRUE)
+    if (nchar(test) > 2) {
 
-    if (length(code) != 1) {
-      error <- "yes"
+      fips_cd <- county
+      fips_cd <- grep(fips_cd, code_df$fips_code, value = TRUE)
+
+      if (length(fips_cd) != 1) {
+        error <- "yes"
+      } else {
+        error <- NULL
+
+        county_nm <- as.character(code_df %>%
+                                    dplyr::filter(fips_code == fips_cd) %>%
+                                    dplyr::select(county_name))
+
+        pur_code <- as.character(code_df %>%
+                                   dplyr::filter(fips_code == fips_cd) %>%
+                                   dplyr::select(pur_code))
+
+        fips_code <- fips_cd
+      }
+
     } else {
-      error <- NULL
 
-      county_nm <- as.character(code_df %>%
-                                  dplyr::filter(county_code == code) %>%
-                                  dplyr::select(county_name))
+      pur_cd <- county
+      pur_cd <- grep(pur_cd, code_df$pur_code, value = TRUE)
+
+      if (length(pur_cd) != 1) {
+        error <- "yes"
+      } else {
+        error <- NULL
+
+        county_nm <- as.character(code_df %>%
+                                    dplyr::filter(pur_code == pur_cd) %>%
+                                    dplyr::select(county_name))
+
+        fips_code <- as.character(code_df %>%
+                                    dplyr::filter(pur_code == pur_cd) %>%
+                                    dplyr::select(fips_code))
+
+        pur_code <- pur_cd
+
+      }
+    }
 
       name <- strsplit(tolower(county_nm), " ")[[1]]
       name <- paste(toupper(substring(name, 1,1)), substring(name, 2),
                     sep = "", collapse = " ")
-    }
+
   }
 
   if (is.null(error)) {
-    if (return == "codes") {
-      return(code)
+    if (return == "pur_codes") {
+      return(pur_code)
     } else if (return == "names") {
       return(name)
+    } else if (return == "fips_codes") {
+      return(fips_code)
     }
   } else {
     return(NULL)
@@ -171,7 +209,7 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
   }
 
   all_cols <- c("chem_code", "chemname", "chemical_class", "kg_chm_used",
-                "section", "township", "county_name", "county_code",
+                "section", "township", "county_name", "pur_code", "fips_code",
                 "date", "aerial_ground", "use_no", "outlier")
 
   missing <- all_cols[!all_cols %in% colnames(df)]
@@ -182,10 +220,10 @@ help_sum_application <- function(df, sum, unit, aerial_ground,
   }
 
   df <- df %>%
-    dplyr::arrange(date, county_name, county_code, chemical_class, chemname,
+    dplyr::arrange(date, county_name, pur_code, fips_code, chemical_class, chemname,
                    chem_code, section, township) %>%
     dplyr::select(chem_code, chemname, chemical_class, kg_chm_used,
-                  section, township, county_name, county_code,
+                  section, township, county_name, pur_code, fips_code,
                   date, aerial_ground, use_no, outlier)
 
   cols_to_remove <- purrr::map_dfr(colnames(df), help_remove_cols, df = df) %>%

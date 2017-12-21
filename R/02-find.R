@@ -121,26 +121,30 @@ find_product_name <- function(year, products = "all", quiet = FALSE) {
 #' Given a vector of counties, \code{find_counties} returns either PUR
 #' county codes or names.
 #'
-#' @param counties A vector of character strings giving either a county names or
-#'  two digit PUR county codes. Not case sensitive. California names and county
-#'  codes as they appear in PUR datasets can be found in the \code{county_codes}
-#'  dataset available with this package.
-#' @param return Either "codes" to return county codes (the default) or "names"
-#'  to return county names.
+#' @param counties A vector of character strings giving either a county names,
+#'  two digit PUR county codes, or six-digit FIPS county codes. Not case
+#'  sensitive. California names and county codes as they appear in PUR datasets
+#'  can be found in the \code{county_codes} dataset available with this package.
+#' @param return Either "pur_codes" to return PUR county codes (the default),
+#'  "fips_codes" to return FIPS county codes, or "names" to return county names.
 #'
-#' @return If \code{return = "codes"}, a vector of two-character strings giving
-#'   the corresponding PUR county codes. If \code{return = "names"}, a vector
-#'   of county names.
+#' @return If \code{return = "pur_codes"}, a vector of two-character strings giving
+#'   the corresponding PUR county codes. If \code{return = "fips_codes"}, a vector
+#'   of six-digit character strings giving the corresponding FIPS county codes.
+#'   If \code{return = "names"}, a vector of county names.
 #'
 #' @examples
-#' find_counties(c("01", "03", "el dorado"))
+#' find_counties(c("01", "06005", "el dorado"))
 #' find_counties(c("contra costa", "45"))
 #'
-#' find_counties(c("01", "03", "el dorado"), return = "names")
+#' find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
+#' find_counties(c("contra costa", "45"), return = "fips_codes")
+#'
+#' find_counties(c("01", "06005", "el dorado"), return = "names")
 #' find_counties(c("contra costa", "45"), return = "names")
 #' @importFrom magrittr %>%
 #' @export
-find_counties <- function(counties, return = "codes") {
+find_counties <- function(counties, return = "pur_codes") {
 
   for (i in 1:length(counties)) {
 
@@ -175,8 +179,8 @@ find_counties <- function(counties, return = "codes") {
 #' PUR code.
 #'
 #' @inheritParams calculate_exposure
-#' @param return Either "name" to return county name (the default) or "code"
-#'   to return county code.
+#' @param return Either "name" to return county name (the default), "pur_code"
+#'   to return PUR county code, or "fips_code" to return the FIPS county code.
 #' @param latlon_out A numeric vector of two with longitude and latitude
 #'   values. If the \code{geocode} code has been run earlier and this output is
 #'   available, this saves a redundant request to the Google Maps API.

@@ -79,7 +79,8 @@ knitr::include_graphics("figures/section_townships.png")
 
 By default, the package works with all recorded active ingredients in the specified counties and date range. However, if you're interested in analyzing application of a specific active ingredient or chemical class of active ingredients, the `find_chemical_codes` function is useful as a starting point to see what active ingredients were present in applied pesticides in a given year. 
 
-For example, too see how active ingredients matching "methyl bromide" or "abietic" were recorded in the year 2000, we would run: 
+For example, too see how active ingredients matching "methyl bromide" or "abietic" were recorded in the year 2000, we can use the `find_chemical_codes` function, which pulls the PUR Chemical Lookup table for a particular year: 
+
 ```{r}
 find_chemical_codes(year = 2000, chemicals = c("methyl bromide", "abietic"))
 ```
@@ -92,7 +93,7 @@ find_chemical_codes(2000) %>% nrow
 
 3,637 unique active ingredients were present in applied pesticides in California in the year 2000. 
 
-The `find_chemical_codes` function works using `grep` to perform pattern matching. Therefore, it may not be effective in returning all active ingredients that should fall under your search term. To find an exhaustive list of all active ingredients that fall under a chemical class, you may find it useful to refer to the CA Department of Pesticide Regulation (DPR)'s [Summary of Pesticide Use Report Data, Indexed by Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf). Chemical classes available in the Summary include:
+The `find_chemical_codes` function works using `grep` to perform pattemrn matching. Therefore, it may not be effective in returning all active ingredients that should fall under your search term. To find an exhaustive list of all active ingredients that fall under a chemical class, you may find it useful to refer to the CA Department of Pesticide Regulation (DPR)'s [Summary of Pesticide Use Report Data, Indexed by Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf). Chemical classes available in the Summary include:
 
 - chemicals known to cause reproductive toxicity, 
 - chemicals known to cause cancer, 
