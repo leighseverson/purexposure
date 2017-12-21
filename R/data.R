@@ -1,21 +1,28 @@
 #' California Pesticide Use Report county codes.
 #'
-#' A data frame containing California county names and corresponding codes
-#' used to identify counties in California Pesticide Use Reports. This file,
-#' "county.txt", was pulled from the .zip file "pur2000.zip" found here:
-#' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+#' A data frame containing California county names and corresponding PUR and
+#' FIPS codes. PUR county codes are unique to PUR datasets, and FIPS county codes
+#' are U.S. Federal Information Processing Standard codes. The file with county
+#' names and PUR codes, "county.txt", was pulled from the .zip file
+#' "pur2000.zip" found here:
+#' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}. FIPS codes were
+#' pulled from here:
+#' \url{http://www2.census.gov/geo/docs/reference/cenpop2010/county/CenPop2010_Mean_CO.txt}
 #'
-#' @format A data frame with 58 rows and two columns:
+#' @format A data frame with 58 rows and three columns:
 #' \describe{
 #'   \item{county_name}{A character vector giving California county names.}
-#'   \item{county_code}{A character vector giving county codes (ranging from "01"
-#'   through "58") corresponding to each California county. Note: these codes
-#'   are unique to California PUR datasets; they do not correspond to FIPS
-#'   codes.}
+#'   \item{pur_code}{A character vector giving two-digit PUR county codes (ranging
+#'   from "01" through "58") corresponding to each California county. Note:
+#'   these codes are unique to California PUR datasets; they do not correspond
+#'   to FIPS codes.}
+#'   \item{fips_code}{A character vector giving six-digit FIPS county codes
+#'   corresponding to each California county.}
 #' }
 #'
 #' @source
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
+#' \url{http://www2.census.gov/geo/docs/reference/cenpop2010/county/CenPop2010_Mean_CO.txt}
 "county_codes"
 
 #' California Pesticide Use Report chemical codes.
