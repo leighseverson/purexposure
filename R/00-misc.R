@@ -36,7 +36,8 @@ df_plot <- function(df) {
   plot <- ggplot2::ggplot(data = df, ggplot2::aes(x = long, y = lat,
                                                   group = group)) +
     ggplot2::geom_polygon(color = "black", fill = NA) +
-    ggplot2::theme_void()
+    ggplot2::theme_void() +
+    ggplot2::coord_map()
 
   return(plot)
 
