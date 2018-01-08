@@ -469,7 +469,7 @@ knitr::include_graphics("figures/se_map4.png")
 
 The plots above visualize a single exposure value. When you specify in your call to `calculate_exposure` that you would like to calculate multiple exposure values for a single location (for example, in four-month increments over 2015), the `exposure` list element has three rows:  
 
-```{r eval = FALSE}
+```{r}
 sun_empire2$exposure
 ```
 

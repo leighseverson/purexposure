@@ -206,12 +206,12 @@ recorded in PUR data sets:
 
 ``` r
 purexposure::county_codes %>% slice(1:3)
-#> # A tibble: 3 x 2
-#>   county_name county_code
-#>         <chr>       <chr>
-#> 1     ALAMEDA          01
-#> 2      ALPINE          02
-#> 3      AMADOR          03
+#> # A tibble: 3 x 3
+#>   county_name pur_code fips_code
+#>         <chr>    <chr>     <chr>
+#> 1     ALAMEDA       01     06001
+#> 2      ALPINE       02     06003
+#> 3      AMADOR       03     06005
 ```
 
 The `find_location_county` function takes a California address or
@@ -791,6 +791,14 @@ rows:
 
 ``` r
 sun_empire2$exposure
+#> # A tibble: 3 x 9
+#>       exposure chemicals start_date   end_date aerial_ground
+#>          <dbl>     <chr>     <date>     <date>         <lgl>
+#> 1 1.909774e-03       all 2015-01-01 2015-04-30            NA
+#> 2 1.834621e-03       all 2015-05-01 2015-08-31            NA
+#> 3 7.241166e-05       all 2015-09-01 2015-12-31            NA
+#> # ... with 4 more variables: location <chr>, radius <dbl>,
+#> #   longitude <dbl>, latitude <dbl>
 ```
 
 In this case, separate list elements are returned from `plot_exposure`
