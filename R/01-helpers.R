@@ -683,7 +683,8 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
 
     plot <- section_data %>%
       ggplot2::ggplot() +
-      ggplot2::theme_void()
+      ggplot2::theme_void() +
+      ggplot2::coord_map()
 
     if (color_by == "amount") {
 

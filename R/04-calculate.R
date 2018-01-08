@@ -219,7 +219,8 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                           color = "grey", fill = NA) +
     ggplot2::geom_polygon(data = buffer_df, ggplot2::aes(x = long, y = lat),
                           color = "red", fill = NA) +
-    ggplot2::theme_void()
+    ggplot2::theme_void() +
+    ggplot2::coord_map()
 
   # find sections (and townships) w/in buffer
   which_pls <- df %>% dplyr::filter(long >= range$min_long &
