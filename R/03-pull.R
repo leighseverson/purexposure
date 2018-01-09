@@ -176,7 +176,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
 #'   \code{pull_clean_pur} from downloading the same data again.
 #'
-#' @return A data frame with 14 columns:
+#' @return A data frame:
 #'   \describe{
 #'     \item{chem_code}{An integer value giving the PUR chemical code
 #'     for the active ingredient applied. Not included if
@@ -215,14 +215,15 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     if \code{aerial_ground = FALSE}.}
 #'     \item{use_no}{A character string identifying unique application of an
 #'     active ingredient across years. This value is a combination of the raw PUR
-#'     \code{use_no} column and the year of application. Will have values of
-#'     \code{NA} if \code{sum_appliction = TRUE}.}
-#'     \item{outlier}{A logical value indicating whether the
-#'     amount listed in \code{kg_chm_used} has been corrected large amounts
-#'     entered in error. The algorithm for identifying and replacing outliers
-#'     was developed based on methods used by Gunier et al. (2001). Please see
-#'     the package vignette for more detail regarding these methods. Will have
-#'     values of \code{NA} if \code{sum_application = TRUE}.}
+#'     \code{use_no} column and the year of application. Not included if
+#'     \code{sum_appliction = TRUE}.}
+#'     \item{outlier}{If the amount listed in \code{kg_chm_used} has been
+#'     corrected for large amounts entered in error, this column lists the raw
+#'     value of recorded kilograms of applied chemicals. Otherwise \code{NA}. The
+#'     algorithm for identifying and replacing outliers was developed based on
+#'     methods used by Gunier et al. (2001). Please see the package vignette for
+#'     more detail regarding these methods. Not included if
+#'     \code{sum_application = TRUE}.}
 #'     \item{prodno}{Integer. The California Registration Number for the applied
 #'     pesticide (will be repeated for different active ingredients present in
 #'     the product). You can match product registration numbers with product
@@ -493,7 +494,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     dplyr::select(chem_code, year, calc_max) %>%
     dplyr::right_join(df, by = c("chem_code", "year")) %>%
     dplyr::mutate(outlier = ifelse((!is.na(calc_max) &
-                                      lbs_per_acre > calc_max), TRUE, FALSE),
+                                      lbs_per_acre > calc_max), lbs_chm_used, NA),
                   lbs_chm_used = ifelse(lbs_per_acre > calc_max,
                                         calc_max*acre_treated, lbs_chm_used)) %>%
     plyr::rename(c("county_cd" = "pur_code")) %>%
