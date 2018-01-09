@@ -272,8 +272,7 @@ head(fresno_classes, 3)
 unique(fresno_classes$chemical_class)
 ```
 
-
-By default, `pull_clean_pur` will print a downloading progress bar for each year of data that you are pulling. You can turn this off by setting the `download_progress` argument to `FALSE`. 
+By default, `pull_clean_pur` will print a downloading progress bar for each year of data that you are pulling. You can turn this off by setting the `quiet` argument to `TRUE`. 
 
 If you've already pulled data using `pull_raw_pur`, you can clean the data without having to pull it again by inputting the raw data frame to the `raw_pur_df` argument. In this case, the `years` and `counties` arguments should list years and counties present in the raw data frame. 
 
@@ -418,7 +417,7 @@ plot_sun_empire$maps
 knitr::include_graphics("figures/se_map1.png")
 ```
 
-Alternatively, pesticide application can be colored according to the percentile it falls into (`color_by = "percentile"`). The number of cut-points can be specified with the `percentile` argument. The default is `c(0.25, 0.5, 0.75)`: 
+Alternatively, pesticide application can be colored according to the percentile of county-level application it falls into (`color_by = "percentile"`). The number of cut-points can be specified with the `percentile` argument. The default is `c(0.25, 0.5, 0.75)`: 
 
 ```{r echo = 1, eval = FALSE}
 plot_exposure(sun_empire, color_by = "percentile")$maps

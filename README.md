@@ -116,7 +116,7 @@ of active ingredients, the `find_chemical_codes` function is useful as a
 starting point to see what active ingredients were present in applied
 pesticides in a given year.
 
-For example, too see how active ingredients matching “methyl bromide” or
+For example, to see how active ingredients matching “methyl bromide” or
 “abietic” were recorded in the year 2000, we would
 run:
 
@@ -191,9 +191,10 @@ The `prodno` column in the product table can be matched with the same
 column in a PUR data set.
 
 Counties are indicated in raw PUR data sets by `county_cd`: a two-digit
-integer code. While you can pull data for for counties with either their
-name or PUR code, the `find_counties` function could be useful to find
-the code or name associated with a county.
+integer code (this code is unrelated to FIPS codes). While you can pull
+data for for counties with either their name or PUR code, the
+`find_counties` function could be useful to find the PUR code or name
+associated with a county.
 
 ``` r
 find_counties(c("01", "02", "03"), return = "names")
@@ -201,8 +202,9 @@ find_counties(c("01", "02", "03"), return = "names")
 ```
 
 Additionally, the `county_codes` data set included with this package
-lists all 58 counties in California with names and codes as they are
-recorded in PUR data sets:
+lists all 58 counties in California with names and PUR codes as they are
+recorded in PUR data sets, as well as FIPS codes, which could be useful
+to link PUR data with other county-level data sets.
 
 ``` r
 purexposure::county_codes %>% slice(1:3)
@@ -223,8 +225,8 @@ find_location_county("12906 South Fowler Ave., Selma, CA 93662")
 #> [1] "Fresno"
 ```
 
-This function is useful later on if you want to pull PUR data to
-calculate exposure at a particular location.
+This function could be useful later on if you want to pull PUR data at
+the county level to calculate exposure at a particular location.
 
 ### 2\. `pull_*` functions: pull raw or cleaned PUR data sets
 
@@ -286,14 +288,14 @@ fresno_clean <- pull_clean_pur(2004, "fresno")
 
 ``` r
 head(fresno_clean, 2)
-#> # A tibble: 2 x 12
+#> # A tibble: 2 x 13
 #>   chem_code                        chemname kg_chm_used   section township
 #>       <int>                           <chr>       <dbl>     <chr>    <chr>
 #> 1      1855 GLYPHOSATE, ISOPROPYLAMINE SALT   0.6340852 M14S22E35  M14S22E
 #> 2       806       2,4-D, DIMETHYLAMINE SALT   1.0387572 M14S22E35  M14S22E
-#> # ... with 7 more variables: county_name <chr>, county_code <chr>,
-#> #   date <date>, aerial_ground <chr>, use_no <chr>, outlier <lgl>,
-#> #   prodno <int>
+#> # ... with 8 more variables: county_name <chr>, pur_code <chr>,
+#> #   fips_code <chr>, date <date>, aerial_ground <chr>, use_no <chr>,
+#> #   outlier <dbl>, prodno <int>
 ```
 
 Pesticide application is recorded by active ingredient (`chem_code` and
@@ -307,11 +309,14 @@ identifies pesticide product uses.
 
 **Outliers**
 
-The `outlier` column is a logical value indicating whether the record
-has been flagged as an outlier, in which case `kg_chm_used` has been
-replaced with a calculated maximum rate of application. The algorithm
-used to identify and correct erroneously high records of application was
-developed based on methods used by Gunier et al. (2001).
+The `outlier` column, in the case when the record has been flagged as an
+outlier and `kg_chm_used` has been replaced with a calculated maximum
+rate of application, lists the raw value of recorded kilograms of
+applied chemical. This column is only included in the data frame
+returned from `pull_clean_pur()` if `sum_application = FALSE`. The
+algorithm used to identify and correct economically unfeasible and
+therefore erroneously high records of application was developed based on
+methods used by Gunier et al. (2001).
 
 For each active ingredient and each year, a calculated maximum rate of
 application was calculated as mean pounds per acre plus two standard
@@ -324,10 +329,13 @@ multiplied by \(\scriptsize2.29568\times10^{-5}\) for `unit_treated ==
 If the pounds per acre applied on a particular day exceeded the
 calculated maximum rate of application for the relevant year and active
 ingredient, the recorded rate was replaced with the calculated maximum
-rate, and the `outlier` column was set to `TRUE`. This calculated
-maximum rate of pounds per acre was then converted back to pounds of
-chemical applied by multiplying the rate by the number of acres treated,
-before being converted to kilograms of chemical applied.
+rate. This calculated maximum rate of pounds per acre was then converted
+back to pounds of chemical applied by multiplying the rate by the number
+of acres treated, before being converted to kilograms of chemical
+applied. The `outlier` column lists the raw value of kilograms of
+chemical applied. If the pounds per acre applied on a particular day did
+not exceed the calculated maximum rate of application for the relevant
+year and active ingredient, the `outlier` column is set to `NA`.
 
 **Table format**
 
@@ -347,13 +355,13 @@ nevada_sulfur <- pull_clean_pur(years = 2000, counties = "nevada", chemicals = "
 
 ``` r
 head(nevada_sulfur, 2)
-#> # A tibble: 2 x 12
+#> # A tibble: 2 x 13
 #>   chem_code    chemname kg_chm_used   section township county_name
 #>       <int>       <chr>       <dbl>     <chr>    <chr>       <chr>
 #> 1       358 LIME-SULFUR    7.468505 M15N09E15  M15N09E      NEVADA
 #> 2       560      SULFUR    2.176259 M17N08E14  M17N08E      NEVADA
-#> # ... with 6 more variables: county_code <chr>, date <date>,
-#> #   aerial_ground <chr>, use_no <chr>, outlier <lgl>, prodno <int>
+#> # ... with 7 more variables: pur_code <chr>, fips_code <chr>, date <date>,
+#> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
 unique(nevada_sulfur$chemname)
 #> [1] "LIME-SULFUR" "SULFUR"
 ```
@@ -400,12 +408,13 @@ tulare <- pull_clean_pur(2010, "tulare",
 
 ``` r
 tulare %>% arrange(township) %>% slice(1:3)
-#> # A tibble: 3 x 6
-#>     chemname kg_chm_used township county_name county_code       date
-#>        <chr>       <dbl>    <chr>       <chr>       <chr>     <date>
-#> 1     DIURON    97.27877  M15S25E      TULARE          54 2010-01-02
-#> 2 GLYPHOSATE    47.32138  M15S25E      TULARE          54 2010-01-02
-#> 3   SIMAZINE   120.15397  M15S25E      TULARE          54 2010-01-02
+#> # A tibble: 3 x 7
+#>     chemname kg_chm_used township county_name pur_code fips_code
+#>        <chr>       <dbl>    <chr>       <chr>    <chr>     <chr>
+#> 1     DIURON    97.27877  M15S25E      TULARE       54     06107
+#> 2 GLYPHOSATE    47.32138  M15S25E      TULARE       54     06107
+#> 3   SIMAZINE   120.15397  M15S25E      TULARE       54     06107
+#> # ... with 1 more variables: date <date>
 ```
 
 There is one record per active ingredient per township per day.
@@ -457,13 +466,13 @@ fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE,
 
 ``` r
 head(fresno_classes, 3)
-#> # A tibble: 3 x 7
-#>   chemical_class kg_chm_used   section township county_name county_code
-#>            <chr>       <dbl>     <chr>    <chr>       <chr>       <chr>
-#> 1          other   215.69157 M12S13E27  M12S13E      FRESNO          10
-#> 2          other   197.21490 M12S13E28  M12S13E      FRESNO          10
-#> 3          other    15.03136 M15S23E14  M15S23E      FRESNO          10
-#> # ... with 1 more variables: date <date>
+#> # A tibble: 3 x 8
+#>   chemical_class kg_chm_used   section township county_name pur_code
+#>            <chr>       <dbl>     <chr>    <chr>       <chr>    <chr>
+#> 1          other   215.69157 M12S13E27  M12S13E      FRESNO       10
+#> 2          other   197.21490 M12S13E28  M12S13E      FRESNO       10
+#> 3          other    15.03136 M15S23E14  M15S23E      FRESNO       10
+#> # ... with 2 more variables: fips_code <chr>, date <date>
 ```
 
 ``` r
@@ -473,7 +482,7 @@ unique(fresno_classes$chemical_class)
 
 By default, `pull_clean_pur` will print a downloading progress bar for
 each year of data that you are pulling. You can turn this off by setting
-the `download_progress` argument to `FALSE`.
+the `quiet` argument to `TRUE`.
 
 If you’ve already pulled data using `pull_raw_pur`, you can clean the
 data without having to pull it again by inputting the raw data frame to
@@ -637,13 +646,13 @@ And the `clean_pur_df` element is the same data frame input to the
 
 ``` r
 sun_empire$clean_pur_df %>% head(2)
-#> # A tibble: 2 x 12
+#> # A tibble: 2 x 13
 #>   chem_code       chemname kg_chm_used   section township county_name
 #>       <int>          <chr>       <dbl>     <chr>    <chr>       <chr>
 #> 1      5014 IRON PHOSPHATE  0.57998930 M15S20E20  M15S20E      FRESNO
 #> 2      3983       SPINOSAD  0.05812017 M13S22E32  M13S22E      FRESNO
-#> # ... with 6 more variables: county_code <chr>, date <date>,
-#> #   aerial_ground <chr>, use_no <chr>, outlier <lgl>, prodno <int>
+#> # ... with 7 more variables: pur_code <chr>, fips_code <chr>, date <date>,
+#> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
 ```
 
 If we wanted to calculate exposure for the same location in four month
