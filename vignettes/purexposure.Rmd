@@ -243,7 +243,7 @@ There is one record per active ingredient per township per day. Alternatively, `
 ```{r}
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) %>%
-  plyr::rename(c("chemical" = "chemical_class"))
+  rename(chemical_class = chemical) 
 head(chemical_class_df, 2)
 tail(chemical_class_df, 2)
 ```

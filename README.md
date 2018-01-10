@@ -430,7 +430,7 @@ like this:
 ``` r
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
                            find_chemical_codes(2000, "aldehyde")) %>%
-  plyr::rename(c("chemical" = "chemical_class"))
+  rename(chemical_class = chemical) 
 head(chemical_class_df, 2)
 #> # A tibble: 2 x 3
 #>   chem_code                             chemname chemical_class
@@ -729,9 +729,9 @@ plot_sun_empire$maps
 <img src="vignettes/figures/se_map1.png" style="display: block; margin: auto;" />
 
 Alternatively, pesticide application can be colored according to the
-percentile it falls into (`color_by = "percentile"`). The number of
-cut-points can be specified with the `percentile` argument. The default
-is
+percentile of county-level application it falls into (`color_by =
+"percentile"`). The number of cut-points can be specified with the
+`percentile` argument. The default is
 `c(0.25, 0.5, 0.75)`:
 
 ``` r

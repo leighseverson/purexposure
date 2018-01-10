@@ -497,7 +497,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                                       lbs_per_acre > calc_max), lbs_chm_used, NA),
                   lbs_chm_used = ifelse(lbs_per_acre > calc_max,
                                         calc_max*acre_treated, lbs_chm_used)) %>%
-    plyr::rename(c("county_cd" = "pur_code")) %>%
+    dplyr::rename(pur_code = county_cd) %>%
     dplyr::ungroup()
 
   county <- purexposure::county_codes
@@ -509,10 +509,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     dplyr::select(chem_code, chemname, kg_chm_used, MTRS, MTR, county_name,
                   pur_code, fips_code, applic_dt, aer_gnd_ind, use_no, outlier,
                   prodno) %>%
-    plyr::rename(c("MTRS" = "section",
-                   "MTR" = "township",
-                   "applic_dt" = "date",
-                   "aer_gnd_ind" = "aerial_ground")) %>%
+    dplyr::rename(section = MTRS,
+                  township = MTR,
+                  date = applic_dt,
+                  aerial_ground = aer_gnd_ind) %>%
     dplyr::arrange(date, county_name)
 
   # missing section and township IDs

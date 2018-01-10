@@ -370,8 +370,8 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                    start_date, end_date, radius, buffer_area,
                    mtrs_mtr, section_township) {
 
-  # mutate_expr <- rlang::enquo(mtrs_mtr)
-  # rename_expr <- rlang::enquo(section_township)
+  mutate_expr <- rlang::enquo(mtrs_mtr)
+  rename_expr <- rlang::enquo(section_township)
 
   if ("chemical_class" %in% colnames(clean_pur_df)) {
 
@@ -384,29 +384,29 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                             chemicals = rep(classes, each = n_pls)) %>%
       dplyr::mutate(pls = as.character(pls))
 
-    if (section_township == "section") {
-      pur_out2 <- pur_out %>%
-        plyr::rename(c("section" = "pls"))
-    } else {
-      pur_out2 <- pur_out %>%
-        plyr::rename(c("township" = "pls"))
-    }
+    # if (section_township == "section") {
+    #   pur_out2 <- pur_out %>%
+    #     plyr::rename(c("section" = "pls"))
+    # } else {
+    #   pur_out2 <- pur_out %>%
+    #     plyr::rename(c("township" = "pls"))
+    # }
 
     pur_out2 <- pur_out2 %>% dplyr::mutate(chemicals = as.character(chemicals))
 
-    # pur_out2 <- pur_out %>%
-    #   dplyr::rename(pls := !!rename_expr,
-    #                 chemicals = chemical_class) %>%
-    #   dplyr::mutate(chemicals = as.character(chemicals))
+    pur_out2 <- pur_out %>%
+      dplyr::rename(pls := !!rename_expr,
+                    chemicals = chemical_class) %>%
+      dplyr::mutate(chemicals = as.character(chemicals))
 
-    if (mtrs_mtr == "MTRS") {
-      exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
-    } else {
-      exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
-    }
+    # if (mtrs_mtr == "MTRS") {
+    #   exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
+    # } else {
+    #   exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
+    # }
 
-    # exp_0 <- pls_percents %>%
-    #   dplyr::rename(pls := !!mutate_expr) %>%
+    exp_0 <- pls_percents %>%
+      dplyr::rename(pls := !!mutate_expr) %>%
 
     exp_0 <- exp_0 %>%
       dplyr::mutate(pls = as.character(pls)) %>%
@@ -429,25 +429,25 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                             chemicals = "all") %>%
       dplyr::mutate(pls = as.character(pls))
 
-    if (section_township == "section") {
-      pur_out2 <- pur_out %>%
-        plyr::rename(c("section" = "pls"))
-    } else {
-      pur_out2 <- pur_out %>%
-        plyr::rename(c("township" = "pls"))
-    }
+    # if (section_township == "section") {
+    #   pur_out2 <- pur_out %>%
+    #     plyr::rename(c("section" = "pls"))
+    # } else {
+    #   pur_out2 <- pur_out %>%
+    #     plyr::rename(c("township" = "pls"))
+    # }
 
-    # pur_out2 <- pur_out %>%
-    #   dplyr::rename(pls := !!rename_expr)
+    pur_out2 <- pur_out %>%
+      dplyr::rename(pls := !!rename_expr)
 
-    if (mtrs_mtr == "MTRS") {
-      exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
-    } else {
-      exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
-    }
+    # if (mtrs_mtr == "MTRS") {
+    #   exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
+    # } else {
+    #   exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
+    # }
 
-    # exp_0 <- pls_percents %>%
-    #   dplyr::rename(pls := !!mutate_expr) %>%
+    exp_0 <- pls_percents %>%
+      dplyr::rename(pls := !!mutate_expr) %>%
 
     exp_0 <- exp_0 %>%
       dplyr::mutate(pls = as.character(pls)) %>%
@@ -627,7 +627,7 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
     full_pls_df <- buffer_df %>%
       dplyr::right_join(full, by = "pls") %>%
       dplyr::select(long, lat, group, kg_intersection) %>%
-      plyr::rename(c("kg_intersection" = "kg")) %>%
+      dplyr::rename(kg = kg_intersection) %>%
       unique()
 
     partial <- dplyr::filter(data_pls, percent <= 0.999)
@@ -653,8 +653,7 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
         #   implicit list embedding of S4 objects is deprecated
 
         int_df <- as.data.frame(methods::as(intersection, "matrix")) %>%
-          plyr::rename(c("x" = "long",
-                          "y" = "lat")) %>%
+          dplyr::rename(long = x, lat = y) %>%
           dplyr::mutate(group = paste0("int", i),
                         kg = unique(df2$kg_intersection))
 
