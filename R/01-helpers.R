@@ -2,40 +2,100 @@
 help_pull_pur <- function(year, counties = "all", quiet = FALSE) {
 
   current_dir <- getwd()
-
   url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
                 year, ".zip")
   file <- paste0("pur", year, ".zip")
 
-  dir <- tempdir()
-  setwd(dir)
-
-  utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  utils::unzip(file, exdir = dir)
-
-  sm_year <- substr(year, 3, 4)
-
   if (!"all" %in% counties) {
-
     codes <- find_counties(counties)
+  } else {
+    sm_year <- substr(year, 3, 4)
+    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+    codes <- substr(files, 7, 8)
+  }
 
-    counties_in_year <- purrr::map_dfr(codes, help_read_in_counties, type = "codes",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
+  if (!exists("purexposure_package_env")) {
+
+    dir <- tempdir()
+    setwd(dir)
+    utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
+    utils::unzip(file, exdir = dir)
+
+    purexposure_package_env <<- new.env()
+    purexposure_package_env$pur_lst <- list()
+
+    if (!"all" %in% counties) {
+
+      for (i in 1:length(codes)) {
+        purexposure_package_env$pur_lst[[paste0(year, "_", codes[i])]] <-
+          help_read_in_counties(codes[i], type = "codes", year = year)
+      }
+
+    } else {
+
+      for (i in 1:length(files)) {
+        purexposure_package_env$pur_lst[[paste0(year, "_", codes[i])]] <-
+          help_read_in_counties(files[i], type = "files", year = year)
+      }
+    }
 
   } else {
 
-    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+    to_be_downloaded <- c()
+    to_be_downloaded_files <- c()
 
-    counties_in_year <- purrr::map_dfr(files, help_read_in_counties, type = "files",
-                                       year = year) %>%
-      dplyr::arrange(applic_dt, county_cd)
+    if (!"all" %in% counties) {
+
+      for (i in 1:length(codes)) {
+        if (is.null(purexposure_package_env$pur_lst[[paste0(year, "_", codes[i])]])) {
+          to_be_downloaded <- c(to_be_downloaded, codes[i])
+        }
+      }
+
+    } else {
+
+      for (i in 1:length(codes)) {
+        if (is.null(purexposure_package_env$pur_lst[[paste0(year, "_", codes[i])]])) {
+          to_be_downloaded <- c(to_be_downloaded, codes[i])
+          to_be_downloaded_files <- c(to_be_downloaded_files, files[i])
+        }
+      }
+    }
+
+    if (!is.null(to_be_downloaded)) {
+
+      dir <- tempdir()
+      setwd(dir)
+      utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
+      utils::unzip(file, exdir = dir)
+
+      for (i in 1:length(to_be_downloaded)) {
+
+        if (!"all" %in% counties) {
+          purexposure_package_env$pur_lst[[paste0(year, "_", to_be_downloaded[i])]] <-
+            help_read_in_counties(to_be_downloaded[i], type = "codes", year = year)
+        } else {
+          purexposure_package_env$pur_lst[[paste0(year, "_", to_be_downloaded[i])]] <-
+            help_read_in_counties(to_be_downloaded_files[i], type = "files", year = year)
+        }
+      }
+    }
+  }
+
+  for (i in 1:length(codes)) {
+
+    pur_data <- purexposure_package_env$pur_lst[[paste0(year, "_", codes[i])]]
+    if (i == 1) {
+      pur_data_out <- pur_data
+    } else {
+      pur_data_out <- rbind(pur_data_out, pur_data)
+    }
 
   }
 
   setwd(current_dir)
 
-  return(counties_in_year)
+  return(pur_data_out)
 
 }
 
@@ -82,7 +142,8 @@ help_read_in_counties <- function(code_or_file, type, year) {
     dplyr::mutate(applic_dt = lubridate::mdy(applic_dt)) %>%
     dplyr::filter(applic_dt >= date_min &
                     applic_dt <= date_max) %>%
-    dplyr::mutate(applic_dt = as.character(applic_dt))
+    dplyr::mutate(applic_dt = as.character(applic_dt)) %>%
+    dplyr::arrange(applic_dt)
 
   return(raw_data)
 
@@ -384,26 +445,12 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                             chemicals = rep(classes, each = n_pls)) %>%
       dplyr::mutate(pls = as.character(pls))
 
-    # if (section_township == "section") {
-    #   pur_out2 <- pur_out %>%
-    #     plyr::rename(c("section" = "pls"))
-    # } else {
-    #   pur_out2 <- pur_out %>%
-    #     plyr::rename(c("township" = "pls"))
-    # }
-
     pur_out2 <- pur_out2 %>% dplyr::mutate(chemicals = as.character(chemicals))
 
     pur_out2 <- pur_out %>%
       dplyr::rename(pls := !!rename_expr,
                     chemicals = chemical_class) %>%
       dplyr::mutate(chemicals = as.character(chemicals))
-
-    # if (mtrs_mtr == "MTRS") {
-    #   exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
-    # } else {
-    #   exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
-    # }
 
     exp_0 <- pls_percents %>%
       dplyr::rename(pls := !!mutate_expr) %>%
@@ -429,22 +476,8 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                             chemicals = "all") %>%
       dplyr::mutate(pls = as.character(pls))
 
-    # if (section_township == "section") {
-    #   pur_out2 <- pur_out %>%
-    #     plyr::rename(c("section" = "pls"))
-    # } else {
-    #   pur_out2 <- pur_out %>%
-    #     plyr::rename(c("township" = "pls"))
-    # }
-
     pur_out2 <- pur_out %>%
       dplyr::rename(pls := !!rename_expr)
-
-    # if (mtrs_mtr == "MTRS") {
-    #   exp_0 <- pls_percents %>% plyr::rename(c("MTRS" = "pls"))
-    # } else {
-    #   exp_0 <- pls_percents %>% plyr::rename(c("MTR" = "pls"))
-    # }
 
     exp_0 <- pls_percents %>%
       dplyr::rename(pls := !!mutate_expr) %>%
