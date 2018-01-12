@@ -739,7 +739,11 @@ pull_spdf <- function(county, section_township = "section",
 #' This function pulls a California Department of Pesticide Regulation Product
 #' Table for a particular year.
 #'
-#' @param year A four digit year in the range of 1990 to 2015.
+#' Product tables are pulled by year from the CDPR's FTP server. Downloaded
+#' tables are saved in a temporary environment, which is deleted at the end of
+#' the current R session.
+#'
+#' @param years A vector of four digit years in the range of 1990 to 2015.
 #' @param quiet TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for the product table that is downloaded.
 #'   The default value is FALSE.
@@ -780,30 +784,92 @@ pull_spdf <- function(county, section_township = "section",
 #' }
 #' @importFrom magrittr %>%
 #' @export
-pull_product_table <- function(year, quiet = FALSE) {
+pull_product_table <- function(years, quiet = FALSE) {
 
-  url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
-                year, ".zip")
-  file <- paste0("pur", year, ".zip")
   current_dir <- getwd()
-  dir <- tempdir()
 
-  setwd(dir)
-  utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
-  utils::unzip(file, exdir = dir)
+  if (!exists("purexposure_package_env")) {
 
-  suppressWarnings(suppressMessages(
-    product_file <- readr::read_csv("product.txt") %>%
-      dplyr::select(prodno, prodstat_ind, product_name, signlwrd_ind) %>%
-      dplyr::mutate(prodno = as.integer(prodno),
-                    prodstat_ind = as.character(prodstat_ind),
-                    product_name = as.character(product_name),
-                    signlwrd_ind = as.integer(signlwrd_ind),
-                    year = as.integer(year))
-  ))
+    dir <- tempdir()
+    setwd(dir)
+
+    purexposure_package_env <<- new.env()
+    purexposure_package_env$pur_lst <- list()
+
+    for (i in 1:length(years)) {
+
+      url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                    years[i], ".zip")
+      file <- paste0("pur", years[i], ".zip")
+
+      utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
+      utils::unzip(file, exdir = dir)
+
+      suppressWarnings(suppressMessages(
+        purexposure_package_env$pur_lst[[as.character(years[i])]] <-
+          readr::read_csv("product.txt") %>%
+          dplyr::select(prodno, prodstat_ind, product_name, signlwrd_ind) %>%
+          dplyr::mutate(prodno = as.integer(prodno),
+                        prodstat_ind = as.character(prodstat_ind),
+                        product_name = as.character(product_name),
+                        signlwrd_ind = as.integer(signlwrd_ind),
+                        year = as.integer(years[i]))
+      ))
+    }
+
+  } else {
+
+    to_be_downloaded <- c()
+
+    for (i in 1:length(years)) {
+      if (is.null(purexposure_package_env$pur_lst[[as.character(years[i])]])) {
+        to_be_downloaded <- c(to_be_downloaded, years[i])
+      }
+    }
+
+    if (!is.null(to_be_downloaded)) {
+
+      dir <- tempdir()
+      setwd(dir)
+
+      for (i in 1:length(to_be_downloaded)) {
+
+        url <- paste0("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/pur",
+                      to_be_downloaded[i], ".zip")
+        file <- paste0("pur", to_be_downloaded[i], ".zip")
+
+        utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
+        utils::unzip(file, exdir = dir)
+
+        suppressWarnings(suppressMessages(
+          purexposure_package_env$pur_lst[[as.character(to_be_downloaded[i])]] <-
+            readr::read_csv("product.txt") %>%
+            dplyr::select(prodno, prodstat_ind, product_name, signlwrd_ind) %>%
+            dplyr::mutate(prodno = as.integer(prodno),
+                          prodstat_ind = as.character(prodstat_ind),
+                          product_name = as.character(product_name),
+                          signlwrd_ind = as.integer(signlwrd_ind),
+                          year = as.integer(to_be_downloaded[i]))
+        ))
+      }
+
+    }
+
+  }
+
+  for (i in 1:length(years)) {
+
+    product_file <- purexposure_package_env$pur_lst[[as.character(years[i])]]
+
+    if (i == 1) {
+      product_file_out <- product_file
+    } else {
+      product_file_out <- rbind(product_file_out, product_file)
+    }
+  }
 
   setwd(current_dir)
 
-  return(product_file)
+  return(product_file_out)
 
 }

@@ -8,8 +8,8 @@
 #' Indexed by Chemical (2008):
 #' \url{http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf}
 #'
-#' @param year A four-digit numeric year in the range of 1990 to 2015. Indicates
-#'   the year in which you would like to match chemical codes.
+#' @param years A vector of four-digit numeric years in the range of 1990 to
+#'   2015. Indicates the years in which you would like to match chemical codes.
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied
 #'   in the given year. The default value is "all", which returns codes for all
@@ -37,10 +37,17 @@
 #' find_chemical_codes(1995, c("ammonia", "benzene"))
 #' @importFrom magrittr %>%
 #' @export
-find_chemical_codes <- function(year, chemicals = "all") {
+find_chemical_codes <- function(years, chemicals = "all") {
 
   df <- purexposure::chemical_list
-  df <- df[[as.character(year)]]
+
+  df <- df[names(df) %in% years]
+
+  for (i in 1:length(years)) {
+    df[[i]] <- df[[i]] %>% dplyr::mutate(year = years[i])
+  }
+
+  df <- do.call("rbind", df)
 
   out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
     unique()
@@ -49,12 +56,16 @@ find_chemical_codes <- function(year, chemicals = "all") {
 
 }
 
-#' Find Pesticide Product names and registration numbers from PUR Product Lookup
+#' Find pesticide product names and registration numbers from PUR Product Lookup
 #' Tables.
 #'
-#' For a year and vector of product search terms, \code{find_product_name} returns
-#' a data frame with corresponding product registration numbers, \code{prodno},
-#' indicator codes, and product names.
+#' For a vector of years and product search terms, \code{find_product_name}
+#' returns a data frame with corresponding product registration numbers,
+#' \code{prodno}, indicator codes, and product names.
+#'
+#' Product tables are pulled by year from the CDPR's FTP server. Downloaded
+#' tables are saved in a temporary environment, which is deleted at the end of
+#' the current R session.
 #'
 #' @param products A character string or a vector of character strings with
 #'   pesticide product names that you would like to search for. Not case
@@ -62,7 +73,7 @@ find_chemical_codes <- function(year, chemicals = "all") {
 #'   applied for a given year.
 #' @inheritParams pull_product_table
 #'
-#' @return A data frame with six columns:
+#' @return A data frame with seven columns:
 #' \describe{
 #'   \item{prodno}{The CA registration number. Can be matched with the
 #'   \code{prodno} in a raw or cleaned PUR dataset.}
@@ -97,9 +108,9 @@ find_chemical_codes <- function(year, chemicals = "all") {
 #' prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 #' }
 #' @export
-find_product_name <- function(year, products = "all", quiet = FALSE) {
+find_product_name <- function(years, products = "all", quiet = FALSE) {
 
-  prod_df <- pull_product_table(year, quiet = quiet)
+  prod_df <- pull_product_table(years, quiet = quiet)
 
   for (i in 1:length(products)) {
     df <- help_find_product(products[i], prod_df)
@@ -178,12 +189,16 @@ find_counties <- function(counties, return = "pur_codes") {
 #' \code{find_location_county} returns the corresponding California county or
 #' PUR code.
 #'
-#' @inheritParams calculate_exposure
+#' @param locations A vector of character strings. Each location should be
+#'   either a California address including street name, city, state, and
+#'   5-digit zip code, or a pair of coordinates in the form "longitude,
+#'   latitude".
 #' @param return Either "name" to return county name (the default), "pur_code"
 #'   to return PUR county code, or "fips_code" to return the FIPS county code.
 #' @param latlon_out A numeric vector of two with longitude and latitude
 #'   values. If the \code{geocode} code has been run earlier and this output is
-#'   available, this saves a redundant request to the Google Maps API.
+#'   available, this saves a redundant request to the Google Maps API. (This
+#'   argument is used internally.)
 #'
 #' @return A character string giving the California county where the address or
 #' coordinate pair given in \code{location} is located.
@@ -191,58 +206,15 @@ find_counties <- function(counties, return = "pur_codes") {
 #' @examples
 #' \dontrun{
 #' address <- "13883 Lassen Ave, Helm, CA 93627"
-#' find_location_county(location = address)
-#'
 #' long_lat <- c("-120.09789, 36.53379")
-#' find_location_county(location = long_lat)
+#' find_location_county(c(address, long_lat))
 #' }
 #' @export
-find_location_county <- function(location, return = "name",
+find_location_county <- function(locations, return = "name",
                                  latlon_out = NULL) {
 
-  if (is.null(latlon_out)) {
-    if (length(grep("-", location)) == 1) {
-      latlon <- location
-      latlon_vec <- as.numeric(as.vector(sapply(unlist(strsplit(latlon, ",")),
-                                                stringr::str_trim)))
-      address_x <- latlon_vec[1]
-      address_y <- latlon_vec[2]
-      latlon_out <- latlon_vec
-    } else {
-      address <- location
-      suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
-      address_x <- latlon_df$lon
-      address_y <- latlon_df$lat
-      latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
-    }
-  } else {
-    latlon_out <- latlon_out
-  }
-
-  counties <- maps::map("county", fill = TRUE, col = "transparent", plot = FALSE)
-  ids <- sapply(strsplit(counties$names, ":"), function(x) x[1])
-  counties_sp <- maptools::map2SpatialPolygons(counties, IDs = ids,
-                                               proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
-
-  points_sp <- sp::SpatialPoints(data.frame(x = latlon_out[1],
-                                            y = latlon_out[2]),
-                                 proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
-
-  index <- sp::over(points_sp, counties_sp)
-
-  county_names <- sapply(counties_sp@polygons, function(x) x@ID)
-  county_name <- county_names[index]
-
-  county_name <- strsplit(county_name, ",")[[1]][2]
-
-  find_counties_safe <- purrr::safely(find_counties)
-  return <- paste0(return, "s")
-  name_clean <- find_counties_safe(county_name, return = return)
-
-  if (!is.null(name_clean$error)) {
-    stop(paste0("Couldn't find ", "\"", location,  "\"", " in California."))
-  }
-
-  return(name_clean$result)
+  out <- purrr::map_dfr(locations, help_find_location_county, return = return,
+                        latlon_out = latlon_out)
+  return(out)
 
 }

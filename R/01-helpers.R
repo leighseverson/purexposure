@@ -1097,3 +1097,55 @@ help_calc_distance <- function(long, lat, origin_long, origin_lat) {
   return(out)
 
 }
+
+help_find_location_county <- function(location, return = "name",
+                                      latlon_out = NULL) {
+
+  if (is.null(latlon_out)) {
+    if (length(grep("-", location)) == 1) {
+      latlon <- location
+      latlon_vec <- as.numeric(as.vector(sapply(unlist(strsplit(latlon, ",")),
+                                                stringr::str_trim)))
+      address_x <- latlon_vec[1]
+      address_y <- latlon_vec[2]
+      latlon_out <- latlon_vec
+    } else {
+      address <- location
+      suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
+      address_x <- latlon_df$lon
+      address_y <- latlon_df$lat
+      latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
+    }
+  } else {
+    latlon_out <- latlon_out
+  }
+
+  counties <- maps::map("county", fill = TRUE, col = "transparent", plot = FALSE)
+  ids <- sapply(strsplit(counties$names, ":"), function(x) x[1])
+  counties_sp <- maptools::map2SpatialPolygons(counties, IDs = ids,
+                                               proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
+
+  points_sp <- sp::SpatialPoints(data.frame(x = latlon_out[1],
+                                            y = latlon_out[2]),
+                                 proj4string = sp::CRS("+proj=longlat +datum=WGS84"))
+
+  index <- sp::over(points_sp, counties_sp)
+
+  county_names <- sapply(counties_sp@polygons, function(x) x@ID)
+  county_name <- county_names[index]
+
+  county_name <- strsplit(county_name, ",")[[1]][2]
+
+  find_counties_safe <- purrr::safely(find_counties)
+  return <- paste0(return, "s")
+  name_clean <- find_counties_safe(county_name, return = return)
+
+  if (!is.null(name_clean$error)) {
+    name_clean$result <- paste0("Error: Couldn't find ", "\"", location,  "\"",
+                                " in California.")
+  }
+
+  out_df <- data.frame(location = location, county = name_clean$result)
+  return(out_df)
+
+}

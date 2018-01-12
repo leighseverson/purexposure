@@ -4,10 +4,10 @@
 \alias{pull_product_table}
 \title{Pull PUR Product Table.}
 \usage{
-pull_product_table(year, quiet = FALSE)
+pull_product_table(years, quiet = FALSE)
 }
 \arguments{
-\item{year}{A four digit year in the range of 1990 to 2015.}
+\item{years}{A vector of four digit years in the range of 1990 to 2015.}
 
 \item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the product table that is downloaded.
@@ -47,6 +47,11 @@ pulled.}
 \description{
 This function pulls a California Department of Pesticide Regulation Product
 Table for a particular year.
+}
+\details{
+Product tables are pulled by year from the CDPR's FTP server. This function
+saves downloaded tables in a temporary environment, which is deleted at the
+end of the current R session.
 }
 \examples{
 \dontrun{

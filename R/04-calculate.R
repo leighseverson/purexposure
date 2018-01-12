@@ -179,7 +179,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   }
 
   # pull county shapefile
-  county <- find_location_county(location, return = "name", latlon_out)
+  county <- find_location_county(location, return = "name", latlon_out)$county
   check <- toupper(county) %in% clean_pur_df$county_name
   if (!check) {
     stop(paste0("\"", location,  "\"", " is located in ", county, " county. ",

@@ -8,8 +8,6 @@ Tables.}
 find_product_name(year, products = "all", quiet = FALSE)
 }
 \arguments{
-\item{year}{A four digit year in the range of 1990 to 2015.}
-
 \item{products}{A character string or a vector of character strings with
 pesticide product names that you would like to search for. Not case
 sensitive. The default is "all", which will return all pesticide products
