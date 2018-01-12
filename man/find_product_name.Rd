@@ -2,12 +2,14 @@
 % Please edit documentation in R/02-find.R
 \name{find_product_name}
 \alias{find_product_name}
-\title{Find Pesticide Product names and registration numbers from PUR Product Lookup
+\title{Find pesticide product names and registration numbers from PUR Product Lookup
 Tables.}
 \usage{
-find_product_name(year, products = "all", quiet = FALSE)
+find_product_name(years, products = "all", quiet = FALSE)
 }
 \arguments{
+\item{years}{A vector of four digit years in the range of 1990 to 2015.}
+
 \item{products}{A character string or a vector of character strings with
 pesticide product names that you would like to search for. Not case
 sensitive. The default is "all", which will return all pesticide products
@@ -18,7 +20,7 @@ message and progress bar printed for the product table that is downloaded.
 The default value is FALSE.}
 }
 \value{
-A data frame with six columns:
+A data frame with seven columns:
 \describe{
   \item{prodno}{The CA registration number. Can be matched with the
   \code{prodno} in a raw or cleaned PUR dataset.}
@@ -48,9 +50,14 @@ product label:
 }
 }
 \description{
-For a year and vector of product search terms, \code{find_product_name} returns
-a data frame with corresponding product registration numbers, \code{prodno},
-indicator codes, and product names.
+For a vector of years and product search terms, \code{find_product_name}
+returns a data frame with corresponding product registration numbers,
+\code{prodno}, indicator codes, and product names.
+}
+\details{
+Product tables are pulled by year from the CDPR's FTP server. Downloaded
+tables are saved in a temporary environment, which is deleted at the end of
+the current R session.
 }
 \examples{
 \dontrun{

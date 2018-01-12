@@ -4,19 +4,21 @@
 \alias{find_location_county}
 \title{Find the county from an address or coordinate pair.}
 \usage{
-find_location_county(location, return = "name", latlon_out = NULL)
+find_location_county(locations, return = "name", latlon_out = NULL)
 }
 \arguments{
-\item{location}{A length-one character string. Either a California address
-including street name, city, state, and 5-digit zip code, or a pair of
-coordinates in the form "longitude, latitude".}
+\item{locations}{A vector of character strings. Each location should be
+either a California address including street name, city, state, and
+5-digit zip code, or a pair of coordinates in the form "longitude,
+latitude".}
 
 \item{return}{Either "name" to return county name (the default), "pur_code"
 to return PUR county code, or "fips_code" to return the FIPS county code.}
 
 \item{latlon_out}{A numeric vector of two with longitude and latitude
 values. If the \code{geocode} code has been run earlier and this output is
-available, this saves a redundant request to the Google Maps API.}
+available, this saves a redundant request to the Google Maps API. (This
+argument is used internally.)}
 }
 \value{
 A character string giving the California county where the address or
@@ -30,9 +32,7 @@ PUR code.
 \examples{
 \dontrun{
 address <- "13883 Lassen Ave, Helm, CA 93627"
-find_location_county(location = address)
-
 long_lat <- c("-120.09789, 36.53379")
-find_location_county(location = long_lat)
+find_location_county(c(address, long_lat))
 }
 }

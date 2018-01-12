@@ -49,9 +49,9 @@ This function pulls a California Department of Pesticide Regulation Product
 Table for a particular year.
 }
 \details{
-Product tables are pulled by year from the CDPR's FTP server. This function
-saves downloaded tables in a temporary environment, which is deleted at the
-end of the current R session.
+Product tables are pulled by year from the CDPR's FTP server. Downloaded
+tables are saved in a temporary environment, which is deleted at the end of
+the current R session.
 }
 \examples{
 \dontrun{

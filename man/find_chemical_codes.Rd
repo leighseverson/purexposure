@@ -4,11 +4,11 @@
 \alias{find_chemical_codes}
 \title{Pull active ingredient chemical codes from PUR Chemical Lookup Tables.}
 \usage{
-find_chemical_codes(year, chemicals = "all")
+find_chemical_codes(years, chemicals = "all")
 }
 \arguments{
-\item{year}{A four-digit numeric year in the range of 1990 to 2015. Indicates
-the year in which you would like to match chemical codes.}
+\item{years}{A vector of four-digit numeric years in the range of 1990 to
+2015. Indicates the years in which you would like to match chemical codes.}
 
 \item{chemicals}{A string or vector of strings giving search terms of
 chemicals to match with active ingredients present in pesticides applied
