@@ -27,7 +27,8 @@
 #'     \item{chemname}{A character string giving unique active ingredients
 #'     corresponding to each search term.}
 #'     \item{chemical}{A character string with search terms given in the
-#'     \code{chemicals} argument.}
+#'     \code{chemicals} argument. Not included if the `chemicals` argument is
+#'     set to its default value of "all".}
 #'     \item{year}{Included if `by_year` is set to `TRUE`.}
 #' }
 #'
@@ -54,9 +55,15 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 
   df <- do.call("rbind", df)
 
-  out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
-    unique() %>%
-    dplyr::select(chem_code, chemname, chemical, year)
+  if (chemicals != "all") {
+    out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
+      unique() %>%
+      dplyr::select(chem_code, chemname, chemical, year)
+  } else {
+    out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
+      unique() %>%
+      dplyr::select(chem_code, chemname, year)
+  }
 
   if (!by_year) {
     out <- out %>% dplyr::select(-year) %>% unique()
