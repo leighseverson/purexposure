@@ -29,7 +29,8 @@ A data frame:
     \item{chemname}{A character string giving unique active ingredients
     corresponding to each search term.}
     \item{chemical}{A character string with search terms given in the
-    \code{chemicals} argument.}
+    \code{chemicals} argument. Not included if the `chemicals` argument is
+    set to its default value of "all".}
     \item{year}{Included if `by_year` is set to `TRUE`.}
 }
 }

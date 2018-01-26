@@ -5,7 +5,7 @@
 \title{Find pesticide product names and registration numbers from PUR Product Lookup
 Tables.}
 \usage{
-find_product_name(years, products = "all", quiet = FALSE)
+find_product_name(years, products = "all", quiet = FALSE, by_year = FALSE)
 }
 \arguments{
 \item{years}{A vector of four digit years in the range of 1990 to 2015.}
@@ -18,6 +18,11 @@ applied for a given year.}
 \item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the product table that is downloaded.
 The default value is FALSE.}
+
+\item{by_year}{TRUE / FALSE for whether you would like PUR Product Lookup
+Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
+default, a data frame is returned with unique results from all years given
+in the `years` argument.}
 }
 \value{
 A data frame with seven columns:
@@ -45,8 +50,9 @@ product label:
   \item 3 = Warning
   \item 4 = Caution
   \item 5 = None}}
-  \item{year}{The year for which product table information was pulled.}
   \item{product}{Product name search terms.}
+  \item{year}{The year for which product table information was pulled.
+  Included if `by_year` is set to TRUE.}
 }
 }
 \description{

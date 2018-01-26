@@ -55,7 +55,7 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 
   df <- do.call("rbind", df)
 
-  if (chemicals != "all") {
+  if (!"all" %in% chemicals) {
     out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
       unique() %>%
       dplyr::select(chem_code, chemname, chemical, year)
@@ -89,6 +89,10 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #'   sensitive. The default is "all", which will return all pesticide products
 #'   applied for a given year.
 #' @inheritParams pull_product_table
+#' @param by_year TRUE / FALSE for whether you would like PUR Product Lookup
+#'   Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
+#'   default, a data frame is returned with unique results from all years given
+#'   in the `years` argument.
 #'
 #' @return A data frame with seven columns:
 #' \describe{
@@ -115,8 +119,9 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #'   \item 3 = Warning
 #'   \item 4 = Caution
 #'   \item 5 = None}}
-#'   \item{year}{The year for which product table information was pulled.}
 #'   \item{product}{Product name search terms.}
+#'   \item{year}{The year for which product table information was pulled.
+#'   Included if `by_year` is set to TRUE.}
 #' }
 #'
 #' @examples
@@ -125,7 +130,8 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #' prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 #' }
 #' @export
-find_product_name <- function(years, products = "all", quiet = FALSE) {
+find_product_name <- function(years, products = "all", quiet = FALSE,
+                              by_year = FALSE) {
 
   prod_df <- pull_product_table(years, quiet = quiet)
 
@@ -138,7 +144,11 @@ find_product_name <- function(years, products = "all", quiet = FALSE) {
     }
   }
 
-  out <- unique(out)
+  out <- unique(out) %>% dplyr::select(1:4, product, year)
+
+  if (!by_year) {
+    out <- out %>% dplyr::select(-year) %>% unique()
+  }
 
   return(out)
 
