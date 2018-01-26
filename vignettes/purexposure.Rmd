@@ -46,7 +46,6 @@ Many examples in this vignette also use functions from the `dplyr` package:
 library(dplyr)
 ```
 
-
 ## Overview of PUR datasets 
 
 ### Units of application 
@@ -77,7 +76,7 @@ knitr::include_graphics("figures/section_townships.png")
 
 ### 1. `find_*` functions: search for active ingredients, product names, and counties 
 
-By default, the package works with all recorded active ingredients in the specified counties and date range. However, if you're interested in analyzing application of a specific active ingredient or chemical class of active ingredients, the `find_chemical_codes` function is useful as a starting point to see what active ingredients were present in applied pesticides in a given year. 
+By default, the package works with all recorded active ingredients in the specified counties and date range. However, if you're interested in analyzing application of a specific active ingredient or chemical class of active ingredients, the `find_chemical_codes` function is useful as a starting point to see what active ingredients were present in applied pesticides in a given year or years. 
 
 For example, to see how active ingredients matching "methyl bromide" or "abietic" were recorded in the year 2000, we can use the `find_chemical_codes` function, which pulls the PUR Chemical Lookup table for a particular year: 
 
@@ -85,15 +84,31 @@ For example, to see how active ingredients matching "methyl bromide" or "abietic
 find_chemical_codes(year = 2000, chemicals = c("methyl bromide", "abietic"))
 ```
 
-The `chem_code` column gives the PUR chemical code for the active ingredient, and `chemname` gives the PUR chemical name. `chemical` gives the search terms input in the `chemicals` argument. This function can also be useful to find the number of unique active ingredients that were recorded in applied pesticides in a given year: 
+The `chem_code` column gives the PUR chemical code for the active ingredient, and `chemname` gives the PUR chemical name. `chemical` gives the search terms input in the `chemicals` argument. This function can also be useful to find the number of unique active ingredients that were recorded in applied pesticides in a given year or years: 
 
 ```{r}
 find_chemical_codes(2000) %>% nrow
 ```
 
-3,637 unique active ingredients were present in applied pesticides in California in the year 2000. 
+3,637 unique active ingredients were present in applied pesticides in California in the year 2000. If you're interested in separating applied chemicals by year, you can set the `by_year` argument to `TRUE`: 
 
-The `find_chemical_codes` function works using `grep` to perform pattemrn matching. Therefore, it may not be effective in returning all active ingredients that should fall under your search term. To find an exhaustive list of all active ingredients that fall under a chemical class, you may find it useful to refer to the CA Department of Pesticide Regulation (DPR)'s [Summary of Pesticide Use Report Data, Indexed by Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf). Chemical classes available in the Summary include:
+```{r}
+find_chemical_codes(c(2000, 2001), chemicals = "methyl bromide", by_year = TRUE) 
+```
+
+This often results in identical search results for multiple years. However, occationally the chemicals present in PUR datasets differs from year to year. For example, the active ingredient imazosulfuron was not applied in 2006, but was applied in 2007: 
+
+```{r}
+find_chemical_codes(c(2006, 2007), chemicals = "imazosulfuron", by_year = TRUE)
+```
+
+If the `by_year` argument is left to its default value of `FALSE`, unique active ingredients applied across multiple years are returned: 
+
+```{r}
+find_chemical_codes(c(2006, 2007), chemicals = c("methyl bromide", "imazosulfuron"))
+```
+
+The `find_chemical_codes` function works using `grep` to perform pattern matching. Therefore, it may not be effective in returning all active ingredients that should fall under your search term. To find an exhaustive list of all active ingredients that fall under a chemical class, you may find it useful to refer to the CA Department of Pesticide Regulation (DPR)'s [Summary of Pesticide Use Report Data, Indexed by Chemical (2008)](http://www.cdpr.ca.gov/docs/pur/pur08rep/chmrpt08.pdf). Chemical classes available in the Summary include:
 
 - chemicals known to cause reproductive toxicity, 
 - chemicals known to cause cancer, 
@@ -104,9 +119,9 @@ The `find_chemical_codes` function works using `grep` to perform pattemrn matchi
 - oil pesticides, and 
 - biopesticides. 
 
-You can use active ingredients listed under the relevant class to include in the `chemicals` argument of `find_chemical_codes` to find if those active ingredients were present in applied pesticides in a given year.
+You can use active ingredients listed under the relevant class to include in the `chemicals` argument of `find_chemical_codes` to find if those active ingredients were present in applied pesticides in a given year or years.
 
-The `find_product_name` works similarly: you can use it to download a product table and search for applied pesticide products for a given year: 
+The `find_product_name` works similarly: you can use it to download a product table and search for applied pesticide products for a given year or years: 
 
 ```{r eval = FALSE, echo = 1}
 product_table <- find_product_name(2015, "insecticide")
@@ -121,13 +136,15 @@ head(product_table, 3)
 
 The `prodno` column in the product table can be matched with the same column in a PUR data set. 
 
-Counties are indicated in raw PUR data sets by `county_cd`: a two-digit integer code. While you can pull data for for counties with either their name or PUR code, the `find_counties` function could be useful to find the code or name associated with a county. 
+The `find_product_name` uses the `pull_product_table` function internally, which saves downloaded tables within the current R session to prevent downloading the same table multiple times. Cacheing in other `pull` functions is discussed further below. This function also has a `by_year` argument, which should be set to `TRUE` if you would like to pull product names for multiple years and separate results by year. Otherwise, if `by_year` is left as its default value of `FALSE`, unique results across years are returned.
+
+Counties are indicated in raw PUR data sets by `county_cd`: a two-digit integer code. You can pull data for for counties with either their name, PUR code or FIPS code. You can use the `find_counties` function to move between county names (`return = "names"`), PUR codes (`return = "pur_codes"`), and FIPS codes (`return = "fips_codes"`). For example: 
 
 ```{r}
-find_counties(c("01", "02", "03"), return = "names")
+find_counties(c("Alameda", "Alpine", "Amador"), return = "fips_codes")
 ```
 
-Additionally, the `county_codes` data set included with this package lists all 58 counties in California with names and PUR codes as they are recorded in PUR data sets, as well as FIPS codes, which could be useful to link PUR data with other county-level data sets. 
+Additionally, the `county_codes` data set included with this package lists all 58 counties in California with county names and PUR codes as they are recorded in PUR data sets, as well as FIPS codes, which could be useful to link PUR data with other county-level data sets. 
 
 ```{r}
 purexposure::county_codes %>% slice(1:3)
@@ -142,8 +159,7 @@ find_location_county("12906 South Fowler Ave., Selma, CA 93662")
 "Fresno"
 ```
 
-
-This function is useful later on if you want to pull PUR data to calculate exposure at a particular location. 
+This function is useful later on if you want to pull PUR data to calculate exposure at a particular location. You can choose to return a county `name` (the default), `pur_code`, or `fips_code` with the `return` argument. 
 
 ### 2. `pull_*` functions: pull raw or cleaned PUR data sets
 
@@ -168,7 +184,7 @@ Raw data pulled using `pull_raw_pur` may differ from data sets downloaded manual
 1. Number of columns: The data pulled using `pull_raw_pur` always has 33 columns. The data sets for some years and counties included columns called `error_flag` and `comtrs`. Since these variables are inconsistently present and are not documented in the User Guide & Documentation manual, they were removed. 
 2. Order of rows: Data sets pulled using this package are arranged by `applic_dt` (application date) and `county_cd` (county code). This may not be the case for data sets downloaded manually. 
 
-For documentation of raw PUR data, you can reference the Pesticide Use Report Data User Guide & Documentation document published by the CA Department of Pesticide Regulation. The file is saved as "cd_doc.pdf in any "pur[year].zip" file between 1990 and 2015 found here: ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/. 
+For documentation of raw PUR data, you can reference the Pesticide Use Report Data User Guide & Documentation document published by the CA Department of Pesticide Regulation. The file is saved as "cd_doc.pdf" in any  "pur[year].zip" file between 1990 and 2015 found here: ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/. 
 
 #### Cleaned data 
 
@@ -186,7 +202,7 @@ load("data/fresno_clean.RData")
 head(fresno_clean, 2)
 ```
 
-Pesticide application is recorded by active ingredient (`chem_code` and `chemname`), kilograms of active ingredient applied (`kg_chm_used`), section, township, county (`county_code` and `county_name`), date, method of application (`aerial_ground`) and product number (`prodno`). Raw PUR data sets are recorded in units of pounds, and cleaned data sets convert applied pesticides to units of kilograms by dividing pounds of active ingredient applied by 2.20562. The `use_no` variable uniquely identifies pesticide product uses. 
+Pesticide application is recorded by active ingredient (`chem_code` and `chemname`), kilograms of active ingredient applied (`kg_chm_used`), section, township, county (`county_name`, `pur_code`, and `fips_code`), date, method of application (`aerial_ground`) and product number (`prodno`). Raw PUR data sets are recorded in units of pounds, and cleaned data sets convert applied pesticides to units of kilograms by dividing pounds of active ingredient applied by 2.20562. The `use_no` variable uniquely identifies pesticide product uses. 
 
 **Outliers**
 
@@ -273,6 +289,10 @@ unique(fresno_classes$chemical_class)
 ```
 
 By default, `pull_clean_pur` will print a downloading progress bar for each year of data that you are pulling. You can turn this off by setting the `quiet` argument to `TRUE`. 
+
+#### Cacheing 
+
+
 
 If you've already pulled data using `pull_raw_pur`, you can clean the data without having to pull it again by inputting the raw data frame to the `raw_pur_df` argument. In this case, the `years` and `counties` arguments should list years and counties present in the raw data frame. 
 
