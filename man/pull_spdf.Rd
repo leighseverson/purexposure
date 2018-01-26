@@ -28,6 +28,11 @@ A SpatialPolygonsDataFrame object.
 SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
 shapefile.
 }
+\details{
+SpatialPolygonsDataFrame objects are pulled by county from the CDPR's FTP
+server. Downloaded SpatialPolygonsDataFrame objects are saved in a temporary
+environment, which is deleted at the end of the current R session.
+}
 \section{Source}{
 
 SpatialPolygonDataFrame objects are downloaded from GIS shapefiles provided

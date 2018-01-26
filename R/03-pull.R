@@ -650,6 +650,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' SpatialPolygonsDataFrame from a county's Geographic Information System (GIS)
 #' shapefile.
 #'
+#' SpatialPolygonsDataFrame objects are pulled by county from the CDPR's FTP
+#' server. Downloaded SpatialPolygonsDataFrame objects are saved in a temporary
+#' environment, which is deleted at the end of the current R session.
+#'
 #' @param county A character string giving either a county name, two digit PUR
 #'  county code, or six-digit FIPS county code. Not case sensitive. California
 #'  names and county codes as they appear in PUR datasets can be found in the
@@ -711,22 +715,62 @@ pull_spdf <- function(county, section_township = "section",
   }
 
   current_dir <- getwd()
-  temp_dir <- tempdir()
-  setwd(temp_dir)
 
-  invisible(suppressMessages(suppressWarnings(file.remove(list.files(temp_dir)))))
+  if (!exists("purexposure_package_env")) {
 
-  utils::download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
+    temp_dir <- tempdir()
+    setwd(temp_dir)
 
-  utils::unzip(file, exdir = temp_dir)
+    purexposure_package_env <<- new.env()
+    purexposure_package_env$pur_lst <- list()
 
-  shp_file <- list.files()[grepl(".shp", list.files()) &
-                             !grepl(".xml", list.files())]
+    invisible(suppressMessages(suppressWarnings(file.remove(list.files(temp_dir)))))
+    utils::download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
+    utils::unzip(file, exdir = temp_dir)
 
-  shp <- rgdal::readOGR(shp_file,
-                        layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
-                        verbose = FALSE)
-  shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
+    shp_file <- list.files()[grepl(".shp", list.files()) &
+                               !grepl(".xml", list.files())]
+    shp <- rgdal::readOGR(shp_file,
+                          layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
+                          verbose = FALSE)
+    shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
+
+    suppressWarnings(suppressMessages(
+      purexposure_package_env$pur_lst[[county_name_underscore]] <- shp
+    ))
+
+  } else {
+
+    to_be_downloaded <- c()
+    if (is.null(purexposure_package_env$pur_lst[[county_name_underscore]])) {
+      to_be_downloaded <- county_name_underscore
+    }
+
+    if(!is.null(to_be_downloaded)) {
+
+      temp_dir <- tempdir()
+      setwd(temp_dir)
+
+      invisible(suppressMessages(suppressWarnings(file.remove(list.files(temp_dir)))))
+      utils::download.file(shp_url, destfile = file, mode = "wb", quiet = quiet)
+      utils::unzip(file, exdir = temp_dir)
+
+      shp_file <- list.files()[grepl(".shp", list.files()) &
+                                 !grepl(".xml", list.files())]
+      shp <- rgdal::readOGR(shp_file,
+                            layer = basename(strsplit(shp_file, "\\.")[[1]])[1],
+                            verbose = FALSE)
+      shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
+
+      suppressWarnings(suppressMessages(
+        purexposure_package_env$pur_lst[[county_name_underscore]] <- shp
+      ))
+
+    }
+
+  }
+
+  shp <- purexposure_package_env$pur_lst[[county_name_underscore]]
 
   setwd(current_dir)
 
