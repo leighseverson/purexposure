@@ -14,8 +14,12 @@
 #'   chemicals to match with active ingredients present in pesticides applied
 #'   in the given year. The default value is "all", which returns codes for all
 #'   active ingredients applied in a given year.
+#' @param by_year TRUE / FALSE for whether you would like PUR Chemical Lookup
+#'   Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
+#'   default, a data frame is returned with unique results from all years given
+#'   in the `years` argument.
 #'
-#' @return A data frame with three columns:
+#' @return A data frame:
 #'   \describe{
 #'     \item{chem_code}{An integer value with chemical codes corresponding to
 #'     each active ingredient. \code{chem_code} values are used to later filter
@@ -24,6 +28,7 @@
 #'     corresponding to each search term.}
 #'     \item{chemical}{A character string with search terms given in the
 #'     \code{chemicals} argument.}
+#'     \item{year}{Included if `by_year` is set to `TRUE`.}
 #' }
 #'
 #' @section Note:
@@ -37,7 +42,7 @@
 #' find_chemical_codes(1995, c("ammonia", "benzene"))
 #' @importFrom magrittr %>%
 #' @export
-find_chemical_codes <- function(years, chemicals = "all") {
+find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 
   df <- purexposure::chemical_list
 
@@ -50,7 +55,12 @@ find_chemical_codes <- function(years, chemicals = "all") {
   df <- do.call("rbind", df)
 
   out <- purrr::map_dfr(chemicals, help_find_chemical, df)  %>%
-    unique()
+    unique() %>%
+    dplyr::select(chem_code, chemname, chemical, year)
+
+  if (!by_year) {
+    out <- out %>% dplyr::select(-year) %>% unique()
+  }
 
   return(out)
 

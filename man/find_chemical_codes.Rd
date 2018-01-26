@@ -4,7 +4,7 @@
 \alias{find_chemical_codes}
 \title{Pull active ingredient chemical codes from PUR Chemical Lookup Tables.}
 \usage{
-find_chemical_codes(years, chemicals = "all")
+find_chemical_codes(years, chemicals = "all", by_year = FALSE)
 }
 \arguments{
 \item{years}{A vector of four-digit numeric years in the range of 1990 to
@@ -14,9 +14,14 @@ find_chemical_codes(years, chemicals = "all")
 chemicals to match with active ingredients present in pesticides applied
 in the given year. The default value is "all", which returns codes for all
 active ingredients applied in a given year.}
+
+\item{by_year}{TRUE / FALSE for whether you would like PUR Chemical Lookup
+Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
+default, a data frame is returned with unique results from all years given
+in the `years` argument.}
 }
 \value{
-A data frame with three columns:
+A data frame:
   \describe{
     \item{chem_code}{An integer value with chemical codes corresponding to
     each active ingredient. \code{chem_code} values are used to later filter
@@ -25,6 +30,7 @@ A data frame with three columns:
     corresponding to each search term.}
     \item{chemical}{A character string with search terms given in the
     \code{chemicals} argument.}
+    \item{year}{Included if `by_year` is set to `TRUE`.}
 }
 }
 \description{
