@@ -453,7 +453,7 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
       dplyr::mutate(chemicals = as.character(chemicals))
 
     exp_0 <- pls_percents %>%
-      dplyr::rename(pls := !!mutate_expr) %>%
+      dplyr::rename(pls := !!mutate_expr)
 
     exp_0 <- exp_0 %>%
       dplyr::mutate(pls = as.character(pls)) %>%
@@ -480,7 +480,7 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
       dplyr::rename(pls := !!rename_expr)
 
     exp_0 <- pls_percents %>%
-      dplyr::rename(pls := !!mutate_expr) %>%
+      dplyr::rename(pls := !!mutate_expr)
 
     exp_0 <- exp_0 %>%
       dplyr::mutate(pls = as.character(pls)) %>%
