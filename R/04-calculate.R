@@ -207,10 +207,10 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                           max_lat = max(lat))
 
   if ("section" %in% colnames(clean_pur_df)) {
-    shp <- pull_spdf(county, "section")
+    shp <- pull_spdf(as.character(county), "section")
     df <- spdf_to_df(shp)
   } else {
-    shp <- pull_spdf(county, "township")
+    shp <- pull_spdf(as.character(county), "township")
     df <- spdf_to_df(shp)
   }
 
