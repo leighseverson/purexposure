@@ -505,7 +505,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' dalton_list$maps[[6]]
 #'
 #' # exposure to a particular active ingredient
-#' # plot amounts instead of percentile categories
+#' # plot percentile categories instead of amounts
 #' chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) %>%
 #'      dplyr::rename(chemical_class = chemical)
 #'
@@ -518,7 +518,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'                         radius = 3000,
 #'                         time_period = "1 year",
 #'                         chemicals = "chemical_class") %>%
-#'      plot_exposure("amount")
+#'      plot_exposure(color_by = "percentile")
 #' do.call("rbind", santa_maria$exposure)
 #' santa_maria$maps[[1]]
 #' santa_maria$maps[[2]]

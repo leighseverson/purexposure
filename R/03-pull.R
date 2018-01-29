@@ -744,13 +744,15 @@ pull_spdf <- function(county, section_township = "section",
     shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
 
     suppressWarnings(suppressMessages(
-      purexposure_package_env$pur_lst[[county_name_underscore]] <- shp
+      purexposure_package_env$pur_lst[[paste0(county_name_underscore,
+                                              "_", section_township)]] <- shp
     ))
 
   } else {
 
     to_be_downloaded <- c()
-    if (is.null(purexposure_package_env$pur_lst[[county_name_underscore]])) {
+    if (is.null(purexposure_package_env$pur_lst[[paste0(county_name_underscore,
+                                                        "_", section_township)]])) {
       to_be_downloaded <- county_name_underscore
     }
 
@@ -771,14 +773,16 @@ pull_spdf <- function(county, section_township = "section",
       shp <- sp::spTransform(shp, sp::CRS("+init=epsg:4326"))
 
       suppressWarnings(suppressMessages(
-        purexposure_package_env$pur_lst[[county_name_underscore]] <- shp
+        purexposure_package_env$pur_lst[[paste0(county_name_underscore,
+                                                "_", section_township)]] <- shp
       ))
 
     }
 
   }
 
-  shp <- purexposure_package_env$pur_lst[[county_name_underscore]]
+  shp <- purexposure_package_env$pur_lst[[paste0(county_name_underscore,
+                                                 "_", section_township)]]
 
   setwd(current_dir)
 

@@ -97,7 +97,7 @@ dalton_list$maps[[5]]
 dalton_list$maps[[6]]
 
 # exposure to a particular active ingredient
-# plot amounts instead of percentile categories
+# plot percentile categories instead of amounts
 chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) \%>\%
      dplyr::rename(chemical_class = chemical)
 
@@ -110,22 +110,19 @@ santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
                         radius = 3000,
                         time_period = "1 year",
                         chemicals = "chemical_class") \%>\%
-     plot_exposure("amount")
+     plot_exposure(color_by = "percentile")
 do.call("rbind", santa_maria$exposure)
 santa_maria$maps[[1]]
 santa_maria$maps[[2]]
 santa_maria$maps[[3]]
 
 # scale colors based on buffer or county
-turk <- pull_clean_pur(1996, "fresno") \%>\%
-     dplyr::filter(chemname == "PHOSPHORIC ACID") \%>\%
-     calculate_exposure(location = "-120.218404, 36.1806",
-                        radius = 1500)
+clotho <- pull_clean_pur(1996, "fresno") \%>\%
+  dplyr::filter(chemname == "SULFUR") \%>\%
+  calculate_exposure(location = "-119.6082, 36.7212",
+                    radius = 1500)
 
-plot_exposure(turk, buffer_or_county = "county")$maps
-plot_exposure(turk, buffer_or_county = "buffer")$maps
-
-plot_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
-plot_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
+plot_exposure(clotho, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+plot_exposure(clotho, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 }
 }

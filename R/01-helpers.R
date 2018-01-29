@@ -445,9 +445,7 @@ help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
                             chemicals = rep(classes, each = n_pls)) %>%
       dplyr::mutate(pls = as.character(pls))
 
-    pur_out2 <- pur_out %>% dplyr::mutate(chemicals = as.character(chemicals))
-
-    pur_out2 <- pur_out2 %>%
+    pur_out2 <- pur_out %>%
       dplyr::rename(pls := !!rename_expr,
                     chemicals = chemical_class) %>%
       dplyr::mutate(chemicals = as.character(chemicals))
