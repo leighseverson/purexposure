@@ -65,6 +65,7 @@ df_plot <- function(df) {
 #' df_plot(df2)
 #' }
 #' @importFrom magrittr %>%
+#' @export
 spdf_to_df <- function(spdf) {
 
   df <- suppressMessages(sp::merge(broom::tidy(spdf), as.data.frame(spdf),
