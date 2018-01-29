@@ -919,10 +919,10 @@ help_categorize <- function(section_data, buffer_or_county,
                       na.rm = TRUE))
     perc_numbers <- as.character(percentile * 100)
     first <- paste0("<=", perc_numbers[1], "th percentile")
-    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
+    last <- paste0(">", perc_numbers[length(perc_numbers)], "th")
 
     for (i in 1:(length(perc_numbers) - 1)) {
-      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
+      label <- paste0(">", perc_numbers[i], "th to <=", perc_numbers[i+1], "th")
       if (i == 1) {
         middle <- label
       } else {
@@ -996,10 +996,10 @@ help_categorize <- function(section_data, buffer_or_county,
                       na.rm = TRUE))
     perc_numbers <- as.character(percentile * 100)
     first <- paste0("<=", perc_numbers[1], "th percentile")
-    last <- paste0(">=", perc_numbers[length(perc_numbers)], "th")
+    last <- paste0(">", perc_numbers[length(perc_numbers)], "th")
 
     for (i in 1:(length(perc_numbers) - 1)) {
-      label <- paste0(">=", perc_numbers[i], "th to <", perc_numbers[i+1], "th")
+      label <- paste0(">", perc_numbers[i], "th to <=", perc_numbers[i+1], "th")
       if (i == 1) {
         middle <- label
       } else {

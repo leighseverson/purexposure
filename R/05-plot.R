@@ -525,16 +525,13 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' santa_maria$maps[[3]]
 #'
 #' # scale colors based on buffer or county
-#' turk <- pull_clean_pur(1996, "fresno") %>%
-#'      dplyr::filter(chemname == "PHOSPHORIC ACID") %>%
-#'      calculate_exposure(location = "-120.218404, 36.1806",
-#'                         radius = 1500)
+#' clotho <- pull_clean_pur(1996, "fresno") %>%
+#'   dplyr::filter(chemname == "SULFUR") %>%
+#'   calculate_exposure(location = "-119.6082, 36.7212",
+#'                     radius = 1500)
 #'
-#' plot_exposure(turk, buffer_or_county = "county")$maps
-#' plot_exposure(turk, buffer_or_county = "buffer")$maps
-#'
-#' plot_exposure(turk, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
-#' plot_exposure(turk, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
+#' plot_exposure(clotho, "amount", buffer_or_county = "county", pls_labels = TRUE)$maps
+#' plot_exposure(clotho, "amount", buffer_or_county = "buffer", pls_labels = TRUE)$maps
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -593,6 +590,10 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
     } else {
       pls_data$none_recorded[i] <- FALSE
     }
+
+    pls_data$data_pls[[i]] <- pls_data$data_pls[[i]] %>%
+      dplyr::mutate(kg = ifelse(kg == 0, NA, kg),
+                    kg_intersection = ifelse(kg_intersection == 0, NA, kg))
 
   }
 
