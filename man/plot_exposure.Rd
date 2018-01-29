@@ -15,7 +15,7 @@ plot_exposure(exposure_list, color_by = "amount",
 \item{color_by}{Either "amount" (the default) or "percentile". Specifies
 whether you would like application amounts to be colored according to
 amount, resulting in a gradient legend, or by the percentile that they fall
-into for the given dataset and date range. You can specify percentile
+into for the given data set and date range. You can specify percentile
 cutpoints with the \code{percentile} argument.}
 
 \item{buffer_or_county}{Either "county" (the default) or "buffer". Specifies

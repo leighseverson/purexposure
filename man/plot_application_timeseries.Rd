@@ -12,7 +12,7 @@ plot_application_timeseries(clean_pur_df, facet = FALSE, axes = "fixed")
 \item{facet}{TRUE / FALSE for whether you would like time series
 plots to be faceted by unique \code{chemname} or \code{chemical_class}
 column values. If \code{facet = FALSE} (the default), all active ingredients
-present in the dataset will be summed per day.}
+present in the data set will be summed per day.}
 
 \item{axes}{A character string passed on to the \code{scales} argument of
 \code{ggplot2::facet_wrap} (\code{"fixed"}, \code{"free"}, \code{"free_x"},

@@ -7,11 +7,11 @@
 #' \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 #'
 #' @param counties_or_df A character vector of county names, pur codes, or fips
-#'   codes. You can use the \code{county_codes} dataset included with this
+#'   codes. You can use the \code{county_codes} data set included with this
 #'   package to check out PUR county names and codes. This argument can also be
 #'   a data frame with a \code{county_cd}, \code{county_name}, \code{pur_code},
 #'   or \code{fips_code} column. If you provide a data frame, a plot for every
-#'   county with data in that dataset will be output.
+#'   county with data in that data set will be output.
 #' @param separate_plots TRUE / FALSE. If you provided multiple counties, whether you
 #'   would like county outlines plotted in the same plot (FALSE), or if you would
 #'   like separate plots returned in a list (TRUE). The default is FALSE.
@@ -140,8 +140,8 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' @param county Optional. If your \code{clean_pur_df} data frame contains data
 #'   for multiple counties, this argument specifies which county you would like
 #'   to plot application for. Either a PUR county name or county code. California
-#'   names and county codes as they appear in PUR datasets can be found in the
-#'   county_codes dataset available with this package.
+#'   names and county codes as they appear in PUR data sets can be found in the
+#'   county_codes data set available with this package.
 #' @param pls Optional. Either "section" or "township". If your
 #'   \code{clean_pur_df} data frame has both a \code{section} and
 #'   \code{township} column, the \code{pls} argument specifies which pls unit
@@ -151,7 +151,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' @param color_by Either "amount" (the default) or "percentile". Specifies
 #'   whether you would like application amounts to be colored according to
 #'   amount, resulting in a gradient legend, or by the percentile that they fall
-#'   into for the given dataset and date range. You can specify percentile
+#'   into for the given data set and date range. You can specify percentile
 #'   cutpoints with the \code{percentile} argument.
 #' @param percentile A numeric vector in (0, 1) specifying percentile cutpoints
 #'   if \code{color_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
@@ -652,7 +652,7 @@ plot_exposure <- function(exposure_list,  color_by = "amount",
 #' @param facet TRUE / FALSE for whether you would like time series
 #'   plots to be faceted by unique \code{chemname} or \code{chemical_class}
 #'   column values. If \code{facet = FALSE} (the default), all active ingredients
-#'   present in the dataset will be summed per day.
+#'   present in the data set will be summed per day.
 #' @param axes A character string passed on to the \code{scales} argument of
 #'   \code{ggplot2::facet_wrap} (\code{"fixed"}, \code{"free"}, \code{"free_x"},
 #'   or \code{"free_y"}). The default is \code{"fixed"}.

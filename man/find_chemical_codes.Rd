@@ -25,7 +25,7 @@ A data frame:
   \describe{
     \item{chem_code}{An integer value with chemical codes corresponding to
     each active ingredient. \code{chem_code} values are used to later filter
-    raw PUR datasets.}
+    raw PUR data sets.}
     \item{chemname}{A character string giving unique active ingredients
     corresponding to each search term.}
     \item{chemical}{A character string with search terms given in the

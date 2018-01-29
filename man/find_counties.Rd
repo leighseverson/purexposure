@@ -9,8 +9,8 @@ find_counties(counties, return = "pur_codes")
 \arguments{
 \item{counties}{A vector of character strings giving either a county names,
 two digit PUR county codes, or six-digit FIPS county codes. Not case
-sensitive. California names and county codes as they appear in PUR datasets
-can be found in the \code{county_codes} dataset available with this package.}
+sensitive. California names and county codes as they appear in PUR data sets
+can be found in the \code{county_codes} data set available with this package.}
 
 \item{return}{Either "pur_codes" to return PUR county codes (the default),
 "fips_codes" to return FIPS county codes, or "names" to return county names.}

@@ -9,11 +9,11 @@ plot_county_locations(counties_or_df, separate_plots = FALSE,
 }
 \arguments{
 \item{counties_or_df}{A character vector of county names, pur codes, or fips
-codes. You can use the \code{county_codes} dataset included with this
+codes. You can use the \code{county_codes} data set included with this
 package to check out PUR county names and codes. This argument can also be
 a data frame with a \code{county_cd}, \code{county_name}, \code{pur_code},
 or \code{fips_code} column. If you provide a data frame, a plot for every
-county with data in that dataset will be output.}
+county with data in that data set will be output.}
 
 \item{separate_plots}{TRUE / FALSE. If you provided multiple counties, whether you
 would like county outlines plotted in the same plot (FALSE), or if you would

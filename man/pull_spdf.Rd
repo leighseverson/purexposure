@@ -9,8 +9,8 @@ pull_spdf(county, section_township = "section", quiet = FALSE)
 \arguments{
 \item{county}{A character string giving either a county name, two digit PUR
 county code, or six-digit FIPS county code. Not case sensitive. California
-names and county codes as they appear in PUR datasets can be found in the
-\code{county_codes} dataset available with this package.}
+names and county codes as they appear in PUR data sets can be found in the
+\code{county_codes} data set available with this package.}
 
 \item{section_township}{Either "section" (the default) or "township".
 Specifies whether you would like to pull a section- or township-level

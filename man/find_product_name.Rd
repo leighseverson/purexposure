@@ -28,7 +28,7 @@ in the `years` argument.}
 A data frame with seven columns:
 \describe{
   \item{prodno}{The CA registration number. Can be matched with the
-  \code{prodno} in a raw or cleaned PUR dataset.}
+  \code{prodno} in a raw or cleaned PUR data set.}
   \item{prodstat_ind}{Character. An indication of product registration status:
   \itemize{
   \item A = Active

@@ -18,7 +18,7 @@ A data frame with four columns:
 \describe{
 \item{prodno}{Integer. The California Registration number for the pesticide
 product. This corresponds to the \code{prodno} column in a raw or cleaned PUR
-dataset returned from \code{pull_raw_pur} or \code{pull_clean_pur}.}
+data set returned from \code{pull_raw_pur} or \code{pull_clean_pur}.}
 \item{prodstat_ind}{Character. An indication of product registration status:
   \itemize{
   \item A = Active

@@ -10,13 +10,13 @@ pull_raw_pur(years = "all", counties = "all", verbose = TRUE,
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
 1990 to 2015. Indicates the years for which you would like to pull PUR
-datasets. \code{years == "all"} will pull data from 1990 through 2015.}
+data sets. \code{years == "all"} will pull data from 1990 through 2015.}
 
 \item{counties}{A vector of character strings giving either a county name,
 two digit PUR county codes, or six-digit FIPS county codes for each county.
 Not case sensitive. California names, county codes as they appear in PUR
-datasets, and FIPS county codes can be found in the \code{county_codes}
-dataset available with this package. For example, to return data for
+data sets, and FIPS county codes can be found in the \code{county_codes}
+data set available with this package. For example, to return data for
 Alameda county, enter either "alameda", "01", or "06001" for the
 \code{counties} argument. \code{counties = "all"} will return data for all
 58 California counties (this will take a while to run).}
@@ -35,8 +35,13 @@ A data frame with 33 columns. Different years and counties for which
   respectively.
 }
 \description{
-\code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
+\code{pull_raw_pur} pulls a raw PUR data set for a given year and vector of
   California counties.
+}
+\details{
+PUR data sets are pulled by county from the CDPR's FTP server. Downloaded
+PUR data sets are saved in a temporary environment, which is deleted at the
+end of the current R session.
 }
 \section{Note}{
 

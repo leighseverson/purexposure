@@ -12,13 +12,13 @@ pull_clean_pur(years = "all", counties = "all", chemicals = "all",
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
 1990 to 2015. Indicates the years for which you would like to pull PUR
-datasets. \code{years == "all"} will pull data from 1990 through 2015.}
+data sets. \code{years == "all"} will pull data from 1990 through 2015.}
 
 \item{counties}{A vector of character strings giving either a county name,
 two digit PUR county codes, or six-digit FIPS county codes for each county.
 Not case sensitive. California names, county codes as they appear in PUR
-datasets, and FIPS county codes can be found in the \code{county_codes}
-dataset available with this package. For example, to return data for
+data sets, and FIPS county codes can be found in the \code{county_codes}
+data set available with this package. For example, to return data for
 Alameda county, enter either "alameda", "01", or "06001" for the
 \code{counties} argument. \code{counties = "all"} will return data for all
 58 California counties (this will take a while to run).}
@@ -54,7 +54,7 @@ data frame given in the argument \code{chemical_class}.}
 integer values giving PUR chemical codes, and \code{chemname} should have
 character strings with corresponding PUR chemical names (these can be
 searched for using the \code{find_chemical_codes} function or with the
-\code{chemical_list} dataset included with this package). The
+\code{chemical_list} data set included with this package). The
 \code{chemical_class} column should have character strings indicating the
 chemical class corresponding to each \code{chem_code}. The
 \code{chemical_class} for a group of active ingredients should be decided
@@ -141,13 +141,18 @@ filtered by counties, years, and active ingredients. Active ingredients
 or chemical classes present in applied pesticides can be summed by either
 Public Land Survey (PLS) section or township.
 }
+\details{
+PUR data sets are pulled by county from the CDPR's FTP server. Downloaded
+PUR data sets are saved in a temporary environment, which is deleted at the
+end of the current R session.
+}
 \section{Note}{
 
   \itemize{
     \item The \code{chemical_list} data frame for a particular year lists
     active ingredients present in applied pesticides across the state of
     California. Therefore, PUR data for a particular county may not include
-    records for active ingredients listed in the \code{chemical_list} dataset
+    records for active ingredients listed in the \code{chemical_list} data set
     for the same year.
     \item To pull raw PUR data, see the \code{pull_raw_pur} function.
     For documentation of raw PUR data, see the Pesticide Use Report Data User
@@ -195,7 +200,7 @@ df4 <- pull_clean_pur(years = 1995,
                       unit = "township",
                       chemical_class = chemical_class_df)
 
-# clean an existing raw PUR dataset
+# clean an existing raw PUR data set
 placer_05 <- pull_raw_pur(2005, "placer")
 df5 <- pull_clean_pur(raw_pur_df = placer_05)
 }

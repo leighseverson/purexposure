@@ -428,8 +428,8 @@ help_sum_ai <- function(pur_filt, start_date, end_date, ...) {
 #' @importFrom rlang !!
 #' @importFrom rlang :=
 help_write_md <- function(clean_pur_df, pls_percents, pur_out, location,
-                   start_date, end_date, radius, buffer_area,
-                   mtrs_mtr, section_township) {
+                          start_date, end_date, radius, buffer_area, mtrs_mtr,
+                          section_township) {
 
   mutate_expr <- rlang::enquo(mtrs_mtr)
   rename_expr <- rlang::enquo(section_township)

@@ -1,16 +1,20 @@
 #' Pull raw PUR data by counties and years.
 #'
-#' \code{pull_raw_pur} pulls a raw PUR dataset for a given year and vector of
+#' \code{pull_raw_pur} pulls a raw PUR data set for a given year and vector of
 #'   California counties.
+#'
+#' PUR data sets are pulled by county from the CDPR's FTP server. Downloaded
+#' PUR data sets are saved in a temporary environment, which is deleted at the
+#' end of the current R session.
 #'
 #' @param years A four-digit numeric year or vector of years in the range of
 #'   1990 to 2015. Indicates the years for which you would like to pull PUR
-#'   datasets. \code{years == "all"} will pull data from 1990 through 2015.
+#'   data sets. \code{years == "all"} will pull data from 1990 through 2015.
 #' @param counties A vector of character strings giving either a county name,
 #'   two digit PUR county codes, or six-digit FIPS county codes for each county.
 #'   Not case sensitive. California names, county codes as they appear in PUR
-#'   datasets, and FIPS county codes can be found in the \code{county_codes}
-#'   dataset available with this package. For example, to return data for
+#'   data sets, and FIPS county codes can be found in the \code{county_codes}
+#'   data set available with this package. For example, to return data for
 #'   Alameda county, enter either "alameda", "01", or "06001" for the
 #'   \code{counties} argument. \code{counties = "all"} will return data for all
 #'   58 California counties (this will take a while to run).
@@ -133,6 +137,10 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' or chemical classes present in applied pesticides can be summed by either
 #' Public Land Survey (PLS) section or township.
 #'
+#' PUR data sets are pulled by county from the CDPR's FTP server. Downloaded
+#' PUR data sets are saved in a temporary environment, which is deleted at the
+#' end of the current R session.
+#'
 #' @inheritParams pull_raw_pur
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied in
@@ -161,7 +169,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'   integer values giving PUR chemical codes, and \code{chemname} should have
 #'   character strings with corresponding PUR chemical names (these can be
 #'   searched for using the \code{find_chemical_codes} function or with the
-#'   \code{chemical_list} dataset included with this package). The
+#'   \code{chemical_list} data set included with this package). The
 #'   \code{chemical_class} column should have character strings indicating the
 #'   chemical class corresponding to each \code{chem_code}. The
 #'   \code{chemical_class} for a group of active ingredients should be decided
@@ -236,7 +244,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     \item The \code{chemical_list} data frame for a particular year lists
 #'     active ingredients present in applied pesticides across the state of
 #'     California. Therefore, PUR data for a particular county may not include
-#'     records for active ingredients listed in the \code{chemical_list} dataset
+#'     records for active ingredients listed in the \code{chemical_list} data set
 #'     for the same year.
 #'     \item To pull raw PUR data, see the \code{pull_raw_pur} function.
 #'     For documentation of raw PUR data, see the Pesticide Use Report Data User
@@ -283,7 +291,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
 #'
-#' # clean an existing raw PUR dataset
+#' # clean an existing raw PUR data set
 #' placer_05 <- pull_raw_pur(2005, "placer")
 #' df5 <- pull_clean_pur(raw_pur_df = placer_05)
 #' }
@@ -656,8 +664,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #'
 #' @param county A character string giving either a county name, two digit PUR
 #'  county code, or six-digit FIPS county code. Not case sensitive. California
-#'  names and county codes as they appear in PUR datasets can be found in the
-#'  \code{county_codes} dataset available with this package.
+#'  names and county codes as they appear in PUR data sets can be found in the
+#'  \code{county_codes} data set available with this package.
 #' @param section_township Either "section" (the default) or "township".
 #'   Specifies whether you would like to pull a section- or township-level
 #'   SpatialPolygonsDataFrame.
@@ -796,7 +804,7 @@ pull_spdf <- function(county, section_township = "section",
 #' \describe{
 #' \item{prodno}{Integer. The California Registration number for the pesticide
 #' product. This corresponds to the \code{prodno} column in a raw or cleaned PUR
-#' dataset returned from \code{pull_raw_pur} or \code{pull_clean_pur}.}
+#' data set returned from \code{pull_raw_pur} or \code{pull_clean_pur}.}
 #' \item{prodstat_ind}{Character. An indication of product registration status:
 #'   \itemize{
 #'   \item A = Active

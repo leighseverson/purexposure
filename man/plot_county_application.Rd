@@ -15,8 +15,8 @@ plot_county_application(clean_pur_df, county = NULL, pls = NULL,
 \item{county}{Optional. If your \code{clean_pur_df} data frame contains data
 for multiple counties, this argument specifies which county you would like
 to plot application for. Either a PUR county name or county code. California
-names and county codes as they appear in PUR datasets can be found in the
-county_codes dataset available with this package.}
+names and county codes as they appear in PUR data sets can be found in the
+county_codes data set available with this package.}
 
 \item{pls}{Optional. Either "section" or "township". If your
 \code{clean_pur_df} data frame has both a \code{section} and
@@ -28,7 +28,7 @@ application will be plotted by township.}
 \item{color_by}{Either "amount" (the default) or "percentile". Specifies
 whether you would like application amounts to be colored according to
 amount, resulting in a gradient legend, or by the percentile that they fall
-into for the given dataset and date range. You can specify percentile
+into for the given data set and date range. You can specify percentile
 cutpoints with the \code{percentile} argument.}
 
 \item{percentile}{A numeric vector in (0, 1) specifying percentile cutpoints

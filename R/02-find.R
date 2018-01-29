@@ -23,7 +23,7 @@
 #'   \describe{
 #'     \item{chem_code}{An integer value with chemical codes corresponding to
 #'     each active ingredient. \code{chem_code} values are used to later filter
-#'     raw PUR datasets.}
+#'     raw PUR data sets.}
 #'     \item{chemname}{A character string giving unique active ingredients
 #'     corresponding to each search term.}
 #'     \item{chemical}{A character string with search terms given in the
@@ -97,7 +97,7 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #' @return A data frame with seven columns:
 #' \describe{
 #'   \item{prodno}{The CA registration number. Can be matched with the
-#'   \code{prodno} in a raw or cleaned PUR dataset.}
+#'   \code{prodno} in a raw or cleaned PUR data set.}
 #'   \item{prodstat_ind}{Character. An indication of product registration status:
 #'   \itemize{
 #'   \item A = Active
@@ -161,8 +161,8 @@ find_product_name <- function(years, products = "all", quiet = FALSE,
 #'
 #' @param counties A vector of character strings giving either a county names,
 #'  two digit PUR county codes, or six-digit FIPS county codes. Not case
-#'  sensitive. California names and county codes as they appear in PUR datasets
-#'  can be found in the \code{county_codes} dataset available with this package.
+#'  sensitive. California names and county codes as they appear in PUR data sets
+#'  can be found in the \code{county_codes} data set available with this package.
 #' @param return Either "pur_codes" to return PUR county codes (the default),
 #'  "fips_codes" to return FIPS county codes, or "names" to return county names.
 #'
@@ -191,7 +191,7 @@ find_counties <- function(counties, return = "pur_codes") {
 
       stop(paste0("\"", counties[i], "\"", " doesn't match any ",
                   "California counties. \nCheck out the ",
-                  "county_codes dataset included with this ",
+                  "county_codes data set included with this ",
                   "package for county names and corresponding ",
                   "codes."))
 
