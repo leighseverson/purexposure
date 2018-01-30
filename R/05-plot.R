@@ -535,7 +535,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' }
 #' @importFrom magrittr %>%
 #' @export
-plot_exposure <- function(exposure_list,  color_by = "amount",
+plot_exposure <- function(exposure_list, color_by = "amount",
                           buffer_or_county = "county",
                           percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
                           alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
