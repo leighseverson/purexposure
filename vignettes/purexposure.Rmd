@@ -304,8 +304,6 @@ The `pull` functions in this package use caching to prevent multiple downloads o
 
 The temporary environment is called `purexposure_package_env`, and data are saved as objects in a list called `pur_lst`. Raw PUR data sets are saved in the format "[year]_[pur county code]" (e.g., "2000_10"), product tabes are saved by year (e.g., "2000"), and SpatialPolygonsDataFrame objects are saved by county name (e.g., "Fresno"). 
 
-If you want to avoid repeatedly downloading the same data sets in future R sessions, you should explicitly save the data.  
-
 ### 3. `calculate_exposure` to applied pesticides 
 
 The `calculate_exposure` function calculates exposure to applied pesticides at a particular location for a given buffer extending from the location, time period, and group of active ingredients. The required arguments are `clean_pur_df`, a data frame returned from `pull_clean_pur`, `location`, which can be an address or a coordinate pair, and radius, which gives the radius of the buffer extending from the location in meters. 

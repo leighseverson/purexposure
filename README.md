@@ -567,9 +567,6 @@ product tabes are saved by year (e.g., “2000”), and
 SpatialPolygonsDataFrame objects are saved by county name (e.g.,
 “Fresno”).
 
-If you want to avoid repeatedly downloading the same data sets in future
-R sessions, you should explicitly save the data.
-
 ### 3\. `calculate_exposure` to applied pesticides
 
 The `calculate_exposure` function calculates exposure to applied
