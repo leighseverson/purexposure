@@ -17,7 +17,7 @@ df <- data.frame(location = rep(schools, 2), start_date = rep(c("2000-01-01",
 
 clean_pur_df <- pur
 locations_dates_df <- df
-radii <- c(1500, 2500, 3000)
+radii <- c(1500, 3000)
 chemicals <- "all"
 aerial_ground <- FALSE
 directory <- "~/Desktop/schools_test"
@@ -56,34 +56,29 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
   loc_df <- data.frame(location = unique(locations_dates_df$location),
                        latlon_loc = latlon)
 
-  locations_dates_df <- full_join(locations_dates_df, loc_df, by = "location")
+  locations_dates_df <- locations_dates_df %>%
+    dplyr::full_join(loc_df, by = "location") %>%
+    dplyr::rename(original_location = location,
+                  location = latlon_loc)
 
   radius_list <- list()
   for (i in 1:length(radii)) {
     radius_list[[i]] <- locations_dates_df %>% mutate(radius = radii[i])
   }
   exposure_mat <- do.call("rbind", radius_list)
-  exposure_mat <- exposure_mat %>% dplyr::mutate(chemicals = chemicals)
 
-  if (aerial_ground) {
-    exposure_mat <- exposure_mat %>% dplyr::mutate(aerial_ground = TRUE)
-  } else {
-    exposure_mat <- exposure_mat %>% dplyr::mutate(aerial_ground = FALSE)
-  }
+  safe_calculate_exposure <- purrr::safely(calculate_exposure)
 
-  if (chemicals == "all") {
-
-    exposure_args <- list(location = as.character(exposure_mat$location),
-                          radius = as.numeric(exposure_mat$radius),
-                          start_date = as.character(exposure_mat$start_date),
-                          end_date = as.character(exposure_mat$end_date))
-    exposure_lists <- purrr::pmap(exposure_args, calculate_exposure,
-                                  verbose = verbose,
-                                  clean_pur_df = clean_pur_df)
-
-
-  }
-
+  exposure_args <- list(location = as.character(exposure_mat$location),
+                        radius = as.numeric(exposure_mat$radius),
+                        start_date = as.character(exposure_mat$start_date),
+                        end_date = as.character(exposure_mat$end_date),
+                        original_location = exposure_mat$original_location)
+  exposure_lists <- purrr::pmap(exposure_args, safe_calculate_exposure,
+                                clean_pur_df = clean_pur_df,
+                                chemicals = chemicals,
+                                aerial_ground = aerial_ground,
+                                verbose = verbose)
 
   if (write_plots = TRUE) {
 
