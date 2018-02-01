@@ -623,13 +623,6 @@ plot_exposure <- function(exposure_list, color_by = "amount",
     exposures[[i]] <- exposure_list$exposure[i,]
   }
 
-  for (i in 1:length(exposures)) {
-    zero <- exposures[[i]]$exposure == 0
-    if (zero) {
-      exposures[[i]]$chemicals <- NA
-    }
-  }
-
   if (color_by == "amount") {
     out_maps_list <- list(maps = plots, pls_data = dfs,
                           exposure = exposures)
