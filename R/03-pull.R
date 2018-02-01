@@ -180,9 +180,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
 #'   "O" = other.) The default is TRUE.
-#' @param raw_pur_df A raw PUR data frame. Optional. If you've already downloaded
-#'   a raw PUR data frame using \code{pull_raw_pur}, this argument prevents
-#'   \code{pull_clean_pur} from downloading the same data again.
 #'
 #' @return A data frame:
 #'   \describe{
@@ -301,75 +298,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            aerial_ground = TRUE, verbose = TRUE,
-                           quiet = FALSE,
-                           raw_pur_df = NULL) {
+                           quiet = FALSE) {
 
-  if (is.null(raw_pur_df)) {
     raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                            quiet = quiet)
-  } else {
-
-    check <- colnames(raw_pur_df) == c("use_no", "prodno", "chem_code",
-                                      "prodchem_pct", "lbs_chm_used",
-                                      "lbs_prd_used", "amt_prd_used",
-                                      "unit_of_meas", "acre_planted",
-                                      "unit_planted", "acre_treated",
-                                      "unit_treated", "applic_cnt", "applic_dt",
-                                      "applic_time", "county_cd", "base_ln_mer",
-                                      "township", "tship_dir", "range",
-                                      "range_dir", "section", "site_loc_id",
-                                      "grower_id", "license_no", "planting_seq",
-                                      "aer_gnd_ind", "site_code", "qualify_cd",
-                                      "batch_no", "document_no", "summary_cd",
-                                      "record_id")
-
-    if (!all(check)) {
-      stop(paste0("The raw_pur_df data frame should be an unaltered data frame ",
-                  "returned from pull_raw_pur() with 33 columns."))
-    }
-
-    unique_years <- raw_pur_df %>%
-      dplyr::mutate(year = lubridate::year(lubridate::ymd(applic_dt))) %>%
-      dplyr::select(year) %>%
-      unique() %>%
-      tibble_to_vector()
-
-    unique_counties <- raw_pur_df %>%
-      dplyr::select(county_cd) %>%
-      unique() %>%
-      tibble_to_vector() %>%
-      find_counties(return = "codes")
-
-    if (is.character(years)) {
-      if (years == "all") {
-      years_check <- unique_years
-      }
-    } else {
-      years_check <- years
-    }
-
-    if (counties == "all") {
-      counties_check <- unique_counties
-    } else {
-      counties_check <- find_counties(counties)
-    }
-
-    years_check <- years_check %in% unique_years
-
-    if (!all(years_check)) {
-      stop(paste0("The years argument specifies years not present in the given ",
-                  "raw_pur_df data frame."))
-    }
-
-    counties_check <- counties_check %in% unique_counties
-
-    if (!all(counties_check)) {
-      stop(paste0("The counties argument specifies counties not present in the ",
-                  "given raw_pur_df data frame."))
-    }
-
-    raw_df <- raw_pur_df
-  }
 
   df <- raw_df %>%
     dplyr::mutate(township_pad = stringr::str_pad(raw_df$township, 2, "left", pad = "0"),
