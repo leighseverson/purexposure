@@ -6,7 +6,7 @@
 \usage{
 calculate_exposure(clean_pur_df, location, radius, time_period = NULL,
   start_date = NULL, end_date = NULL, chemicals = "all",
-  aerial_ground = FALSE, verbose = TRUE)
+  aerial_ground = FALSE, verbose = TRUE, ...)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
@@ -27,9 +27,10 @@ about 1,609 meters (1 mile). That of a township could range from about
 9,656 to 11,265 meters (6-7 miles).}
 
 \item{time_period}{Optional. A character string giving a time period over which you
-would like to calculate exposure. For example, if you enter "6 months" for
-\code{time_period}, \code{calculate_exposure} will calculate exposure for
-every six month period starting January 1 of the earliest year present in the
+would like to calculate exposure in days, weeks, months, or years.
+For example, if you enter "6 months" for \code{time_period},
+\code{calculate_exposure} will calculate exposure for every six month
+period starting January 1 of the earliest year present in the
 \code{clean_pur_df} data frame. Start and end dates can be optionally specified
 with the \code{start_date} and \code{end_date} arguments. Alternatively, to
 calculate exposure over only one specified time period, you can leave this

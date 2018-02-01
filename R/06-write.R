@@ -1,27 +1,25 @@
-schools <- readRDS("~/Documents/pesticides_project/data/fresno_schools.rds")
-schools <- schools[1:3,"full_address"] %>% purexposure:::tibble_to_vector()
-
-schools <- gsub("-.*", "", schools)
-
-schools_df <- find_location_county(schools)
-sum(!duplicated(schools_df$county)) == 1
-
-pur <- pull_clean_pur(2000:2001, counties = "fresno", chemicals = "sulfur")
-df <- data.frame(location = rep(schools, 2), start_date = rep(c("2000-01-01",
-                                                                  "2000-05-25",
-                                                                  "2001-02-16"), 2),
-                     end_date = c("2000-04-01", "2000-07-01",
-                                   "2000-08-25", "2000-11-25",
-                                   "2001-05-16", "2001-08-16")) %>%
-  dplyr::arrange(location, start_date)
-
-clean_pur_df <- pur
-locations_dates_df <- df
-radii <- c(1500, 3000)
-chemicals <- "all"
-aerial_ground <- FALSE
-directory <- "~/Desktop/schools_test"
-write_plots <- TRUE
+# schools <- readRDS("~/Documents/pesticides_project/data/fresno_schools.rds")
+# schools <- schools[1:3,"full_address"] %>% purexposure:::tibble_to_vector()
+#
+# schools <- gsub("-.*", "", schools)
+#
+# schools_df <- find_location_county(schools)
+# sum(!duplicated(schools_df$county)) == 1
+#
+# pur <- pull_clean_pur(2000:2001, counties = "fresno", chemicals = "sulfur")
+# df <- data.frame(location = rep(schools, each = 2),
+#                  start_date = rep(c("2000-01-01", "2000-05-25", "2001-02-16"),
+#                                     each = 2),
+#                  end_date = c("2000-04-01", "2000-07-01",
+#                               "2000-08-25", "2000-11-25",
+#                               "2001-05-16", "2001-08-16"))
+# clean_pur_df <- pur
+# locations_dates_df <- df
+# radii <- c(1500, 3000)
+# chemicals <- "all"
+# aerial_ground <- FALSE
+# directory <- "~/Desktop/schools_test"
+# write_plots <- TRUE
 
 write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                            chemicals = "all", aerial_ground = FALSE,
@@ -73,14 +71,80 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                         radius = as.numeric(exposure_mat$radius),
                         start_date = as.character(exposure_mat$start_date),
                         end_date = as.character(exposure_mat$end_date),
-                        original_location = exposure_mat$original_location)
+                        original_location = as.character(exposure_mat$original_location))
   exposure_lists <- purrr::pmap(exposure_args, safe_calculate_exposure,
                                 clean_pur_df = clean_pur_df,
                                 chemicals = chemicals,
                                 aerial_ground = aerial_ground,
                                 verbose = verbose)
 
-  if (write_plots = TRUE) {
+  meta_list <- list()
+
+  for (i in 1:length(exposure_lists)) {
+
+    if (!is.null(exposure_lists[[i]]$error)) {
+      row <- data.frame(exposure = NA, chemicals = chemicals,
+                        start_date = exposure_mat[i, ]$start_date,
+                        end_date = exposure_mat[i, ]$end_date,
+                        aerial_ground = NA,
+                        location = exposure_mat[i, ]$original_location,
+                        radius = exposure_mat[i, ]$radius,
+                        longitude = NA, latitude = NA,
+                        error_message = exposure_lists[[i]]$error)
+      meta_data <- data.frame(pls = NA, chemicals = chemicals, percent = NA,
+                              kg = NA, kg_intersection = NA,
+                              start_date = exposure_mat[i, ]$start_date,
+                              end_date = exposure_mat[i, ]$end_date,
+                              aerial_ground = NA, none_recorded = NA,
+                              location = exposure_mat[i, ]$original_location,
+                              radius = exposure_mat[i, ]$radius,
+                              area = NA, error_message = exposure_lists[[i]]$error)
+    } else {
+      error_message <- NA
+      row <- exposure_lists[[i]]$result$exposure %>%
+        dplyr::mutate(error_message = NA)
+      meta_data <- exposure_lists[[i]]$result$meta_data %>%
+        dplyr::mutate(error_message = NA,
+                      location = exposure_mat[i, ]$original_location)
+    }
+
+    if (i == 1) {
+      row_out <- row
+    } else {
+      row_out <- rbind(row_out, row)
+    }
+
+    meta_list[[i]] <- meta_data
+
+  }
+
+  # replace location w/ original location
+  location_df <- exposure_mat %>%
+    dplyr::select(original_location, location) %>%
+    dplyr::mutate_all(as.character)
+
+  row_out <- row_out %>%
+    dplyr::full_join(location_df, by = "location") %>%
+    unique() %>%
+    dplyr::select(-location) %>%
+    dplyr::rename(location = original_location) %>%
+    dplyr::select(exposure, chemicals, start_date, end_date, aerial_ground,
+                  location, radius, longitude, latitude, error_message)
+
+  if (!dir.exists(directory)) {
+    dir.create(directory)
+  }
+
+  saveRDS(row_out, file = paste0(directory, "/exposure_df.rds"))
+
+
+
+
+  if (write_plots) {
+
+    if (!dir.exists(paste0(directory, "/exposure_plots"))) {
+      dir.create(paste0(directory, "/exposure_plots"))
+    }
 
     plot_exposure(exposure_list, ...)
 

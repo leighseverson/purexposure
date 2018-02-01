@@ -370,6 +370,20 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     }
   }
 
+  # remove longitude and latitude ??
+  if ("longitude" %in% colnames(row_out)) {
+    row_out <- row_out %>% dplyr::select(-longitude)
+  }
+  if ("latitude" %in% colnames(meta_out)) {
+    meta_out <- meta_out %>% dplyr::select(-latitude)
+  }
+  if ("latitude" %in% colnames(row_out)) {
+    row_out <- row_out %>% dplyr::select(-latitude)
+  }
+  if ("longitude" %in% colnames(meta_out)) {
+    meta_out <- meta_out %>% dplyr::select("longitude")
+  }
+
   row_out <- dplyr::mutate(row_out,
                            longitude = latlon_out[1],
                            latitude = latlon_out[2])
