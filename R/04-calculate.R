@@ -19,9 +19,10 @@
 #'   about 1,609 meters (1 mile). That of a township could range from about
 #'   9,656 to 11,265 meters (6-7 miles).
 #' @param time_period Optional. A character string giving a time period over which you
-#'   would like to calculate exposure. For example, if you enter "6 months" for
-#'   \code{time_period}, \code{calculate_exposure} will calculate exposure for
-#'   every six month period starting January 1 of the earliest year present in the
+#'   would like to calculate exposure in days, weeks, months, or years.
+#'   For example, if you enter "6 months" for \code{time_period},
+#'   \code{calculate_exposure} will calculate exposure for every six month
+#'   period starting January 1 of the earliest year present in the
 #'   \code{clean_pur_df} data frame. Start and end dates can be optionally specified
 #'   with the \code{start_date} and \code{end_date} arguments. Alternatively, to
 #'   calculate exposure over only one specified time period, you can leave this
@@ -160,7 +161,7 @@
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
                                end_date = NULL, chemicals = "all",
-                               aerial_ground = FALSE, verbose = TRUE) {
+                               aerial_ground = FALSE, verbose = TRUE, ...) {
 
   # get numeric coordinate vector from location
   if (length(grep("-", location)) == 1) {
@@ -190,8 +191,33 @@ calculate_exposure <- function(clean_pur_df, location, radius,
   clean_pur_df <- clean_pur_df %>% dplyr::filter(county_name == toupper(county))
 
   if (verbose) {
-    message(paste0("Calculating exposure for the location ", "\"", location,
-                   "\"", "."))
+
+    # relevant for write_exposure()
+    args <- list(...)
+    if (!is.null(args$original_location)) {
+      loc_message <- args$original_location
+    } else {
+      loc_message <- location
+    }
+
+    if (is.null(time_period) & is.null(start_date) & is.null(end_date)) {
+      date_message <- " over the entire date range of the supplied PUR data set"
+    } else if (!is.null(time_period)) {
+      time_period_message <- stringr::str_replace(time_period, "s", "")
+      date_message <- paste0(" over ", time_period_message, " increments")
+    } else if (!is.null(start_date) & !is.null(end_date)) {
+      date_message <- paste0(" from ", start_date, " to ", end_date)
+    }
+
+    if (chemicals == "all") {
+      chem_message <- "for all active ingredients in the supplied PUR data set"
+    } else if (chemicals == "chemical_class") {
+      chem_message <- "for all chemical classes in the supplied PUR data set"
+    }
+
+    message(paste0("Calculating exposure for ", radius, " meters extending from ",
+                   "the location ", "\"", loc_message, "\"",
+                   date_message, " ", chem_message, "."))
   }
 
   radius <- as.numeric(radius)
