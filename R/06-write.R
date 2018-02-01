@@ -146,7 +146,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
       dir.create(paste0(directory, "/exposure_plots"))
     }
 
-    plot_exposure(exposure_list, ...)
+    # plot_exposure(exposure_list, ...)
 
   }
 
