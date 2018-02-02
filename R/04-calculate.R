@@ -49,16 +49,16 @@
 #'
 #' @return A list with five elements:
 #'  \describe{
-#'    \item{exposure}{A data frame with 7 columns: \code{exposure},
+#'    \item{exposure}{A data frame with 9 columns: \code{exposure},
 #'    the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
 #'    indicating that all active ingredients present in the \code{clean_pur_df}
 #'    were summed or the chemical class(es) specified in the \code{clean_pur_df}
 #'    data frame), \code{start_date}, \code{end_date}, \code{aerial_ground},
 #'    which can take values of "A" = aerial, "G" = ground, and "O" = others, (if
 #'    the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground}
-#'    will be \code{NA} in the \code{exposure} data frame), \code{location}, and
+#'    will be \code{NA} in the \code{exposure} data frame), \code{location},
 #'    \code{radius}, the radius in meters for the buffer extending from the
-#'    location.}
+#'    location, and the \code{longitude} and \code{latitude} of the location.}
 #'    \item{meta_data}{A data frame with 12 columns and at least one row for
 #'    every section or township intersected by the specified buffer extending
 #'    from the given location. Columns include \code{pls}, giving either the
@@ -161,7 +161,7 @@
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
                                end_date = NULL, chemicals = "all",
-                               aerial_ground = FALSE, verbose = TRUE, ...) {
+                               aerial_ground = FALSE, verbose = TRUE, ...) { # what is the ... for. @original_location !
 
   # get numeric coordinate vector from location
   if (length(grep("-", location)) == 1) {
@@ -173,7 +173,7 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     latlon_out <- latlon_vec
   } else {
     address <- location
-    suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
+    latlon_df <- help_geocode(address)
     address_x <- latlon_df$lon
     address_y <- latlon_df$lat
     latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
@@ -370,23 +370,14 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     }
   }
 
-  # remove longitude and latitude ??
-  if ("longitude" %in% colnames(row_out)) {
-    row_out <- row_out %>% dplyr::select(-longitude)
-  }
-  if ("latitude" %in% colnames(meta_out)) {
-    meta_out <- meta_out %>% dplyr::select(-latitude)
-  }
-  if ("latitude" %in% colnames(row_out)) {
-    row_out <- row_out %>% dplyr::select(-latitude)
-  }
-  if ("longitude" %in% colnames(meta_out)) {
-    meta_out <- meta_out %>% dplyr::select("longitude")
-  }
-
   row_out <- dplyr::mutate(row_out,
                            longitude = latlon_out[1],
                            latitude = latlon_out[2])
+
+  if (!is.null(args$original_location)) {
+    row_out$location <- args$original_location
+    meta_data$location <- args$original_location
+  }
 
   out <- list(exposure = row_out,
               meta_data = meta_out,

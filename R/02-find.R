@@ -222,10 +222,6 @@ find_counties <- function(counties, return = "pur_codes") {
 #'   latitude".
 #' @param return Either "name" to return county name (the default), "pur_code"
 #'   to return PUR county code, or "fips_code" to return the FIPS county code.
-#' @param latlon_out A numeric vector of two with longitude and latitude
-#'   values. If the \code{geocode} code has been run earlier and this output is
-#'   available, this saves a redundant request to the Google Maps API. (This
-#'   argument is used internally.)
 #'
 #' @return A character string giving the California county where the address or
 #' coordinate pair given in \code{location} is located.
@@ -237,11 +233,20 @@ find_counties <- function(counties, return = "pur_codes") {
 #' find_location_county(c(address, long_lat))
 #' }
 #' @export
-find_location_county <- function(locations, return = "name",
-                                 latlon_out = NULL) {
+find_location_county <- function(locations, return = "name", ...) { #latlon_out
 
-  out <- purrr::map_dfr(locations, help_find_location_county, return = return,
-                        latlon_out = latlon_out)
+  args <- list(...)
+
+    if (!is.null(args$latlon_out)) {
+
+      out <- purrr::map_dfr(locations, help_find_location_county, return = return,
+                            latlon_out = args$latlon_out)
+    } else {
+
+      out <- purrr::map_dfr(locations, help_find_location_county, return = return)
+
+    }
+
   return(out)
 
 }

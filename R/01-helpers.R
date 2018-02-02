@@ -1109,7 +1109,7 @@ help_find_location_county <- function(location, return = "name",
       latlon_out <- latlon_vec
     } else {
       address <- location
-      suppressMessages(latlon_df <- ggmap::geocode(address, messaging = FALSE))
+      latlon_df <- help_geocode(address)
       address_x <- latlon_df$lon
       address_y <- latlon_df$lat
       latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
@@ -1147,3 +1147,51 @@ help_find_location_county <- function(location, return = "name",
   return(out_df)
 
 }
+
+# https://stackoverflow.com/questions/36175529/getting-over-query-limit-after-one-request-with-geocode
+# the request doesn't use a key, which means you share the quota with all pages
+# hosted on the same server
+help_geocode <- function(address) {
+
+  geocode_quiet <- purrr::quietly(ggmap::geocode)
+  latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
+
+  if (!is.null(latlon$warnings)) {
+    if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
+                    latlon$error)) > 0) {
+      Sys.sleep(3)
+      latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
+    }
+  }
+
+  if (!is.null(latlon$warnings)) {
+    if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
+                    latlon$error)) > 0) {
+      Sys.sleep(3)
+      latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
+    }
+  }
+
+  if (!is.null(latlon$warnings)) {
+    if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
+                    latlon$error)) > 0) {
+      Sys.sleep(3)
+      latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
+    }
+  }
+
+  if (!is.na(latlon$result$lon[1]) & !is.na(latlon$result$lat[1])) {
+
+    return(latlon$result)
+
+  } else {
+
+    return(latlon$warnings)
+
+  }
+
+}
+
+
+
+
