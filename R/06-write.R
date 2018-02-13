@@ -21,7 +21,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
       latlon_df <- help_geocode(address)
       address_x <- latlon_df$lon
       address_y <- latlon_df$lat
-      latlon_out <- as.numeric(c(latlon_df$lon, latlon_df$lat))
+      latlon_out <- as.numeric(c(address_x, address_y))
     }
     latlon_ch <- paste0(latlon_out[1], ", ", latlon_out[2])
     if (i == 1) {
@@ -63,6 +63,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
   for (i in 1:length(exposure_list)) {
 
     if (!is.null(exposure_list[[i]]$error)) {
+
       row <- data.frame(exposure = NA, chemicals = chemicals,
                         start_date = exposure_mat[i, ]$start_date,
                         end_date = exposure_mat[i, ]$end_date,
@@ -70,7 +71,8 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                         location = exposure_mat[i, ]$original_location,
                         radius = exposure_mat[i, ]$radius,
                         longitude = NA, latitude = NA,
-                        error_message = exposure_list[[i]]$error)
+                        error_message = exposure_list[[i]]$error,
+                        n_row = 1)
       meta_data <- data.frame(pls = NA, chemicals = chemicals, percent = NA,
                               kg = NA, kg_intersection = NA,
                               start_date = exposure_mat[i, ]$start_date,
@@ -80,12 +82,16 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                               radius = exposure_mat[i, ]$radius,
                               area = NA, error_message = exposure_list[[i]]$error)
     } else {
+
       error_message <- NA
       row <- exposure_list[[i]]$result$exposure %>%
-        dplyr::mutate(error_message = NA)
+        dplyr::mutate(error_message = NA) %>%
+        dplyr::mutate(n_row = n())
+
       meta_data <- exposure_list[[i]]$result$meta_data %>%
         dplyr::mutate(error_message = NA,
                       location = exposure_mat[i, ]$original_location)
+
     }
 
     if (i == 1) {
@@ -94,7 +100,17 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
       row_out <- rbind(row_out, row)
     }
 
-    meta_list[[i]] <- meta_data
+    if (i == 1) {
+      for (l in 1:row$n_row) {
+        meta_list[[l]] <- meta_data
+      }
+    } else {
+      starting_point <- length(meta_list)
+      meta_list_vec <- 1:row$n_row + starting_point
+      for (l in meta_list_vec) {
+        meta_list[[l]] <- meta_data
+      }
+    }
 
   }
 
@@ -102,11 +118,13 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
     dir.create(directory)
   }
 
+  row_out <- row_out %>% dplyr::select(-n_row)
+
   saveRDS(row_out, file = paste0(directory, "/exposure_df.rds"))
 
-  saveRDS(row_out, file = paste0(directory, "/meta_data.rds"))
+  saveRDS(meta_list, file = paste0(directory, "/meta_data.rds"))
 
-  pad_width <- nchar(sub('^0+','',sub('\\.','',length(exposure_list))))
+  pad_width <- nchar(sub('^0+','',sub('\\.', '', nrow(row_out))))
 
   if (write_plots) {
 
@@ -168,21 +186,38 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                                    pls_labels = pls_labels,
                                    pls_labels_size = pls_labels_size)
 
-        exp_plot <- plot_list$maps[[1]] # what if length(plot_list$maps > 1)
+        for (j in 1:length(plot_list$maps)) {
 
-        file_number <- stringr::str_pad(as.character(i), pad_width, "left", pad = "0")
+          exp_plot <- plot_list$maps[[j]]
 
-        ggplot2::ggsave(paste0(directory, "/exposure_plots/", file_number,
-                               "_exposure_plot.png"),
-                        plot = exp_plot)
+          row_to_match <- plot_list$exposure[[j]] %>% dplyr::ungroup()
 
-        if (!is.null(plot_list$cutoff_values)) {
-          if (!dir.exists(paste0(directory, "/exposure_plots/cutoff_values"))) {
-            dir.create(paste0(directory, "/exposure_plots/cutoff_values"))
+          row_out_noerror <- row_out %>% dplyr::select(-error_message) %>%
+            dplyr::ungroup()
+         #  k <- which(apply(row_out_noerror, 1, identical, row_to_match))
+
+          for (z in 1:nrow(row_out_noerror)) {
+            match <- identical(row_out_noerror[z,], row_to_match)
+            if (match) {
+              k <- z
+            }
           }
-          cutoff_df <- plot_list$cutoff_values
-          saveRDS(cutoff_df, file = paste0(directory, "/exposure_plots/cutoff_values/",
-                                           file_number, "_cutoff_values.rds"))
+
+          file_number <- stringr::str_pad(as.character(k), pad_width, "left", pad = "0")
+
+          ggplot2::ggsave(paste0(directory, "/exposure_plots/", file_number,
+                                 "_exposure_plot.png"),
+                          plot = exp_plot)
+
+          if (!is.null(plot_list$cutoff_values[[j]])) {
+            if (!dir.exists(paste0(directory, "/exposure_plots/cutoff_values"))) {
+              dir.create(paste0(directory, "/exposure_plots/cutoff_values"))
+            }
+            cutoff_df <- plot_list$cutoff_values[[j]]
+            saveRDS(cutoff_df, file = paste0(directory, "/exposure_plots/cutoff_values/",
+                                             file_number, "_cutoff_values.rds"))
+          }
+
         }
 
       }

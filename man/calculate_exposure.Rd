@@ -63,16 +63,16 @@ while the function is running. The default is \code{TRUE}.}
 \value{
 A list with five elements:
  \describe{
-   \item{exposure}{A data frame with 7 columns: \code{exposure},
+   \item{exposure}{A data frame with 9 columns: \code{exposure},
    the estimate of exposure in kg/m^2, \code{chemicals}, (either "all",
    indicating that all active ingredients present in the \code{clean_pur_df}
    were summed or the chemical class(es) specified in the \code{clean_pur_df}
    data frame), \code{start_date}, \code{end_date}, \code{aerial_ground},
    which can take values of "A" = aerial, "G" = ground, and "O" = others, (if
    the \code{aerial_ground} argument is \code{FALSE}, \code{aerial_ground}
-   will be \code{NA} in the \code{exposure} data frame), \code{location}, and
+   will be \code{NA} in the \code{exposure} data frame), \code{location},
    \code{radius}, the radius in meters for the buffer extending from the
-   location.}
+   location, and the \code{longitude} and \code{latitude} of the location.}
    \item{meta_data}{A data frame with 12 columns and at least one row for
    every section or township intersected by the specified buffer extending
    from the given location. Columns include \code{pls}, giving either the

@@ -857,7 +857,8 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
         ggplot2::geom_point(x = location_longitude, y = location_latitude, color = "black",
                    size = 2) +
         ggplot2::theme_void() +
-        ggplot2::scale_fill_manual(name = legend_label, values = c("None recorded" = NA))
+        ggplot2::scale_fill_manual(name = legend_label, values = c("None recorded" = NA)) +
+        ggplot2::coord_map()
 
     } else if (color_by == "amount") {
 
@@ -867,7 +868,8 @@ help_map_exp <- function(start_date, end_date, chemicals, aerial_ground,
         ggplot2::geom_point(x = location_longitude, y = location_latitude, color = "black",
                    size = 2) +
         ggplot2::theme_void() +
-        ggplot2::scale_fill_manual(name = legend_label, values = c("0" = NA))
+        ggplot2::scale_fill_manual(name = legend_label, values = c("0" = NA)) +
+        ggplot2::coord_map()
 
     }
 
@@ -1143,7 +1145,8 @@ help_find_location_county <- function(location, return = "name",
                                 " in California.")
   }
 
-  out_df <- data.frame(location = location, county = name_clean$result)
+  out_df <- data.frame(location = location, county = name_clean$result) %>%
+    dplyr::mutate_all(as.character)
   return(out_df)
 
 }
@@ -1158,7 +1161,7 @@ help_geocode <- function(address) {
 
   if (!is.null(latlon$warnings)) {
     if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
-                    latlon$error)) > 0) {
+                    latlon$warnings)) > 0) {
       Sys.sleep(3)
       latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
     }
@@ -1166,7 +1169,7 @@ help_geocode <- function(address) {
 
   if (!is.null(latlon$warnings)) {
     if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
-                    latlon$error)) > 0) {
+                    latlon$warnings)) > 0) {
       Sys.sleep(3)
       latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
     }
@@ -1174,11 +1177,28 @@ help_geocode <- function(address) {
 
   if (!is.null(latlon$warnings)) {
     if (length(grep("geocode failed with status OVER_QUERY_LIMIT, location",
-                    latlon$error)) > 0) {
+                    latlon$warnings)) > 0) {
       Sys.sleep(3)
       latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
     }
   }
+
+  help_test_latlon_safe <- purrr::safely(help_test_latlon)
+  out <- help_test_latlon_safe(latlon)
+
+  if (is.null(out$error)) { # ??
+
+    return(out$result)
+
+  } else {
+
+    return(out$error)
+
+  }
+
+}
+
+help_test_latlon <- function(latlon, address) {
 
   if (!is.na(latlon$result$lon[1]) & !is.na(latlon$result$lat[1])) {
 
@@ -1186,7 +1206,14 @@ help_geocode <- function(address) {
 
   } else {
 
-    return(latlon$warnings)
+    Sys.sleep(3)
+    latlon <- suppressMessages(geocode_quiet(address, messaging = FALSE))
+
+    if (!is.null(latlon$warnings)) {
+      return(latlon$warnings)
+    } else {
+      return(latlon$result)
+    }
 
   }
 

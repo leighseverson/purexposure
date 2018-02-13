@@ -4,7 +4,7 @@
 \alias{find_location_county}
 \title{Find the county from an address or coordinate pair.}
 \usage{
-find_location_county(locations, return = "name", latlon_out = NULL)
+find_location_county(locations, return = "name", ...)
 }
 \arguments{
 \item{locations}{A vector of character strings. Each location should be
@@ -14,11 +14,6 @@ latitude".}
 
 \item{return}{Either "name" to return county name (the default), "pur_code"
 to return PUR county code, or "fips_code" to return the FIPS county code.}
-
-\item{latlon_out}{A numeric vector of two with longitude and latitude
-values. If the \code{geocode} code has been run earlier and this output is
-available, this saves a redundant request to the Google Maps API. (This
-argument is used internally.)}
 }
 \value{
 A character string giving the California county where the address or
