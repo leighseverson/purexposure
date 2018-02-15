@@ -517,6 +517,7 @@ help_calc_exp <- function(exp, buffer_area, ...) {
   group_by_vars <- rlang::quos(...)
 
   exp_out <- exp %>%
+    dplyr::filter(none_recorded == FALSE) %>%
     dplyr::group_by(!!!group_by_vars) %>%
     dplyr::summarise(exposure = sum(kg_intersection, na.rm = TRUE) / buffer_area)
 

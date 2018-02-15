@@ -1,7 +1,106 @@
-
-# ...  for plot_exposure() function
-# not working for chemicals = "chemical_class" yet
-
+#' Write exposure values for specified locations and dates in a certain county.
+#'
+#' For a particular combination of locations and dates, radii, and active
+#' ingredients, \code{write_exposure} calculates exposure (kg/m^2) and writes
+#' out files (exposure values, meta data, and plots) to a specified directory.
+#'
+#' @param clean_pur_df A data frame returned by \code{pull_clean_pur} that
+#'   includes data for the county of your locations, the time periods, and the
+#'   active ingredients or cheimcal classes for which you want to calculate
+#'   exposure.
+#' @param locations_dates_df A data frame with three columns: \code{location},
+#'   character strings of California addresses with street names, cities, state,
+#'   and 5-digit zip codes, or pairs of coordinates in the form "longitude,
+#'   latitude". All of the locations should be in the same county. The other two
+#'   columns are \code{start_date} and \code{end_date}, with "yyyy-mm-dd"
+#'   character strings specifying the time period(s) over which you would like
+#'   to calculate exposure for each location.
+#' @param radii A vector of numeric values greater than zero that give the radii
+#'   in meters defining the buffers around your locations in which you would
+#'   like to calculate exposure. For reference, the length and width of a PLS
+#'   section is about 1,609 meters (1 mile). That of a township could range from
+#'   about 9,656 to 11,265 meters (6-7 miles).
+#' @param directory A path to the directory where you would like exposure files
+#'   to be written. This directory will be created if it doesn't already exist.
+#' @param write_plots TRUE / FALSE for whether you would like to write out
+#'   plots returned from \code{plot_exposure} for each combination of location,
+#'   date, radius, chemical class, and aerial/ground application. Plots are
+#'   saved in a subdirectory called "exposure_plots".
+#' @param ... Additional arguments passed on to \code{plot_exposure}.
+#' @inheritParams calculate_exposure
+#'
+#' @return Two .rds files ("exposure_df" and "meta_data") and a subdirectory
+#'   ("exposure_plots") with PDF files of \code{plot_exposure} plots:
+#' \describe{
+#'   \item{exposure_df.rds}{A data frame with 10 columns: \code{exposure}, the
+#'   exposure value in kg/m^2 for that combination of chemicals, date range,
+#'   aerial/ground application, location, and radius, \code{chemicals}, either
+#'   "all" or a chemical class present in the provided \code{clean_pur_df} data
+#'   frame, \code{start_date} and \code{end_date}, \code{aerial_ground}, which
+#'   will be \code{NA} unless the \code{aerial_ground} argument is set to
+#'   \code{TRUE}, \code{location}, \code{radius}, \code{longitude} and
+#'   \code{latitude} of each location, and any \code{error_message}s that were
+#'   returned when calculating exposure.}
+#'   \item{meta_data.rds}{A list with as many elements as there are rows in the
+#'   exposure_df.rds data frame. Each element is a data frame with meta data
+#'   relevant to the exposure value in the corresponding row of the exposure_df
+#'   data frame. For example, meta data for exposure_df[1,] is saved as
+#'   meta_data[[1]], exposure_df[2,] saved as meta_data[[2]], and so on. Meta
+#'   data data frames have 13 columns: \code{pls}, with each PLS unit intersected
+#'   by the specified buffer, \code{chemicals}, either a chemical class or "all"
+#'   (indicating exposure was calculated for all active ingredients present in
+#'   the clean_pur_df data frame), \code{percent}, the percent intersection of
+#'   the PLS unit with the buffer, \code{kg}, kg of active ingredients applied
+#'   in the PLS unit for the given date range/chemicals/aerial_ground combination,
+#'   \code{kg_intersection}, \code{percent} multiplied by \code{kg},
+#'   \code{start_date}, \code{end_date}, \code{aerial_ground} (this will be
+#'   \code{NA} if the \code{aerial_ground} argument is set to \code{FALSE} or if
+#'   \code{none_recorded} is \code{TRUE}), \code{none_recorded}, a logical value
+#'   indicating if there were no active ingredients recorded for the
+#'   PLS/date range/chemicals combination, \code{location}, \code{radius},
+#'   \code{area}, the area of the specified buffer, and \code{error_message},
+#'   which gives the error message, if any, that was returned.}
+#'   \item{exposure_plots}{A subdirectory with a \code{plot_exposure} plot saved
+#'   for each row of the exposure_df data frame and element of the meta_data list.
+#'   Plots are saved as #_exposure_plot.pdf, with numbers corresponding to the
+#'   row number and element number of the exposure_df data frame and meta_data
+#'   list, respectively. For example, 12_exposure_plot.pdf corresponds to
+#'   exposure_df[12,] and meta_data[[12]].}
+#' }
+#'
+#' @section Note:
+#'  \itemize{
+#'    \item{Unlike the \code{calculate_exposure} function, \code{write_exposure}
+#'          requires that you specify at least one start and end date for each
+#'          location with the \code{locations_dates_df} argument. This is to
+#'          accomodate multiple date ranges within a single location and
+#'          differing start/end dates across locations.}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' chemical_class_df <- rbind(find_chemical_codes(2000:2001, "sulfur"),
+#'                            find_chemical_codes(2000:2001, "methyl bromide")) %>%
+#'    dplyr::rename(chemical_class = chemical)
+#' pur <- pull_clean_pur(2000:2001, counties = "fresno",
+#'                       chemicals = chemical_class_df$chemname,
+#'                       sum_application = TRUE,
+#'                       sum = "chemical_class",
+#'                       chemical_class = chemical_class_df)
+#' schools <- c("3333 American Ave., Fresno, CA 93725",
+#'              "1111 Van Ness Ave., Fresno, CA 93721",
+#'              "1616 South Fruit Ave., Fresno, CA 93706")
+#' df <- data.frame(location = rep(schools, each = 2),
+#'                  start_date = rep(c("2000-01-01", "2000-05-25", "2001-02-16"),
+#'                                   each = 2),
+#'                  end_date = c("2000-04-01", "2000-07-01",
+#'                               "2000-08-25", "2000-11-25",
+#'                               "2001-05-16", "2001-08-16"))
+#' write_exposure(pur, df, c(1500, 3000), "chemical_class",
+#'                directory = "~/Documents/fresno_schools")
+#' }
+#' @importFrom magrittr %>%
+#' @export
 write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                            chemicals = "all", aerial_ground = FALSE,
                            directory, write_plots = TRUE, verbose = TRUE, ...) {
@@ -86,6 +185,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
       error_message <- NA
       row <- exposure_list[[i]]$result$exposure %>%
         dplyr::mutate(error_message = NA) %>%
+        dplyr::ungroup() %>%
         dplyr::mutate(n_row = n())
 
       meta_data <- exposure_list[[i]]$result$meta_data %>%
@@ -101,15 +201,26 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
     }
 
     if (i == 1) {
-      for (l in 1:row$n_row) {
-        meta_list[[l]] <- meta_data
+
+      for (l in 1:unique(row$n_row)) {
+        meta_row <- row[l,]
+        meta_data_row <- meta_data %>%
+          dplyr::filter(chemicals == meta_row$chemicals)
+        meta_list[[l]] <- meta_data_row
       }
+
     } else {
+
       starting_point <- length(meta_list)
-      meta_list_vec <- 1:row$n_row + starting_point
+      meta_list_vec <- 1:unique(row$n_row) + starting_point
+
       for (l in meta_list_vec) {
-        meta_list[[l]] <- meta_data
+        meta_row <- row[l-starting_point,]
+        meta_data_row <- meta_data %>%
+          dplyr::filter(chemicals == meta_row$chemicals)
+        meta_list[[l]] <- meta_data_row
       }
+
     }
 
   }

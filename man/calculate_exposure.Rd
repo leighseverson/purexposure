@@ -59,6 +59,8 @@ each method of application: aerial or ground. The default is FALSE.}
 
 \item{verbose}{TRUE / FALSE for whether you would like a message to print out
 while the function is running. The default is \code{TRUE}.}
+
+\item{...}{Used internally.}
 }
 \value{
 A list with five elements:

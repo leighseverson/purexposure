@@ -46,6 +46,7 @@
 #'   each method of application: aerial or ground. The default is FALSE.
 #' @param verbose TRUE / FALSE for whether you would like a message to print out
 #'   while the function is running. The default is \code{TRUE}.
+#' @param ... Used internally.
 #'
 #' @return A list with five elements:
 #'  \describe{
@@ -161,7 +162,7 @@
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
                                end_date = NULL, chemicals = "all",
-                               aerial_ground = FALSE, verbose = TRUE, ...) { # what is the ... for. @original_location !
+                               aerial_ground = FALSE, verbose = TRUE, ...) { # original_location
 
   # get numeric coordinate vector from location
   if (length(grep("-", location)) == 1) {

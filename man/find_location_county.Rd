@@ -14,6 +14,8 @@ latitude".}
 
 \item{return}{Either "name" to return county name (the default), "pur_code"
 to return PUR county code, or "fips_code" to return the FIPS county code.}
+
+\item{...}{Used internally.}
 }
 \value{
 A character string giving the California county where the address or

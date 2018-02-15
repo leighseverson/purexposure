@@ -222,6 +222,7 @@ find_counties <- function(counties, return = "pur_codes") {
 #'   latitude".
 #' @param return Either "name" to return county name (the default), "pur_code"
 #'   to return PUR county code, or "fips_code" to return the FIPS county code.
+#' @param ... Used internally.
 #'
 #' @return A character string giving the California county where the address or
 #' coordinate pair given in \code{location} is located.
