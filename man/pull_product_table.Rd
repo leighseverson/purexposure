@@ -46,7 +46,7 @@ pulled.}
 }
 \description{
 This function pulls a California Department of Pesticide Regulation Product
-Table for a particular year.
+Table for a vector of years.
 }
 \details{
 Product tables are pulled by year from the CDPR's FTP server. Downloaded

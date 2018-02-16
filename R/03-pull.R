@@ -725,7 +725,7 @@ pull_spdf <- function(county, section_township = "section",
 #' Pull PUR Product Table.
 #'
 #' This function pulls a California Department of Pesticide Regulation Product
-#' Table for a particular year.
+#' Table for a vector of years.
 #'
 #' Product tables are pulled by year from the CDPR's FTP server. Downloaded
 #' tables are saved in a temporary environment, which is deleted at the end of
