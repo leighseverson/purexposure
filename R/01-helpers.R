@@ -1220,6 +1220,31 @@ help_test_latlon <- function(latlon, address) {
 
 }
 
+#' @importFrom magrittr %>%
+help_calculate_buffers <- function(exposure_df_row) {
+
+  buffer <- geosphere::destPoint(p = c(exposure_df_row$longitude,
+                                       exposure_df_row$latitude), b = 0:360,
+                                 d = exposure_df_row$radius)
+  colnames(buffer)[1] <- "long"
+  buffer_df <- as.data.frame(buffer)
+  buffer_df <- buffer_df %>% dplyr::mutate(location = exposure_df_row$location)
+
+  return(buffer_df)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

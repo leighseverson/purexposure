@@ -700,3 +700,79 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
   return(plot)
 
 }
+
+#' Plot exposure for multiple locations in a county.
+#'
+#' \code{plot_locations_exposure} returns a plot of exposure to applied pesticides
+#' for multiple locations in a given county.
+#'
+#' @param exposure_df A data frame returned from \code{write_exposure} with 10
+#'   columns, including \code{exposure}, \code{location}, \code{radius},
+#'   \code{longitude}, and \code{latitude}. This data frame should be filtered
+#'   so that there is one exposure value per location.
+#' @param section_township Either "section" (the default) or "township". Specifies
+#'   which PLS unit to plot the county by.
+#' @inheritParams plot_county_application
+#'
+#' @return A plot with one point per location, colored by each location's
+#' corresponding exposure value.
+#'
+#' @importFrom magrittr %>%
+plot_locations_exposure <- function(exposure_df, section_township = "section",
+                                    fill_option = "viridis") {
+
+  check <- nrow(exposure_df) == length(unique(exposure_df$location))
+  if (!check) {
+    stop(paste0("Filter your exposure_df so that there is one row per location ",
+                "in your exposure_df."))
+  }
+
+  for (i in 1:nrow(exposure_df)) {
+
+    buffer <- help_calculate_buffers(exposure_df[i,])
+    if (i == 1) {
+      buffer_out <- buffer
+    } else {
+      buffer_out <- bind_rows(buffer_out, buffer)
+    }
+
+  }
+
+  buffer_out <- buffer_out %>%
+    dplyr::full_join(dplyr::select(exposure_df, location, exposure), by = "location")
+
+  county <- find_location_county(exposure_df[1,]$location)$county
+
+  shp <- pull_spdf(county, section_township)
+  df <- spdf_to_df(shp)
+
+  colormaps_vec <- unlist(colormap::colormaps)
+  names(colormaps_vec) <- NULL
+
+  gradient <- colormap::colormap(fill_option, nshades = 1000)
+
+  if (!fill_option %in% colormaps_vec) {
+    stop(paste0("The fill_option argument should be a color palette from the ",
+                "colormap package."))
+  }
+
+  plot <- ggplot2::ggplot(data = df) +
+    ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group),
+                         color = "lightgrey", fill = NA) +
+    ggplot2::geom_polygon(data = buffer_out, ggplot2::aes(x = long, y = lat,
+                                                          group = location,
+                                                          fill = exposure)) +
+    ggplot2::coord_map() +
+    ggplot2::theme_void() +
+    ggplot2::scale_fill_gradientn(colours = gradient,
+                                 name = expression(paste("Exposure (",
+                                                         "kg/", "m"^{2}, ")")))
+
+  return(plot)
+
+}
+
+
+
+
+
