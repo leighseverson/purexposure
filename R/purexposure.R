@@ -47,6 +47,8 @@
 #'   particular location.
 #'   \item \code{plot_application_timeseries}: Plot time series of active
 #'   ingredients in applied pesticides.
+#'   \item \code{plot_locations_exposure}: Plot exposure for multiple locations
+#'   in a given county.
 #' }
 #'
 #' @section write_* function:

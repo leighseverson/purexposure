@@ -406,6 +406,8 @@ In this case, there is one exposure value calculated for each four-month increme
 
 #### Visualize exposure 
 
+**Plot exposure for a single location** 
+
 The `plot_exposure` function returns a list with three elements: `maps`, `pls_data`, and `exposure`. `pls_data` and `exposure` data frames are similar to the `meta_data` and `exposure` data frames returned by `calculate_exposure`. For each exposure value that is calculated, there is a separate map, PLS data frame (with one row per section or township), and exposure data frame (with one row). 
 
 The first argument of plot_exposure is a list returned by `calculate_exposure`. 
@@ -503,6 +505,36 @@ knitr::include_graphics("vignettes/figures/m_plots.png")
 ```
 
 Other `plot_exposure` list elements are organized in the same way. For example, the first `plot_monroe2$maps` element corresponds to `plot_monroe2$pls_data[[1]]`, `plot_monroe2$exposure[[1]]`, and `plot_monroe2$cutoff_values[[1]]`. 
+
+**Plot exposure for multiple locations in a county** 
+
+After calling `write_exposure` (explained in more detail further below), the `plot_locations_exposure` function could be useful to visually compare exposure at multiple locations. The first argument is an `exposure_df` data frame returned from `write_exposure`. If there are more than one exposure values calculated per location, the data frame should be manually filtered first. The `exposure_df` data frame in this example was written in the `write_exposure` example below. 
+
+```{r eval = FALSE}
+exposure_df <- readRDS("~/Documents/fresno_example/exposure_df.rds")
+nrow(exposure_df)
+exposure_df[1:3,]
+```
+
+```{r echo = FALSE}
+load("vignettes/data/exposure_df.RData")
+nrow(exposure_df)
+exposure_df[1:3,]
+```
+
+Since the data frame has four exposure values calculated per location, we need to manually filter the data frame and choose the combination of chemicals, date range, aerial/ground application, and radius to plot: 
+
+```{r eval = FALSE}
+exposure_df %>% dplyr::filter(radius == 3000 & end_date %in% 
+                                c(lubridate::ymd(c("2000-04-01", "2005-06-01", 
+                                                   "2005-08-01")))) %>% 
+  plot_locations_exposure()
+```
+```{r echo = FALSE, fig.align = "center"}
+knitr::include_graphics("vignettes/figures/locations_plot.png")
+```
+
+Each colored point represents the exposure at that location. You can control the background county's PLS units with `section_township` (left as its default, `"section"`, in this example), and the fill color of points with the `fill` option, which takes any one of the palettes from the `colormap` package. The `alpha` argument can change the transparency of these points.
 
 #### Visualize application 
 

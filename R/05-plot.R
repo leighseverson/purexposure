@@ -719,7 +719,7 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #'
 #' @importFrom magrittr %>%
 plot_locations_exposure <- function(exposure_df, section_township = "section",
-                                    fill = "viridis") {
+                                    fill = "viridis", alpha = 1) {
 
   check <- nrow(exposure_df) == length(unique(exposure_df$location))
   if (!check) {
@@ -749,7 +749,7 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
   colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
-  gradient <- colormap::colormap(fill, nshades = 1000)
+  gradient <- colormap::colormap(fill, nshades = 1000, alpha = alpha)
 
   if (!fill %in% colormaps_vec) {
     stop(paste0("The fill argument should be a color palette from the ",
@@ -764,9 +764,8 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
                                                           fill = exposure)) +
     ggplot2::coord_map() +
     ggplot2::theme_void() +
-    ggplot2::scale_fill_gradientn(colours = gradient,
-                                 name = expression(paste("Exposure (",
-                                                         "kg/", "m"^{2}, ")")))
+    scale_fill_gradientn2(colours = gradient, alpha = alpha,
+                          name = expression(paste("Exposure (", "kg/", "m"^{2}, ")")))
 
   return(plot)
 

@@ -5,7 +5,7 @@
 \title{Plot exposure for multiple locations in a county.}
 \usage{
 plot_locations_exposure(exposure_df, section_township = "section",
-  fill = "viridis")
+  fill = "viridis", alpha = 1)
 }
 \arguments{
 \item{exposure_df}{A data frame returned from \code{write_exposure} with 10
@@ -20,6 +20,9 @@ which PLS unit to plot the county by.}
 "viridis". To see colormap palette options, visit
 \url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
+
+\item{alpha}{A number in [0,1] specifying the transparency of fill colors.
+Numbers closer to 0 will result in more transparency. The default is 1.}
 }
 \value{
 A plot with one point per location, colored by each location's

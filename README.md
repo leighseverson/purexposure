@@ -755,6 +755,8 @@ values calculated for different values of `chemical_class` (if the
 
 #### Visualize exposure
 
+**Plot exposure for a single location**
+
 The `plot_exposure` function returns a list with three elements: `maps`,
 `pls_data`, and `exposure`. `pls_data` and `exposure` data frames are
 similar to the `meta_data` and `exposure` data frames returned by
@@ -898,6 +900,52 @@ Other `plot_exposure` list elements are organized in the same way. For
 example, the first `plot_monroe2$maps` element corresponds to
 `plot_monroe2$pls_data[[1]]`, `plot_monroe2$exposure[[1]]`, and
 `plot_monroe2$cutoff_values[[1]]`.
+
+**Plot exposure for multiple locations in a county**
+
+After calling `write_exposure` (explained in more detail further below),
+the `plot_locations_exposure` function could be useful to visually
+compare exposure at multiple locations. The first argument is an
+`exposure_df` data frame returned from `write_exposure`. If there are
+more than one exposure values calculated per location, the data frame
+should be manually filtered first. The `exposure_df` data frame in this
+example was written in the `write_exposure` example below.
+
+``` r
+exposure_df <- readRDS("~/Documents/fresno_example/exposure_df.rds")
+nrow(exposure_df)
+exposure_df[1:3,]
+```
+
+    #> [1] 12
+    #> # A tibble: 3 x 10
+    #>    exposure chemicals start_date end_date   aerial_ground location  radius
+    #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
+    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…   1500
+    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…   1500
+    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…   1500
+    #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
+    #> #   error_message <lgl>
+
+Since the data frame has four exposure values calculated per location,
+we need to manually filter the data frame and choose the combination of
+chemicals, date range, aerial/ground application, and radius to plot:
+
+``` r
+exposure_df %>% dplyr::filter(radius == 3000 & end_date %in% 
+                                c(lubridate::ymd(c("2000-04-01", "2005-06-01", 
+                                                   "2005-08-01")))) %>% 
+  plot_locations_exposure()
+```
+
+<img src="vignettes/figures/locations_plot.png" style="display: block; margin: auto;" />
+
+Each colored point represents the exposure at that location. You can
+control the background county’s PLS units with `section_township` (left
+as its default, `"section"`, in this example), and the fill color of
+points with the `fill` option, which takes any one of the palettes from
+the `colormap` package. The `alpha` argument can change the transparency
+of these points.
 
 #### Visualize application
 
