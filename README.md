@@ -909,7 +909,8 @@ compare exposure at multiple locations. The first argument is an
 `exposure_df` data frame returned from `write_exposure`. If there are
 more than one exposure values calculated per location, the data frame
 should be manually filtered first. The `exposure_df` data frame in this
-example was written in the `write_exposure` example below.
+example was written to the “fresno\_example” directory in the
+`write_exposure` example below.
 
 ``` r
 exposure_df <- readRDS("~/Documents/fresno_example/exposure_df.rds")
