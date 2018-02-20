@@ -842,7 +842,7 @@ plot_exposure(monroe, buffer_or_county = "buffer")$maps
 <img src="vignettes/figures/m_map3.png" style="display: block; margin: auto;" />
 
 There are a few other arguments that can change the appearance of the
-returned plot in other ways. `fill_option` takes any palette from the
+returned plot in other ways. `fill` takes any palette from the
 `colormap` package. `alpha` sets the transparency of fill colors, and is
 set by default to `0.7`. You can also include section or township labels
 with `pls_labels` set to `TRUE`. `pls_labels_size` controls the size of
@@ -850,7 +850,7 @@ these labels (the default is `4`). For example:
 
 ``` r
 plot_exposure(monroe, 
-              fill_option = "density", 
+              fill = "density", 
               alpha = 0.5, 
               pls_labels = TRUE, 
               pls_labels_size = 3.5)$maps
@@ -964,15 +964,15 @@ township by specifying `pls = "township"`, choose to scale colors by
 amount or percentile with `color_by`, specify `percentile` break points,
 choose the date range that you would like to plot with `start_date` and
 `end_date`, and choose certain `chemicals` to plot. You can also change
-the color palette with `fill_option` (you can specify any palette from
-the `colormap` package), `crop` the plot to PLS units with recorded
+the color palette with `fill` (you can specify any palette from the
+`colormap` package), `crop` the plot to PLS units with recorded
 application, and change the transparency of colors with `alpha`.
 
 ``` r
 plot_county_application(fresno_clean, pls = "township", 
                         color_by = "percentile", 
                         percentile = c(0.2, 0.4, 0.6, 0.8), 
-                        fill_option = "magma", 
+                        fill = "magma", 
                         crop = TRUE)$map
 ```
 
@@ -1027,6 +1027,190 @@ plot_application_timeseries(fresno_clean) +
 ```
 
 <img src="vignettes/figures/timeseries4.png" style="display: block; margin: auto;" />
+
+### 5\. `write_exposure` for multiple locations in the same county
+
+You can use `write_exposure` to calculate exposure for multiple
+locations in the same county at once, and write out files to a specified
+directory. For example, if your directory is a path to
+“fresno\_example”, there will be an `exposure_df` data frame written
+with exposure values for each unique combination of location, date
+range, chemicals, aerial/ground application, and radius, a `meta_data`
+list of data frames with application data for each PLS unit
+corresponding to each exposure value, and an `"exposure_plots"`
+subdirectory with `plot_exposure` plots for each exposure
+value:
+
+<img src="vignettes/figures/ex_directory.png" style="display: block; margin: auto;" />
+
+The function takes a data frame returned from `pull_clean_pur` as its
+first argument, which should have data for the county of your vector of
+locations. The `locations_dates_df` argument takes a data frame
+specifying start and end dates for each location. This is meant to
+accomodate situations when you might want to calculate exposure for
+different time periods for each location, with differing start dates. In
+the example below, we would be calculating exposure for 3 and 6 month
+periods for three locations with three different start
+dates:
+
+``` r
+locations_dates <- data.frame(location = rep(c("3333 American Ave., Fresno, CA 93725", 
+                                               "1616 South Fruit Ave., Fresno, CA 93706", 
+                                               "295 West Saginaw Ave., Caruthers, CA 93609"), 
+                                             each = 2), 
+                              start_date = c("2000-01-01", "2000-01-01", 
+                                             "2005-03-01", "2005-03-01", 
+                                             "2005-05-01", "2005-05-01"),
+                              end_date = c("2000-04-01", "2000-07-01", 
+                                           "2005-06-01", "2005-09-01", 
+                                           "2005-08-01", "2005-11-01"))
+locations_dates
+#>                                     location start_date   end_date
+#> 1       3333 American Ave., Fresno, CA 93725 2000-01-01 2000-04-01
+#> 2       3333 American Ave., Fresno, CA 93725 2000-01-01 2000-07-01
+#> 3    1616 South Fruit Ave., Fresno, CA 93706 2005-03-01 2005-06-01
+#> 4    1616 South Fruit Ave., Fresno, CA 93706 2005-03-01 2005-09-01
+#> 5 295 West Saginaw Ave., Caruthers, CA 93609 2005-05-01 2005-08-01
+#> 6 295 West Saginaw Ave., Caruthers, CA 93609 2005-05-01 2005-11-01
+```
+
+The `radii` argument takes a vector of numeric radius values in meters.
+If we wanted to calculate exposure for 1,500 and 3,000 meter buffers
+extending from each location, we would set `radii = c(1500, 3000)`. The
+`chemicals` argument, similarly to `calculate_exposure`, can be set to
+either `"all"` or `"chemical_class"` (depending on if the data frame
+pulled using `pull_clean_pur` has a `chemical_class` column that you
+would like to group by in exposure calculations), and `aerial_ground`
+can be set to `TRUE` or `FALSE`.
+
+The `directory` argument specifies the directory where you would like
+the data to be saved. If the folder specified doesn’t exist yet, the
+function will create it. The `write_plots` argument is `TRUE/FALSE`
+specifying if you would like to save plots returned from `plot_exposure`
+for each exposure value. `write_exposure` takes additional arguments
+that are passed on to `plot_exposure` to control the appearance of these
+plots.
+
+This example will save four exposure values for each location (3 and 6
+month time periods and two radii: 1,500 and 3,000 m). First, we can use
+`find_location_county` to check that all of the addresses are in the
+same
+county:
+
+``` r
+test <- find_location_county(as.character(unique(locations_dates$location)))
+unique(test$county)
+```
+
+    #> [1] "Fresno"
+
+And pull PUR data for Fresno county and the relevant years:
+
+``` r
+fresno_data <- pull_clean_pur(c(2000, 2005), "fresno")
+```
+
+A message will be printed out for each of the 12 unique exposure
+calculations. You can turn this off by setting `verbose` to `FALSE`.
+This call will save two .rds files to `"~/Documents/fresno_example"`.
+
+``` r
+write_exposure(clean_pur_df = fresno_data, 
+               locations_dates_df = locations_dates, 
+               radii = c(1500, 3000), 
+               directory = "~/Documents/fresno_example")
+```
+
+1.  The first file is named `exposure_df.rds`.
+
+This is a data frame that lists exposure values for each unique
+combination of location, date range, chemicals, aerial/ground
+application, and radius specified in the function’s arguments. There are
+12 rows, with four exposure values calculated for each of the three
+locations:
+
+``` r
+exposure_df <- readRDS("~/Documents/fresno_example/exposure_df.rds")
+nrow(exposure_df)
+head(exposure_df)
+```
+
+    #> [1] 12
+    #> # A tibble: 6 x 10
+    #>    exposure chemicals start_date end_date   aerial_ground location  radius
+    #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
+    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…   1500
+    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…   1500
+    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…   1500
+    #> 4 0.0000885 all       2005-03-01 2005-09-01 NA            1616 Sou…   1500
+    #> 5 0.00376   all       2005-05-01 2005-08-01 NA            295 West…   1500
+    #> 6 0.00383   all       2005-05-01 2005-11-01 NA            295 West…   1500
+    #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
+    #> #   error_message <lgl>
+
+2.  The second file is named `meta_data.rds`.
+
+This is a list of data frames. Each data frame has one row per PLS unit
+(section or township) that is intersected by the relevant buffer. Each
+list element corresponds to a row of the `exposure_df` data frame. For
+example, the first element of the `meta_data` list corresponds to the
+first row of the `exposure_df` data frame.
+
+``` r
+meta_data <- readRDS("~/Documents/fresno_example/meta_data.rds")
+length(meta_data)
+head(meta_data[[1]])
+```
+
+    #> [1] 12
+    #>         pls chemicals   percent        kg kg_intersection start_date
+    #> 1 M14S21E32       all 0.1742803 1409.3826        245.6276 2000-01-01
+    #> 2 M14S21E31       all 0.7114561 5139.5855       3656.5897 2000-01-01
+    #> 3 M14S20E36       all 0.1307941 2543.8801        332.7245 2000-01-01
+    #> 4 M15S21E05       all 0.3483183 1740.7311        606.3285 2000-01-01
+    #> 5 M15S21E06       all 0.9969748  492.2735        490.7843 2000-01-01
+    #> 6 M15S20E01       all 0.2648533 1336.7372        354.0393 2000-01-01
+    #>     end_date aerial_ground none_recorded
+    #> 1 2000-04-01            NA         FALSE
+    #> 2 2000-04-01            NA         FALSE
+    #> 3 2000-04-01            NA         FALSE
+    #> 4 2000-04-01            NA         FALSE
+    #> 5 2000-04-01            NA         FALSE
+    #> 6 2000-04-01            NA         FALSE
+    #>                               location radius    area error_message
+    #> 1 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #> 2 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #> 3 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #> 4 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #> 5 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #> 6 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+
+Additionally, if `write_plots` is left as its default (`TRUE`), plots
+returned from `plot_exposure` will be saved in a subdirectory called
+`exposure_plots`. Each plot is saved as
+    “\#\_exposure\_plot.png“.
+
+``` r
+list.files("~/Documents/fresno_example/exposure_plots")
+```
+
+    #>  [1] "01_exposure_plot.png" "02_exposure_plot.png" "03_exposure_plot.png"
+    #>  [4] "04_exposure_plot.png" "05_exposure_plot.png" "06_exposure_plot.png"
+    #>  [7] "07_exposure_plot.png" "08_exposure_plot.png" "09_exposure_plot.png"
+    #> [10] "10_exposure_plot.png" "11_exposure_plot.png" "12_exposure_plot.png"
+
+The \# corresponds to the row of the `exposure_df` data frame and the
+element of the `meta_data` list. For example, `01_exposure_plot.png`
+corresponds to `exposure_df[1,]` and
+`meta_data[[1]]`:
+
+<img src="vignettes/figures/01_exposure_plot.png" width="400pt" height="400pt" style="display: block; margin: auto;" />
+
+If `color_by` is set to `"percentile"`, there is an additional
+subdirectory (“exposure\_plots/cutoff\_values”) where data frames with
+cutoff values for each percentile are saved. These files are similarly
+named (“\#\_cutoff\_values.rds“) with file numbers corresponding to
+\#\_exposure\_plot.png file numbers.
 
 ### Source code and bugs
 

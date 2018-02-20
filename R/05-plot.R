@@ -168,7 +168,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 #'   a specific active ingredient present in the \code{chemname} column of the
 #'   \code{clean_pur_df} data frame.
-#' @param fill_option A palette from the colormap package. The default is
+#' @param fill A palette from the colormap package. The default is
 #'   "viridis". To see colormap palette options, visit
 #'   \url{https://bhaskarvk.github.io/colormap/} or run
 #'   \code{colormap::colormaps}.
@@ -205,7 +205,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' # map a specific active ingredient
 #' fresno_list2 <- plot_county_application(fresno_df, pls = "township",
 #'                                        chemicals = "sulfur",
-#'                                        fill_option = "plasma")
+#'                                        fill = "plasma")
 #' fresno_list2$map
 #'
 #' # map a chemical class
@@ -232,7 +232,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                    color_by = "amount",
                                    percentile = c(0.25, 0.5, 0.75),
                                    start_date = NULL, end_date = NULL,
-                                   chemicals = "all", fill_option = "viridis",
+                                   chemicals = "all", fill = "viridis",
                                    crop = FALSE, alpha = 1) {
 
   if (is.null(pls)) {
@@ -368,12 +368,12 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
-  if (!fill_option %in% colormaps_vec) {
-    stop(paste0("The fill_option argument should be a color palette from the ",
+  if (!fill %in% colormaps_vec) {
+    stop(paste0("The fill argument should be a color palette from the ",
                 "colormap package."))
   }
 
-  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- colormap::colormap(fill, nshades = 1000, alpha = alpha)
   # gradient <- c("#FFFFFF", gradient)
 
   plot <- ggmap::ggmap(location) +
@@ -493,7 +493,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'                        radius = 4000,
 #'                        time_period = "6 months",
 #'                        aerial_ground = TRUE) %>%
-#'     plot_exposure(fill_option = "plasma")
+#'     plot_exposure(fill = "plasma")
 #' do.call("rbind", dalton_list$exposure)
 #' # one map for each exposure value (unique combination of chemicals,
 #' # dates, and aerial/ground application)
@@ -537,7 +537,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' @export
 plot_exposure <- function(exposure_list, color_by = "amount",
                           buffer_or_county = "county",
-                          percentile = c(0.25, 0.5, 0.75), fill_option = "viridis",
+                          percentile = c(0.25, 0.5, 0.75), fill = "viridis",
                           alpha = 0.7, pls_labels = FALSE, pls_labels_size = 4) {
 
   buffer_df <- exposure_list$buffer_plot_df
@@ -553,12 +553,12 @@ plot_exposure <- function(exposure_list, color_by = "amount",
   colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
-  if (!fill_option %in% colormaps_vec) {
-    stop(paste0("The fill_option argument should be a color palette from the ",
+  if (!fill %in% colormaps_vec) {
+    stop(paste0("The fill argument should be a color palette from the ",
                 "colormap package."))
   }
 
-  gradient <- colormap::colormap(fill_option, nshades = 1000, alpha = alpha)
+  gradient <- colormap::colormap(fill, nshades = 1000, alpha = alpha)
 
   location_longitude <- unique(exposure_list$exposure$longitude)
   location_latitude <- unique(exposure_list$exposure$latitude)
@@ -719,7 +719,7 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #'
 #' @importFrom magrittr %>%
 plot_locations_exposure <- function(exposure_df, section_township = "section",
-                                    fill_option = "viridis") {
+                                    fill = "viridis") {
 
   check <- nrow(exposure_df) == length(unique(exposure_df$location))
   if (!check) {
@@ -749,10 +749,10 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
   colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL
 
-  gradient <- colormap::colormap(fill_option, nshades = 1000)
+  gradient <- colormap::colormap(fill, nshades = 1000)
 
-  if (!fill_option %in% colormaps_vec) {
-    stop(paste0("The fill_option argument should be a color palette from the ",
+  if (!fill %in% colormaps_vec) {
+    stop(paste0("The fill argument should be a color palette from the ",
                 "colormap package."))
   }
 

@@ -6,7 +6,7 @@
 \usage{
 plot_exposure(exposure_list, color_by = "amount",
   buffer_or_county = "county", percentile = c(0.25, 0.5, 0.75),
-  fill_option = "viridis", alpha = 0.7, pls_labels = FALSE,
+  fill = "viridis", alpha = 0.7, pls_labels = FALSE,
   pls_labels_size = 4)
 }
 \arguments{
@@ -28,7 +28,7 @@ if \code{color_by = "percentile"}. The default is \code{c(0.25, 0.5, 0.75)},
 which results in four categories: < 25th percentile, >= 25th to < 50th,
 >= 50th to < 75th, and >= 75th.}
 
-\item{fill_option}{A palette from the colormap package. The default is
+\item{fill}{A palette from the colormap package. The default is
 "viridis". To see colormap palette options, visit
 \url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
@@ -85,7 +85,7 @@ dalton_list <- pull_clean_pur(2000, "modoc") \%>\%
                        radius = 4000,
                        time_period = "6 months",
                        aerial_ground = TRUE) \%>\%
-    plot_exposure(fill_option = "plasma")
+    plot_exposure(fill = "plasma")
 do.call("rbind", dalton_list$exposure)
 # one map for each exposure value (unique combination of chemicals,
 # dates, and aerial/ground application)

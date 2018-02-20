@@ -6,8 +6,8 @@
 \usage{
 plot_county_application(clean_pur_df, county = NULL, pls = NULL,
   color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
-  end_date = NULL, chemicals = "all", fill_option = "viridis",
-  crop = FALSE, alpha = 1)
+  end_date = NULL, chemicals = "all", fill = "viridis", crop = FALSE,
+  alpha = 1)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur}.}
@@ -50,7 +50,7 @@ the \code{chemical_class} column of the \code{clean_pur_df} data frame, or
 a specific active ingredient present in the \code{chemname} column of the
 \code{clean_pur_df} data frame.}
 
-\item{fill_option}{A palette from the colormap package. The default is
+\item{fill}{A palette from the colormap package. The default is
 "viridis". To see colormap palette options, visit
 \url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}
@@ -97,7 +97,7 @@ fresno_list$cutoff_values
 # map a specific active ingredient
 fresno_list2 <- plot_county_application(fresno_df, pls = "township",
                                        chemicals = "sulfur",
-                                       fill_option = "plasma")
+                                       fill = "plasma")
 fresno_list2$map
 
 # map a chemical class

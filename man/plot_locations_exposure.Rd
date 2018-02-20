@@ -5,7 +5,7 @@
 \title{Plot exposure for multiple locations in a county.}
 \usage{
 plot_locations_exposure(exposure_df, section_township = "section",
-  fill_option = "viridis")
+  fill = "viridis")
 }
 \arguments{
 \item{exposure_df}{A data frame returned from \code{write_exposure} with 10
@@ -16,7 +16,7 @@ so that there is one exposure value per location.}
 \item{section_township}{Either "section" (the default) or "township". Specifies
 which PLS unit to plot the county by.}
 
-\item{fill_option}{A palette from the colormap package. The default is
+\item{fill}{A palette from the colormap package. The default is
 "viridis". To see colormap palette options, visit
 \url{https://bhaskarvk.github.io/colormap/} or run
 \code{colormap::colormaps}.}

@@ -56,7 +56,7 @@ while the function is running. The default is \code{TRUE}.}
 }
 \value{
 Two .rds files ("exposure_df" and "meta_data") and a subdirectory
-  ("exposure_plots") with PDF files of \code{plot_exposure} plots:
+  ("exposure_plots") with PNG files of \code{plot_exposure} plots:
 \describe{
   \item{exposure_df.rds}{A data frame with 10 columns: \code{exposure}, the
   exposure value in kg/m^2 for that combination of chemicals, date range,
@@ -88,9 +88,9 @@ Two .rds files ("exposure_df" and "meta_data") and a subdirectory
   which gives the error message, if any, that was returned.}
   \item{exposure_plots}{A subdirectory with a \code{plot_exposure} plot saved
   for each row of the exposure_df data frame and element of the meta_data list.
-  Plots are saved as #_exposure_plot.pdf, with numbers corresponding to the
+  Plots are saved as #_exposure_plot.png, with numbers corresponding to the
   row number and element number of the exposure_df data frame and meta_data
-  list, respectively. For example, 12_exposure_plot.pdf corresponds to
+  list, respectively. For example, 12_exposure_plot.png corresponds to
   exposure_df[12,] and meta_data[[12]].}
 }
 }

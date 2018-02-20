@@ -30,7 +30,7 @@
 #' @inheritParams calculate_exposure
 #'
 #' @return Two .rds files ("exposure_df" and "meta_data") and a subdirectory
-#'   ("exposure_plots") with PDF files of \code{plot_exposure} plots:
+#'   ("exposure_plots") with PNG files of \code{plot_exposure} plots:
 #' \describe{
 #'   \item{exposure_df.rds}{A data frame with 10 columns: \code{exposure}, the
 #'   exposure value in kg/m^2 for that combination of chemicals, date range,
@@ -62,9 +62,9 @@
 #'   which gives the error message, if any, that was returned.}
 #'   \item{exposure_plots}{A subdirectory with a \code{plot_exposure} plot saved
 #'   for each row of the exposure_df data frame and element of the meta_data list.
-#'   Plots are saved as #_exposure_plot.pdf, with numbers corresponding to the
+#'   Plots are saved as #_exposure_plot.png, with numbers corresponding to the
 #'   row number and element number of the exposure_df data frame and meta_data
-#'   list, respectively. For example, 12_exposure_plot.pdf corresponds to
+#'   list, respectively. For example, 12_exposure_plot.png corresponds to
 #'   exposure_df[12,] and meta_data[[12]].}
 #' }
 #'
@@ -266,10 +266,10 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
           percentile <- c(0.25, 0.5, 0.75)
         }
 
-        if (!is.null(plot_args$fill_option)) {
-          fill_option <- plot_args$fill_option
+        if (!is.null(plot_args$fill)) {
+          fill <- plot_args$fill
         } else {
-          fill_option <- "viridis"
+          fill <- "viridis"
         }
 
         if (!is.null(plot_args$alpha)) {
@@ -293,7 +293,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
         plot_list <- plot_exposure(exposure_list[[i]]$result, color_by = color_by,
                                    buffer_or_county = buffer_or_county,
                                    percentile = percentile,
-                                   fill_option = fill_option, alpha = alpha,
+                                   fill = fill, alpha = alpha,
                                    pls_labels = pls_labels,
                                    pls_labels_size = pls_labels_size)
 
