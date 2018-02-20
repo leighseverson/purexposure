@@ -140,7 +140,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
 
   radius_list <- list()
   for (i in 1:length(radii)) {
-    radius_list[[i]] <- locations_dates_df %>% mutate(radius = radii[i])
+    radius_list[[i]] <- locations_dates_df %>% dplyr::mutate(radius = radii[i])
   }
   exposure_mat <- do.call("rbind", radius_list)
 
