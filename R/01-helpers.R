@@ -537,10 +537,10 @@ help_return_exposure <- function(start_date, end_date, location, radius,
   if (nrow(row_out_0) == 0) {
 
     row_out <- data.frame(exposure = 0,
-                          chemicals = NA,
+                          chemicals = "NA",
                           start_date = start_date,
                           end_date = end_date,
-                          aerial_ground = NA,
+                          aerial_ground = "NA",
                           location = location,
                           radius = radius)
 
