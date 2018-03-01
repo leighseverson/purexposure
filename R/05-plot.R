@@ -195,20 +195,20 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'
 #' # plot all active ingredients
 #' fresno_df <- pull_clean_pur(2000:2001, "fresno")
-#' freno_list <- plot_county_application(fresno_df,
+#' fresno_list <- plot_county_application(fresno_df,
 #'                                       color_by = "percentile",
 #'                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 #' fresno_list$map
 #' head(fresno_list$data)
 #' fresno_list$cutoff_values
 #'
-#' # map a specific active ingredient
+#' # plot a specific active ingredient
 #' fresno_list2 <- plot_county_application(fresno_df, pls = "township",
 #'                                        chemicals = "sulfur",
 #'                                        fill = "plasma")
 #' fresno_list2$map
 #'
-#' # map a chemical class
+#' # plot a chemical class
 #' chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
 #'                                              "naled", "malathion",
 #'                                              "trichlorfon"),
@@ -717,6 +717,15 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' @return A plot with one point per location, colored by each location's
 #' corresponding exposure value.
 #'
+#' @examples
+#' \dontrun{
+#' fresno <- pull_clean_pur(2000, "fresno")
+#' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
+#'                               "55190 Point Rd., Big Creek, CA 93605"),
+#'                  start_date = "2000-01-01", end_date = "2000-12-31")
+#' write_exposure(fresno, df, 3000, "~/Documents/fresno")
+#' }
+#'
 #' @importFrom magrittr %>%
 plot_locations_exposure <- function(exposure_df, section_township = "section",
                                     fill = "viridis", alpha = 1) {
@@ -770,8 +779,3 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
   return(plot)
 
 }
-
-
-
-
-

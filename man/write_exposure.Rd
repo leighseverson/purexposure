@@ -4,9 +4,9 @@
 \alias{write_exposure}
 \title{Write exposure values for specified locations and dates in a certain county.}
 \usage{
-write_exposure(clean_pur_df, locations_dates_df, radii, chemicals = "all",
-  aerial_ground = FALSE, directory, write_plots = TRUE, verbose = TRUE,
-  ...)
+write_exposure(clean_pur_df, locations_dates_df, radii, directory,
+  chemicals = "all", aerial_ground = FALSE, write_plots = TRUE,
+  verbose = TRUE, ...)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
@@ -28,6 +28,9 @@ like to calculate exposure. For reference, the length and width of a PLS
 section is about 1,609 meters (1 mile). That of a township could range from
 about 9,656 to 11,265 meters (6-7 miles).}
 
+\item{directory}{A path to the directory where you would like exposure files
+to be written. This directory will be created if it doesn't already exist.}
+
 \item{chemicals}{Either "all" or "chemical_class". The default is "all", which
 will calculate exposure to the summed active ingredients present in the
 \code{clean_pur_df} data frame. Enter "chemical_class" to calculate
@@ -40,9 +43,6 @@ incorporate aerial/ground application into exposure calculations. If
 column in the input \code{clean_pur_df} data frame. There will be a value of
 exposure calculated for each chemical ("all" or by chemical class) and for
 each method of application: aerial or ground. The default is FALSE.}
-
-\item{directory}{A path to the directory where you would like exposure files
-to be written. This directory will be created if it doesn't already exist.}
 
 \item{write_plots}{TRUE / FALSE for whether you would like to write out
 plots returned from \code{plot_exposure} for each combination of location,

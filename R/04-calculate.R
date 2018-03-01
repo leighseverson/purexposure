@@ -278,7 +278,8 @@ calculate_exposure <- function(clean_pur_df, location, radius,
 
     } else {
 
-      borders <- df %>% group_by(MTR) %>%
+      borders <- df %>%
+        dplyr::group_by(MTR) %>%
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 

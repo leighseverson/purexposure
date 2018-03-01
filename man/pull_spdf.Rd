@@ -50,9 +50,9 @@ a temporary directory.
 \examples{
 \dontrun{
 trinity_shp <- pull_spdf("trinity")
-plot(trinity_shp)
+graphics::plot(trinity_shp)
 
 del_norte_shp <- pull_spdf("08", "township")
-plot(del_norte_shp)
+graphics::plot(del_norte_shp)
 }
 }

@@ -87,20 +87,20 @@ names(tulare_list)
 
 # plot all active ingredients
 fresno_df <- pull_clean_pur(2000:2001, "fresno")
-freno_list <- plot_county_application(fresno_df,
+fresno_list <- plot_county_application(fresno_df,
                                       color_by = "percentile",
                                       percentile = c(0.2, 0.4, 0.6, 0.8))
 fresno_list$map
 head(fresno_list$data)
 fresno_list$cutoff_values
 
-# map a specific active ingredient
+# plot a specific active ingredient
 fresno_list2 <- plot_county_application(fresno_df, pls = "township",
                                        chemicals = "sulfur",
                                        fill = "plasma")
 fresno_list2$map
 
-# map a chemical class
+# plot a chemical class
 chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
                                              "naled", "malathion",
                                              "trichlorfon"),

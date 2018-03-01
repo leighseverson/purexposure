@@ -534,7 +534,17 @@ help_return_exposure <- function(start_date, end_date, location, radius,
 
   row_out_0 <- help_calc_exp(exp, buffer_area, !!!vars)
 
-  if ("aerial_ground" %in% colnames(row_out_0)) {
+  if (nrow(row_out_0) == 0) {
+
+    row_out <- data.frame(exposure = 0,
+                          chemicals = NA,
+                          start_date = start_date,
+                          end_date = end_date,
+                          aerial_ground = NA,
+                          location = location,
+                          radius = radius)
+
+  } else if ("aerial_ground" %in% colnames(row_out_0)) {
 
     row_out <- row_out_0 %>%
       dplyr::mutate(start_date = start_date,
@@ -1233,18 +1243,3 @@ help_calculate_buffers <- function(exposure_df_row) {
   return(buffer_df)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

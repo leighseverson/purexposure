@@ -172,14 +172,11 @@ find_product_name <- function(years, products = "all", quiet = FALSE,
 #'   If \code{return = "names"}, a vector of county names.
 #'
 #' @examples
+#' \dontrun{
 #' find_counties(c("01", "06005", "el dorado"))
-#' find_counties(c("contra costa", "45"))
-#'
 #' find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
-#' find_counties(c("contra costa", "45"), return = "fips_codes")
-#'
 #' find_counties(c("01", "06005", "el dorado"), return = "names")
-#' find_counties(c("contra costa", "45"), return = "names")
+#' }
 #' @importFrom magrittr %>%
 #' @export
 find_counties <- function(counties, return = "pur_codes") {

@@ -26,12 +26,9 @@ Given a vector of counties, \code{find_counties} returns either PUR
 county codes or names.
 }
 \examples{
+\dontrun{
 find_counties(c("01", "06005", "el dorado"))
-find_counties(c("contra costa", "45"))
-
 find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
-find_counties(c("contra costa", "45"), return = "fips_codes")
-
 find_counties(c("01", "06005", "el dorado"), return = "names")
-find_counties(c("contra costa", "45"), return = "names")
+}
 }

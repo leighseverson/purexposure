@@ -32,3 +32,13 @@ corresponding exposure value.
 \code{plot_locations_exposure} returns a plot of exposure to applied pesticides
 for multiple locations in a given county.
 }
+\examples{
+\dontrun{
+fresno <- pull_clean_pur(2000, "fresno")
+df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
+                              "55190 Point Rd., Big Creek, CA 93605"),
+                 start_date = "2000-01-01", end_date = "2000-12-31")
+write_exposure(fresno, df, 3000, "~/Documents/fresno")
+}
+
+}

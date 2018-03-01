@@ -287,10 +287,6 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'                       sum = "chemical_class",
 #'                       unit = "township",
 #'                       chemical_class = chemical_class_df)
-#'
-#' # clean an existing raw PUR data set
-#' placer_05 <- pull_raw_pur(2005, "placer")
-#' df5 <- pull_clean_pur(raw_pur_df = placer_05)
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -620,10 +616,10 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' @examples
 #' \dontrun{
 #' trinity_shp <- pull_spdf("trinity")
-#' plot(trinity_shp)
+#' graphics::plot(trinity_shp)
 #'
 #' del_norte_shp <- pull_spdf("08", "township")
-#' plot(del_norte_shp)
+#' graphics::plot(del_norte_shp)
 #' }
 #' @export
 pull_spdf <- function(county, section_township = "section",

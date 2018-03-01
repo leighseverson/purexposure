@@ -101,9 +101,9 @@
 #' }
 #' @importFrom magrittr %>%
 #' @export
-write_exposure <- function(clean_pur_df, locations_dates_df, radii,
+write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
                            chemicals = "all", aerial_ground = FALSE,
-                           directory, write_plots = TRUE, verbose = TRUE, ...) {
+                           write_plots = TRUE, verbose = TRUE, ...) {
 
   locations <- as.character(unique(locations_dates_df$location))
 
@@ -152,10 +152,8 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii,
                         end_date = as.character(exposure_mat$end_date),
                         original_location = as.character(exposure_mat$original_location))
   exposure_list <- purrr::pmap(exposure_args, safe_calculate_exposure,
-                                clean_pur_df = clean_pur_df,
-                                chemicals = chemicals,
-                                aerial_ground = aerial_ground,
-                                verbose = verbose)
+                               clean_pur_df = clean_pur_df, chemicals = chemicals,
+                               aerial_ground = aerial_ground, verbose = verbose)
 
   meta_list <- list()
 

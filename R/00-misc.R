@@ -100,6 +100,7 @@ spdf_to_df <- function(spdf) {
 #' }
 #'
 #' @importFrom magrittr %>%
+#' @export
 tibble_to_vector <- function(tib) {
 
   vec <- tib %>% dplyr::pull(1) %>% as.character()
@@ -120,6 +121,7 @@ scale_fill_gradientn2 <- function(..., colours, values = NULL, space = "Lab",
 }
 
 gradient_n_pal2 <- function(colours, values = NULL, space = "Lab", alpha = NULL) {
+
   # Include alpha option in scales::gradient_n_pal().
   if (!identical(space, "Lab")) {
     warning("Non Lab interpolation is deprecated", call. = FALSE)

@@ -25,7 +25,7 @@ Imports:
     maps (>= 3.2.0),
     maptools (>= 0.9.2),
     geosphere (>= 1.5.5),
-    rlang (>= 0.1.6),
+    rlang (>= 0.2.0),
     rgeos (>= 0.3-23),
     magrittr (>= 1.5),
     utils (>= 3.4.1),
