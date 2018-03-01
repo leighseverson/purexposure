@@ -288,6 +288,12 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
           pls_labels_size <- 4
         }
 
+        exposure_list[[i]]$result$exposure$chemicals <-
+          as.character(exposure_list[[i]]$result$exposure$chemicals)
+
+        exposure_list[[i]]$result$exposure$aerial_ground <-
+          as.character(exposure_list[[i]]$result$exposure$aerial_ground)
+
         plot_list <- plot_exposure(exposure_list[[i]]$result, color_by = color_by,
                                    buffer_or_county = buffer_or_county,
                                    percentile = percentile,
@@ -299,7 +305,10 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
 
           exp_plot <- plot_list$maps[[j]]
 
-          row_to_match <- plot_list$exposure[[j]] %>% dplyr::ungroup()
+          row_to_match <- plot_list$exposure[[j]] %>%
+            dplyr::ungroup() %>%
+            dplyr::mutate(aerial_ground = as.character(aerial_ground),
+                          chemicals = as.character(chemicals))
 
           row_out_noerror <- row_out %>% dplyr::select(-error_message) %>%
             dplyr::ungroup()
