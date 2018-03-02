@@ -575,6 +575,9 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 
   # want pls_data in same order as exposure_list$exposure
 
+  pls_data <- pls_data %>% dplyr::mutate(aerial_ground = as.character(aerial_ground),
+                                         chemicals = as.character(chemicals))
+
   pls_data <- exposure_list$exposure %>%
     dplyr::select(start_date, end_date, chemicals, aerial_ground) %>%
     dplyr::full_join(pls_data, by = c("start_date", "end_date", "aerial_ground",
