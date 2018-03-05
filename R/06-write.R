@@ -178,6 +178,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
                               location = exposure_mat[i, ]$original_location,
                               radius = exposure_mat[i, ]$radius,
                               area = NA, error_message = exposure_list[[i]]$error)
+
     } else {
 
       error_message <- NA
@@ -193,30 +194,130 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
     }
 
     if (i == 1) {
-      row_out <- row
-    } else {
-      row_out <- rbind(row_out, row)
-    }
 
-    if (i == 1) {
+      row_out <- row
 
       for (l in 1:unique(row$n_row)) {
+
         meta_row <- row[l,]
-        meta_data_row <- meta_data %>%
-          dplyr::filter(chemicals == meta_row$chemicals)
+
+        chemicals_match <- meta_row$chemicals
+        aerial_ground_match <- meta_row$aerial_ground
+        radius_match <- meta_row$radius
+
+        if (length(unique(meta_data$chemicals)) > 1) {
+          meta_data_row <- meta_data %>%
+            dplyr::filter(chemicals == chemicals_match)
+          if (class(aerial_ground_match) != "logical" & aerial_ground_match %in%
+              c("A", "G", "O")) {
+            meta_data_row <- meta_data_row %>%
+              dplyr::filter(aerial_ground == aerial_ground_match)
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+          } else {
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+
+          }
+        } else {
+
+          if (class(aerial_ground_match) != "logical" & aerial_ground_match %in%
+              c("A", "G", "O")) {
+            meta_data_row <- meta_data %>%
+              dplyr::filter(aerial_ground == aerial_ground_match)
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+
+          } else {
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data %>%
+                dplyr::filter(radius == radius_match)
+            } else {
+
+              meta_data_row <- meta_data
+
+            }
+
+          }
+
+        }
+
         meta_list[[l]] <- meta_data_row
+
       }
 
     } else {
 
-      starting_point <- length(meta_list)
-      meta_list_vec <- 1:unique(row$n_row) + starting_point
+      row_out <- rbind(row_out, row)
 
-      for (l in meta_list_vec) {
+      starting_point <- length(meta_list)
+      meta_list_vec <- (1:unique(row$n_row)) + starting_point
+
+      for (l in 1:meta_list_vec) {
+
         meta_row <- row[l-starting_point,]
-        meta_data_row <- meta_data %>%
-          dplyr::filter(chemicals == meta_row$chemicals)
+
+        chemicals_match <- meta_row$chemicals
+        aerial_ground_match <- meta_row$aerial_ground
+        radius_match <- meta_row$radius
+
+        if (length(unique(meta_data$chemicals)) > 1) {
+          meta_data_row <- meta_data %>%
+            dplyr::filter(chemicals == chemicals_match)
+          if (class(aerial_ground_match) != "logical" & aerial_ground_match %in%
+              c("A", "G", "O")) {
+            meta_data_row <- meta_data_row %>%
+              dplyr::filter(aerial_ground == aerial_ground_match)
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+          } else {
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+
+          }
+        } else {
+
+          if (class(aerial_ground_match) != "logical" & aerial_ground_match %in%
+              c("A", "G", "O")) {
+            meta_data_row <- meta_data %>%
+              dplyr::filter(aerial_ground == aerial_ground_match)
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data_row %>%
+                dplyr::filter(radius == radius_match)
+            }
+
+          } else {
+
+            if (length(unique(meta_data_row$radius)) > 1) {
+              meta_data_row <- meta_data %>%
+                dplyr::filter(radius == radius_match)
+            } else {
+
+              meta_data_row <- meta_data
+
+            }
+
+          }
+
+        }
+
         meta_list[[l]] <- meta_data_row
+
       }
 
     }
@@ -227,7 +328,10 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
     dir.create(directory)
   }
 
-  row_out <- row_out %>% dplyr::select(-n_row)
+  row_out <- row_out %>%
+    dplyr::select(-n_row) %>%
+    dplyr::mutate(aerial_ground = ifelse(aerial_ground == "NA", NA, aerial_ground),
+                  chemicals = ifelse(chemicals == "NA", NA, chemicals))
 
   saveRDS(row_out, file = paste0(directory, "/exposure_df.rds"))
 
