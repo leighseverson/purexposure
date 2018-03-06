@@ -131,5 +131,6 @@ df <- data.frame(location = rep(schools, each = 2),
                               "2001-05-16", "2001-08-16"))
 write_exposure(pur, df, c(1500, 3000), "chemical_class",
                directory = "~/Documents/fresno_schools")
+exposure_df <- readRDS("~/Documents/fresno_schools/exposure_df.rds")
 }
 }

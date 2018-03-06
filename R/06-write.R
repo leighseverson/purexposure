@@ -98,6 +98,7 @@
 #'                               "2001-05-16", "2001-08-16"))
 #' write_exposure(pur, df, c(1500, 3000), "chemical_class",
 #'                directory = "~/Documents/fresno_schools")
+#' exposure_df <- readRDS("~/Documents/fresno_schools/exposure_df.rds")
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -238,19 +239,18 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
 
           } else {
 
-            if (length(unique(meta_data_row$radius)) > 1) {
+            if (length(unique(meta_data$radius)) > 1) {
               meta_data_row <- meta_data %>%
                 dplyr::filter(radius == radius_match)
-            } else {
-
-              meta_data_row <- meta_data
-
             }
 
           }
 
         }
 
+        if (!exists("meta_data_row")) {
+          meta_data_row <- meta_data
+        }
         meta_list[[l]] <- meta_data_row
 
       }
@@ -303,17 +303,17 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
 
           } else {
 
-            if (length(unique(meta_data_row$radius)) > 1) {
+            if (length(unique(meta_data$radius)) > 1) {
               meta_data_row <- meta_data %>%
                 dplyr::filter(radius == radius_match)
-            } else {
-
-              meta_data_row <- meta_data
-
             }
 
           }
 
+        }
+
+        if (!exists("meta_data_row")) {
+          meta_data_row <- meta_data
         }
 
         meta_list[[l]] <- meta_data_row
