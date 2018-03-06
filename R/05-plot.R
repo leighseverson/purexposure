@@ -727,9 +727,12 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #'                               "55190 Point Rd., Big Creek, CA 93605"),
 #'                  start_date = "2000-01-01", end_date = "2000-12-31")
 #' write_exposure(fresno, df, 3000, "~/Documents/fresno")
+#' exp_df <- readRDS("~/Documents/fresno/exposure_df.rds")
+#' plot_locations_exposure(exp_df)
 #' }
 #'
 #' @importFrom magrittr %>%
+#' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",
                                     fill = "viridis", alpha = 1) {
 
@@ -745,7 +748,7 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
     if (i == 1) {
       buffer_out <- buffer
     } else {
-      buffer_out <- bind_rows(buffer_out, buffer)
+      buffer_out <- dplyr::bind_rows(buffer_out, buffer)
     }
 
   }

@@ -39,6 +39,8 @@ df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
                               "55190 Point Rd., Big Creek, CA 93605"),
                  start_date = "2000-01-01", end_date = "2000-12-31")
 write_exposure(fresno, df, 3000, "~/Documents/fresno")
+exp_df <- readRDS("~/Documents/fresno/exposure_df.rds")
+plot_locations_exposure(exp_df)
 }
 
 }
