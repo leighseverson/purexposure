@@ -262,7 +262,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
       starting_point <- length(meta_list)
       meta_list_vec <- (1:unique(row$n_row)) + starting_point
 
-      for (l in 1:meta_list_vec) {
+      for (l in meta_list_vec) {
 
         meta_row <- row[l-starting_point,]
 
@@ -406,15 +406,16 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
                                    pls_labels_size = pls_labels_size)
 
         for (j in 1:length(plot_list$maps)) {
-
           exp_plot <- plot_list$maps[[j]]
 
           row_to_match <- plot_list$exposure[[j]] %>%
             dplyr::ungroup() %>%
-            dplyr::mutate(aerial_ground = as.character(aerial_ground),
+            dplyr::mutate(aerial_ground = ifelse(aerial_ground == "NA", NA,
+                                                 aerial_ground),
                           chemicals = as.character(chemicals))
 
-          row_out_noerror <- row_out %>% dplyr::select(-error_message) %>%
+          row_out_noerror <- row_out %>%
+            dplyr::select(-error_message) %>%
             dplyr::ungroup()
          #  k <- which(apply(row_out_noerror, 1, identical, row_to_match))
 
