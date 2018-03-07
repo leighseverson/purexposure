@@ -41,6 +41,12 @@ df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
 write_exposure(fresno, df, 3000, "~/Documents/fresno")
 exp_df <- readRDS("~/Documents/fresno/exposure_df.rds")
 plot_locations_exposure(exp_df)
-}
 
+# this exposure_df was saved from the example for write_exposure()
+exp_df2 <- readRDS("~/Documents/fresno_schools/exposure_df.rds")
+# filter to one exposure value per location
+exp_df2 <- dplyr::filter(exp_df2, chemicals == "methyl bromide" &
+                          radius == 3000)[c(1, 3, 5),]
+plot_locations_exposure(exp_df2)
+}
 }
