@@ -21,16 +21,18 @@ fresno$map
 
 <img src="vignettes/figures/fresno_example.png" title="Applied pesticides in Fresno, California from 1995 through 1998." alt="Applied pesticides in Fresno, California from 1995 through 1998." width="400pt" height="300pt" />
 
-The `purexposure` package has four main categories of functions:
-`find_*`, `pull_*`, `calculate_*`, and `plot_*`. `find_*` functions are
-designed to explore both pesticide products and active ingredients
-present in applied pesticides, return county names or codes as they are
-used in PUR data sets, and find the county of a particular location.
-`pull_*` functions pull raw or cleaned PUR data sets through the CA
-Department of Pesticide Regulation’s FTP server. The
+The `purexposure` package has five main categories of functions:
+`find_*`, `pull_*`, `calculate_*`, `plot_*`, and `write_*`. `find_*`
+functions are designed to explore both pesticide products and active
+ingredients present in applied pesticides, return county names or codes
+as they are used in PUR data sets, and find the county of a particular
+location. `pull_*` functions pull raw or cleaned PUR data sets through
+the CA Department of Pesticide Regulation’s FTP server. The
 `calculate_exposure` function calculates exposure to applied pesticides
 for a given location, and `plot_*` functions return visualizations of
-application and exposure.
+application and exposure. The `write_exposure` function calculates
+exposure to applied pesticides for a vector of functions and writes out
+files to a specified directory.
 
 `purexposure` currently exists in a development version on GitHub. You
 can install and load the package with the following code:
@@ -153,8 +155,8 @@ find_chemical_codes(c(2000, 2001), chemicals = "methyl bromide", by_year = TRUE)
 #> # A tibble: 2 x 4
 #>   chem_code chemname       chemical        year
 #>       <int> <chr>          <chr>          <dbl>
-#> 1       385 METHYL BROMIDE methyl bromide  2000
-#> 2       385 METHYL BROMIDE methyl bromide  2001
+#> 1       385 METHYL BROMIDE methyl bromide 2000.
+#> 2       385 METHYL BROMIDE methyl bromide 2001.
 ```
 
 This often results in identical search results for multiple years.
@@ -168,7 +170,7 @@ find_chemical_codes(c(2006, 2007), chemicals = "imazosulfuron", by_year = TRUE)
 #> # A tibble: 1 x 4
 #>   chem_code chemname      chemical       year
 #>       <int> <chr>         <chr>         <dbl>
-#> 1      5987 IMAZOSULFURON imazosulfuron  2007
+#> 1      5987 IMAZOSULFURON imazosulfuron 2007.
 ```
 
 If the `by_year` argument is left to its default value of `FALSE`,
@@ -463,7 +465,7 @@ tulare %>% arrange(township) %>% slice(1:3)
 #>   <chr>           <dbl> <chr>    <chr>       <chr>    <chr>     <date>    
 #> 1 DIURON           97.3 M15S25E  TULARE      54       06107     2010-01-02
 #> 2 GLYPHOSA…        47.3 M15S25E  TULARE      54       06107     2010-01-02
-#> 3 SIMAZINE        120   M15S25E  TULARE      54       06107     2010-01-02
+#> 3 SIMAZINE        120.  M15S25E  TULARE      54       06107     2010-01-02
 ```
 
 There is one record per active ingredient per township per day.
@@ -517,8 +519,8 @@ head(fresno_classes, 3)
 #> # A tibble: 3 x 8
 #>   chemical_class kg_chm_used section   township county_name pur_code
 #>   <chr>                <dbl> <chr>     <chr>    <chr>       <chr>   
-#> 1 other                216   M12S13E27 M12S13E  FRESNO      10      
-#> 2 other                197   M12S13E28 M12S13E  FRESNO      10      
+#> 1 other                216.  M12S13E27 M12S13E  FRESNO      10      
+#> 2 other                197.  M12S13E28 M12S13E  FRESNO      10      
 #> 3 other                 15.0 M15S23E14 M15S23E  FRESNO      10      
 #> # ... with 2 more variables: fips_code <chr>, date <date>
 ```
@@ -626,7 +628,7 @@ monroe$exposure
 #> # A tibble: 1 x 9
 #>   exposure chemicals start_date end_date   aerial_ground location   radius
 #>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>       <dbl>
-#> 1  0.00458 all       2015-01-01 2015-12-31 NA            11842 Sou…   1500
+#> 1  0.00458 all       2015-01-01 2015-12-31 NA            11842 Sou…  1500.
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -656,11 +658,11 @@ unit, active ingredients, and time period. Other columns are `location`,
 ``` r
 monroe$meta_data %>% slice(1:3)
 #> # A tibble: 3 x 12
-#>   pls       chemicals percent    kg kg_intersection start_date end_date  
-#>   <chr>     <chr>       <dbl> <dbl>           <dbl> <date>     <date>    
-#> 1 M15S21E31 all        0.0373  4936           184   2015-01-01 2015-12-31
-#> 2 M15S20E36 all        0.0389  2332            90.6 2015-01-01 2015-12-31
-#> 3 M16S21E06 all        0.800  22721         18170   2015-01-01 2015-12-31
+#>   pls       chemicals percent     kg kg_intersection start_date end_date  
+#>   <chr>     <chr>       <dbl>  <dbl>           <dbl> <date>     <date>    
+#> 1 M15S21E31 all        0.0373  4936.           184.  2015-01-01 2015-12-31
+#> 2 M15S20E36 all        0.0389  2332.            90.6 2015-01-01 2015-12-31
+#> 3 M16S21E06 all        0.800  22721.         18170.  2015-01-01 2015-12-31
 #> # ... with 5 more variables: aerial_ground <lgl>, none_recorded <lgl>,
 #> #   location <chr>, radius <dbl>, area <dbl>
 ```
@@ -737,9 +739,9 @@ monroe2$exposure
 #> # A tibble: 3 x 9
 #>    exposure chemicals start_date end_date   aerial_ground location  radius
 #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…   1500
-#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…   1500
-#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…   1500
+#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…  1500.
+#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…  1500.
+#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…  1500.
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -871,9 +873,9 @@ monroe2$exposure
 #> # A tibble: 3 x 9
 #>    exposure chemicals start_date end_date   aerial_ground location  radius
 #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…   1500
-#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…   1500
-#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…   1500
+#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…  1500.
+#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…  1500.
+#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…  1500.
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -922,9 +924,9 @@ exposure_df[1:3,]
     #> # A tibble: 3 x 10
     #>    exposure chemicals start_date end_date   aerial_ground location  radius
     #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…   1500
-    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…   1500
-    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…   1500
+    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…  1500.
+    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…  1500.
+    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…  1500.
     #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
     #> #   error_message <lgl>
 
@@ -1003,8 +1005,8 @@ head(fresno$data, 2)
 #> # A tibble: 2 x 2
 #>   pls          kg
 #>   <chr>     <dbl>
-#> 1 M10S13E28  1583
-#> 2 M10S13E32  1481
+#> 1 M10S13E28 1583.
+#> 2 M10S13E32 1481.
 ```
 
 There are additional arguments you can pass to `plot_county_application`
@@ -1188,12 +1190,12 @@ head(exposure_df)
     #> # A tibble: 6 x 10
     #>    exposure chemicals start_date end_date   aerial_ground location  radius
     #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…   1500
-    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…   1500
-    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…   1500
-    #> 4 0.0000885 all       2005-03-01 2005-09-01 NA            1616 Sou…   1500
-    #> 5 0.00376   all       2005-05-01 2005-08-01 NA            295 West…   1500
-    #> 6 0.00383   all       2005-05-01 2005-11-01 NA            295 West…   1500
+    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…  1500.
+    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…  1500.
+    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…  1500.
+    #> 4 0.0000885 all       2005-03-01 2005-09-01 NA            1616 Sou…  1500.
+    #> 5 0.00376   all       2005-05-01 2005-08-01 NA            295 West…  1500.
+    #> 6 0.00383   all       2005-05-01 2005-11-01 NA            295 West…  1500.
     #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
     #> #   error_message <lgl>
 

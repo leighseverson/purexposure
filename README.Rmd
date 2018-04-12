@@ -29,7 +29,7 @@ fresno$map
 knitr::include_graphics("vignettes/figures/fresno_example.png")
 ```
 
-The `purexposure` package has four main categories of functions: `find_*`, `pull_*`, `calculate_*`, and `plot_*`. `find_*` functions are designed to explore both pesticide products and active ingredients present in applied pesticides, return county names or codes as they are used in PUR data sets, and find the county of a particular location. `pull_*` functions pull raw or cleaned PUR data sets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `plot_*` functions return visualizations of application and exposure.  
+The `purexposure` package has five main categories of functions: `find_*`, `pull_*`, `calculate_*`, `plot_*`, and `write_*`. `find_*` functions are designed to explore both pesticide products and active ingredients present in applied pesticides, return county names or codes as they are used in PUR data sets, and find the county of a particular location. `pull_*` functions pull raw or cleaned PUR data sets through the CA Department of Pesticide Regulation's FTP server. The `calculate_exposure` function calculates exposure to applied pesticides for a given location, and `plot_*` functions return visualizations of application and exposure. The `write_exposure` function calculates exposure to applied pesticides for a vector of functions and writes out files to a specified directory. 
 
 `purexposure` currently exists in a development version on GitHub. You can install and load the package with the following code: 
 ```{r eval = FALSE}
