@@ -20,8 +20,8 @@ level.
 the \code{pull_spdf} function to a data frame.
 }
 \examples{
-\dontrun{
 df <- pull_spdf("fresno") \%>\% spdf_to_df()
+\donttest{
 df2 <- pull_spdf("sonoma") \%>\% spdf_to_df()
 
 # use df_plot() function to easily plot the output data frames:

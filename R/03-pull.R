@@ -42,9 +42,10 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' df <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
-#' df2 <- pull_raw_pur(years = 2015, counties = c("colusa"))
+#' df <- pull_raw_pur(years = 2000, counties = "fresno")
+#' \donttest{
+#' df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
+#' df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -255,7 +256,8 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' df <- pull_clean_pur(2000, "fresno")
+#' \donttest{
 #' df <- pull_clean_pur(years = 2000:2001,
 #'                      counties = c("06001", "29", "riverside"),
 #'                      chemicals = "methylene",
@@ -614,10 +616,9 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' a temporary directory.
 #'
 #' @examples
-#' \dontrun{
-#' trinity_shp <- pull_spdf("trinity")
-#' graphics::plot(trinity_shp)
-#'
+#' fresno_shp <- pull_spdf("fresno")
+#' graphics::plot(fresno_shp)
+#' \donttest{
 #' del_norte_shp <- pull_spdf("08", "township")
 #' graphics::plot(del_norte_shp)
 #' }
@@ -763,9 +764,7 @@ pull_spdf <- function(county, section_township = "section",
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' prod_95 <- pull_product_table(1995)
-#' }
 #' @importFrom magrittr %>%
 #' @export
 pull_product_table <- function(years, quiet = FALSE) {

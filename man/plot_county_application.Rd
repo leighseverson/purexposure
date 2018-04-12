@@ -81,10 +81,9 @@ is summed by section or township. PLS units can be shaded by amount or by
 percentile.
 }
 \examples{
-\dontrun{
-tulare_list <- pull_clean_pur(2010, "tulare") \%>\% plot_county_application()
-names(tulare_list)
-
+fresno_list <- pull_clean_pur(2000, "fresno") \%>\% plot_county_application()
+names(fresno_list)
+\donttest{
 # plot all active ingredients
 fresno_df <- pull_clean_pur(2000:2001, "fresno")
 fresno_list <- plot_county_application(fresno_df,

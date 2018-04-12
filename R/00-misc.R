@@ -26,7 +26,10 @@ utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
 #' @return A ggplot2 plot of the county.
 #'
 #' @examples
-#' \dontrun{
+#' pull_spdf("fresno") %>%
+#'    spdf_to_df() %>%
+#'    df_plot()
+#' \donttest{
 #' pull_spdf("san diego", "township") %>%
 #'    spdf_to_df() %>%
 #'    df_plot()
@@ -57,8 +60,8 @@ df_plot <- function(df) {
 #' level.
 #'
 #' @examples
-#' \dontrun{
 #' df <- pull_spdf("fresno") %>% spdf_to_df()
+#' \donttest{
 #' df2 <- pull_spdf("sonoma") %>% spdf_to_df()
 #'
 #' # use df_plot() function to easily plot the output data frames:
@@ -96,9 +99,7 @@ spdf_to_df <- function(spdf) {
 #' @return A character vector.
 #'
 #' @examples
-#' \dontrun{
 #' tibble::tibble(x = 1:3) %>% tibble_to_vector()
-#' }
 #'
 #' @importFrom magrittr %>%
 #' @export

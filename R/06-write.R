@@ -78,7 +78,6 @@
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' chemical_class_df <- rbind(find_chemical_codes(2000:2001, "sulfur"),
 #'                            find_chemical_codes(2000:2001, "methyl bromide")) %>%
 #'    dplyr::rename(chemical_class = chemical)
@@ -96,9 +95,22 @@
 #'                  end_date = c("2000-04-01", "2000-07-01",
 #'                               "2000-08-25", "2000-11-25",
 #'                               "2001-05-16", "2001-08-16"))
+#' temp_dir <- tempdir()
 #' write_exposure(pur, df, c(1500, 3000), "chemical_class",
-#'                directory = "~/Documents/fresno_schools")
-#' exposure_df <- readRDS("~/Documents/fresno_schools/exposure_df.rds")
+#'                directory = temp_dir)
+#' exposure_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
+#' meta_data <- readRDS(paste0(temp_dir, "/meta_data.rds"))
+#' list.files(paste0(temp, "/exposure_plots"))
+#' \dontshow{
+#' pur <- pull_clean_pur(2000, "fresno")
+#' df <- data.frame(location = "-119.726751, 36.660967",
+#'                  start_date = "2000-01-01",
+#'                  end_date = "2000-12-31")
+#' temp <- tempdir()
+#' write_exposure(pur, df, 3000, temp)
+#' exposure <- readRDS(paste0(temp, "/exposure_df.rds"))
+#' meta <- readRDS(paste0(temp, "/meta_data.rds"))
+#' list.files(paste0(temp, "/exposure_plots"))
 #' }
 #' @importFrom magrittr %>%
 #' @export

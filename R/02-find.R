@@ -125,8 +125,8 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #' }
 #'
 #' @examples
-#' \dontrun{
 #' prod_df <- find_product_name(2000, "mosquito")
+#' \donttest{
 #' prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 #' }
 #' @export
@@ -172,8 +172,8 @@ find_product_name <- function(years, products = "all", quiet = FALSE,
 #'   If \code{return = "names"}, a vector of county names.
 #'
 #' @examples
-#' \dontrun{
 #' find_counties(c("01", "06005", "el dorado"))
+#' \donttest{
 #' find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
 #' find_counties(c("01", "06005", "el dorado"), return = "names")
 #' }
@@ -225,11 +225,9 @@ find_counties <- function(counties, return = "pur_codes") {
 #' coordinate pair given in \code{location} is located.
 #'
 #' @examples
-#' \dontrun{
 #' address <- "13883 Lassen Ave, Helm, CA 93627"
 #' long_lat <- c("-120.09789, 36.53379")
 #' find_location_county(c(address, long_lat))
-#' }
 #' @export
 find_location_county <- function(locations, return = "name", ...) { #latlon_out
 

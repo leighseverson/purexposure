@@ -130,14 +130,12 @@ estimate of exposure in kg of active ingredient per m^2.
 }
 
 \examples{
-\dontrun{
-clean_pur <- pull_clean_pur(2000, counties = "10")
+clean_pur <- pull_clean_pur(2000, "fresno")
 exposure_list <- calculate_exposure(clean_pur,
                                     location = "13883 Lassen Ave, Helm, CA 93627",
                                     radius = 3000)
 names(exposure_list)
-exposure_list$county_plot
-
+\donttest{
 # specify time intervals
 exp_list2 <- calculate_exposure(clean_pur,
                                 location = "13883 Lassen Ave, Helm, CA 93627",

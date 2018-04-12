@@ -38,9 +38,8 @@ or a PUR data frame with a \code{county_cd}, \code{county_name},
 \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 }
 \examples{
-\dontrun{
 plot_county_locations("fresno")
-
+\donttest{
 pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 plot_county_locations(pur_df)
 
@@ -50,5 +49,4 @@ names(plot_list)
 plot_list[[1]]
 plot_list[[2]]
 }
-
 }

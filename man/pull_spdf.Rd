@@ -48,10 +48,9 @@ a temporary directory.
 }
 
 \examples{
-\dontrun{
-trinity_shp <- pull_spdf("trinity")
-graphics::plot(trinity_shp)
-
+fresno_shp <- pull_spdf("fresno")
+graphics::plot(fresno_shp)
+\donttest{
 del_norte_shp <- pull_spdf("08", "township")
 graphics::plot(del_norte_shp)
 }

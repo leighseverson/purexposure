@@ -54,7 +54,5 @@ tables are saved in a temporary environment, which is deleted at the end of
 the current R session.
 }
 \examples{
-\dontrun{
 prod_95 <- pull_product_table(1995)
-}
 }

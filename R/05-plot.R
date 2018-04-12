@@ -25,9 +25,8 @@
 #' List element names correspond to county names.
 #'
 #' @examples
-#' \dontrun{
 #' plot_county_locations("fresno")
-#'
+#' \donttest{
 #' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 #' plot_county_locations(pur_df)
 #'
@@ -37,7 +36,6 @@
 #' plot_list[[1]]
 #' plot_list[[2]]
 #' }
-#'
 #' @importFrom magrittr %>%
 #' @importFrom rlang !!
 #' @export
@@ -189,10 +187,9 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' tulare_list <- pull_clean_pur(2010, "tulare") %>% plot_county_application()
-#' names(tulare_list)
-#'
+#' fresno_list <- pull_clean_pur(2000, "fresno") %>% plot_county_application()
+#' names(fresno_list)
+#' \donttest{
 #' # plot all active ingredients
 #' fresno_df <- pull_clean_pur(2000:2001, "fresno")
 #' fresno_list <- plot_county_application(fresno_df,
@@ -476,7 +473,14 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' }
 #'
 #' @examples
-#' \dontrun{
+#' fresno_list <- pull_clean_pur(2000, "fresno") %>%
+#'    calculate_exposure(location = "-119.726751, 36.660967", radius = 3000) %>%
+#'    plot_exposure()
+#' names(fresno_list)
+#' fresno_list$maps
+#' fresno_list$pls_data
+#' fresno_list$exposure
+#' \donttest{
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>%
 #'    calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) %>%
 #'    plot_exposure()
@@ -579,6 +583,7 @@ plot_exposure <- function(exposure_list, color_by = "amount",
                                          chemicals = as.character(chemicals))
 
   pls_data <- exposure_list$exposure %>%
+    dplyr::mutate(aerial_ground = as.character(aerial_ground)) %>%
     dplyr::select(start_date, end_date, chemicals, aerial_ground) %>%
     dplyr::full_join(pls_data, by = c("start_date", "end_date", "aerial_ground",
                                       "chemicals")) %>%
@@ -657,13 +662,12 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #' @return A \code{ggplot2} object.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pull_clean_pur(1990:1992, "fresno") %>%
 #'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
 #'     plot_application_timeseries(facet = TRUE)
-#'
-#' pull_clean_pur(2000, "riverside") %>% plot_application_timeseries()
 #' }
+#' pull_clean_pur(2000, "fresno") %>% plot_application_timeseries()
 #' @export
 plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
                                         axes = "fixed") {
@@ -721,22 +725,14 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' corresponding exposure value.
 #'
 #' @examples
-#' \dontrun{
 #' fresno <- pull_clean_pur(2000, "fresno")
 #' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
 #'                               "55190 Point Rd., Big Creek, CA 93605"),
 #'                  start_date = "2000-01-01", end_date = "2000-12-31")
-#' write_exposure(fresno, df, 3000, "~/Documents/fresno")
-#' exp_df <- readRDS("~/Documents/fresno/exposure_df.rds")
+#' temp_dir <- tempdir()
+#' write_exposure(fresno, df, 3000, temp_dir)
+#' exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 #' plot_locations_exposure(exp_df)
-#'
-#' # this exposure_df was saved from the example for write_exposure()
-#' exp_df2 <- readRDS("~/Documents/fresno_schools/exposure_df.rds")
-#' # filter to one exposure value per location
-#' exp_df2 <- dplyr::filter(exp_df2, chemicals == "methyl bromide" &
-#'                           radius == 3000)[c(1, 3, 5),]
-#' plot_locations_exposure(exp_df2)
-#' }
 #' @importFrom magrittr %>%
 #' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",

@@ -19,7 +19,10 @@ Meant to be analogous to the ease of using plot() to quickly view a
 SpatialPolygonDataFrame object.
 }
 \examples{
-\dontrun{
+pull_spdf("fresno") \%>\%
+   spdf_to_df() \%>\%
+   df_plot()
+\donttest{
 pull_spdf("san diego", "township") \%>\%
    spdf_to_df() \%>\%
    df_plot()

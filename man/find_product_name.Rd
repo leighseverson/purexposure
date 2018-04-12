@@ -66,8 +66,8 @@ tables are saved in a temporary environment, which is deleted at the end of
 the current R session.
 }
 \examples{
-\dontrun{
 prod_df <- find_product_name(2000, "mosquito")
+\donttest{
 prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 }
 }

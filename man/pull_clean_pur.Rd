@@ -163,7 +163,8 @@ end of the current R session.
 }
 
 \examples{
-\dontrun{
+df <- pull_clean_pur(2000, "fresno")
+\donttest{
 df <- pull_clean_pur(years = 2000:2001,
                      counties = c("06001", "29", "riverside"),
                      chemicals = "methylene",
