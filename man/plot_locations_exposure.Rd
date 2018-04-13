@@ -33,7 +33,11 @@ corresponding exposure value.
 for multiple locations in a given county.
 }
 \examples{
-fresno <- pull_clean_pur(2000, "fresno")
+exposure_df <- rbind(purexposure::exposure_ex$exposure,
+                     purexposure::exposure_ex2$exposure)
+plot_locations_exposure(exposure_df)
+\donttest{
+fresno <- purexposure::fresno_ex
 df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
                               "55190 Point Rd., Big Creek, CA 93605"),
                  start_date = "2000-01-01", end_date = "2000-12-31")
@@ -41,4 +45,6 @@ temp_dir <- tempdir()
 write_exposure(fresno, df, 3000, temp_dir)
 exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 plot_locations_exposure(exp_df)
+plot_locations_exposure(purexposure::exposure_ex$exposure)
+}
 }

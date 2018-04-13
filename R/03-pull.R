@@ -617,8 +617,8 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #'
 #' @examples
 #' fresno_shp <- pull_spdf("fresno")
-#' graphics::plot(fresno_shp)
 #' \donttest{
+#' graphics::plot(fresno_shp)
 #' del_norte_shp <- pull_spdf("08", "township")
 #' graphics::plot(del_norte_shp)
 #' }

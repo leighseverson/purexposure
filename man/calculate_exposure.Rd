@@ -130,9 +130,9 @@ estimate of exposure in kg of active ingredient per m^2.
 }
 
 \examples{
-clean_pur <- pull_clean_pur(2000, "fresno")
+clean_pur <- purexposure::fresno_ex
 exposure_list <- calculate_exposure(clean_pur,
-                                    location = "13883 Lassen Ave, Helm, CA 93627",
+                                    location = "-120.098794, 36.532866",
                                     radius = 3000)
 names(exposure_list)
 \donttest{

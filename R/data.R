@@ -59,3 +59,35 @@
 #' @source
 #' \url{https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html}
 "california_shp"
+
+#' A toy PUR dataset
+#'
+#' A PUR dataset pulled using `pull_clean_pur` for Fresno county for the year
+#' 2000 and filtered to the month of January.
+#'
+#' @format A data frame with 16,907 rows and 13 columns.
+"fresno_ex"
+
+#' A toy exposure list
+#'
+#' A list created using the `calculate_exposure` function for the `fresno_ex`
+#' dataset, the location (longitude, latitude) "-119.726751, 36.660967", and
+#' a radius of 3,000 meters. The `county_plot` list element has been removed.
+#'
+#' @format A list with four data frame elements: `exposure`, `meta_data`,
+#' `buffer_plot_df`, and `clean_pur_df`.
+"exposure_ex"
+
+#' Another toy exposure list
+#'
+#' Another list created using the `calculate_exposure` function for the
+#' `fresno_ex` dataset, the location (longitude, latitude)
+#' "-119.247100, 37.204875", and a radius of 3,000 meters. The `county_plot`
+#' list element has been removed.
+#'
+#' @format A list with four data frame elements: `exposure`, `meta_data`,
+#' `buffer_plot_df`, and `clean_pur_df`.
+"exposure_ex2"
+
+
+

@@ -68,9 +68,7 @@ ingredients, and application method relevant for the exposure values returned
 from \code{calculate_exposure}.
 }
 \examples{
-fresno_list <- pull_clean_pur(2000, "fresno") \%>\%
-   calculate_exposure(location = "-119.726751, 36.660967", radius = 3000) \%>\%
-   plot_exposure()
+fresno_list <- purexposure::exposure_ex \%>\% plot_exposure()
 names(fresno_list)
 fresno_list$maps
 fresno_list$pls_data

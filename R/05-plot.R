@@ -187,7 +187,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' }
 #'
 #' @examples
-#' fresno_list <- pull_clean_pur(2000, "fresno") %>% plot_county_application()
+#' fresno_list <- purexposure::fresno_ex %>% plot_county_application()
 #' names(fresno_list)
 #' \donttest{
 #' # plot all active ingredients
@@ -473,9 +473,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' }
 #'
 #' @examples
-#' fresno_list <- pull_clean_pur(2000, "fresno") %>%
-#'    calculate_exposure(location = "-119.726751, 36.660967", radius = 3000) %>%
-#'    plot_exposure()
+#' fresno_list <- purexposure::exposure_ex %>% plot_exposure()
 #' names(fresno_list)
 #' fresno_list$maps
 #' fresno_list$pls_data
@@ -662,12 +660,12 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #' @return A \code{ggplot2} object.
 #'
 #' @examples
+#' purexposure::fresno_ex %>% plot_application_timeseries()
 #' \donttest{
 #' pull_clean_pur(1990:1992, "fresno") %>%
 #'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
 #'     plot_application_timeseries(facet = TRUE)
 #' }
-#' pull_clean_pur(2000, "fresno") %>% plot_application_timeseries()
 #' @export
 plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
                                         axes = "fixed") {
@@ -725,7 +723,11 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' corresponding exposure value.
 #'
 #' @examples
-#' fresno <- pull_clean_pur(2000, "fresno")
+#' exposure_df <- rbind(purexposure::exposure_ex$exposure,
+#'                      purexposure::exposure_ex2$exposure)
+#' plot_locations_exposure(exposure_df)
+#' \donttest{
+#' fresno <- purexposure::fresno_ex
 #' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
 #'                               "55190 Point Rd., Big Creek, CA 93605"),
 #'                  start_date = "2000-01-01", end_date = "2000-12-31")
@@ -733,6 +735,8 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' write_exposure(fresno, df, 3000, temp_dir)
 #' exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 #' plot_locations_exposure(exp_df)
+#' plot_locations_exposure(purexposure::exposure_ex$exposure)
+#' }
 #' @importFrom magrittr %>%
 #' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",

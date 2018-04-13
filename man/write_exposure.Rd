@@ -135,7 +135,7 @@ exposure_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 meta_data <- readRDS(paste0(temp_dir, "/meta_data.rds"))
 list.files(paste0(temp, "/exposure_plots"))
 \dontshow{
-pur <- pull_clean_pur(2000, "fresno")
+pur <- purexposure::fresno_ex
 df <- data.frame(location = "-119.726751, 36.660967",
                  start_date = "2000-01-01",
                  end_date = "2000-12-31")
