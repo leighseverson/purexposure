@@ -745,14 +745,17 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' @param section_township Either "section" (the default) or "township". Specifies
 #'   which PLS unit to plot the county by.
 #' @inheritParams plot_county_application
+#' @param ... Used internally.
 #'
 #' @return A plot with one point per location, colored by each location's
 #' corresponding exposure value.
 #'
 #' @examples
+#' \dontshow{
+#' spdf <- purexposure::fresno_spdf
 #' exposure_df <- rbind(purexposure::exposure_ex$exposure,
 #'                      purexposure::exposure_ex2$exposure)
-#' plot_locations_exposure(exposure_df)
+#' plot_locations_exposure(exposure_df, spdf = spdf)}
 #' \donttest{
 #' fresno <- purexposure::fresno_clean
 #' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
@@ -766,7 +769,7 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' @importFrom magrittr %>%
 #' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",
-                                    fill = "viridis", alpha = 1) {
+                                    fill = "viridis", alpha = 1, ...) {
 
   check <- nrow(exposure_df) == length(unique(exposure_df$location))
   if (!check) {
@@ -790,8 +793,14 @@ plot_locations_exposure <- function(exposure_df, section_township = "section",
 
   county <- find_location_county(exposure_df[1,]$location)$county
 
-  shp <- pull_spdf(county, section_township)
-  df <- spdf_to_df(shp)
+  args <- list(...)
+  if (is.null(args$spdf)) {
+    shp <- pull_spdf(county, section_township)
+    df <- spdf_to_df(shp)
+  } else {
+    shp <- args$spdf
+    df <- spdf_to_df(shp)
+  }
 
   colormaps_vec <- unlist(colormap::colormaps)
   names(colormaps_vec) <- NULL

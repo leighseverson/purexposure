@@ -5,7 +5,7 @@
 \title{Plot exposure for multiple locations in a county.}
 \usage{
 plot_locations_exposure(exposure_df, section_township = "section",
-  fill = "viridis", alpha = 1)
+  fill = "viridis", alpha = 1, ...)
 }
 \arguments{
 \item{exposure_df}{A data frame returned from \code{write_exposure} with 10
@@ -24,6 +24,8 @@ which PLS unit to plot the county by.}
 
 \item{alpha}{A number in [0,1] specifying the transparency of fill colors.
 Numbers closer to 0 will result in more transparency. The default is 1.}
+
+\item{...}{Used internally.}
 }
 \value{
 A plot with one point per location, colored by each location's
@@ -34,9 +36,11 @@ corresponding exposure value.
 for multiple locations in a given county.
 }
 \examples{
+\dontshow{
+spdf <- purexposure::fresno_spdf
 exposure_df <- rbind(purexposure::exposure_ex$exposure,
                      purexposure::exposure_ex2$exposure)
-plot_locations_exposure(exposure_df)
+plot_locations_exposure(exposure_df, spdf = spdf)}
 \donttest{
 fresno <- purexposure::fresno_clean
 df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
