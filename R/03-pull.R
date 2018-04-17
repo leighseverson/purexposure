@@ -307,7 +307,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
     raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                            quiet = quiet)
   } else {
-    raw_df <- raw_pur
+    raw_df <- args$raw_pur
   }
 
   df <- raw_df %>%
