@@ -86,7 +86,7 @@ percentile.
 library(magrittr)
 fresno_spdf <- purexposure::fresno_spdf
 # application in Fresno for the month of January, 2000
-fresno_list <- purexposure::frenso_clean \%>\%
+fresno_list <- purexposure::fresno_clean \%>\%
     plot_county_application(spdf = fresno_spdf)
 names(fresno_list)
 \donttest{

@@ -38,7 +38,7 @@ exposure_df <- rbind(purexposure::exposure_ex$exposure,
                      purexposure::exposure_ex2$exposure)
 plot_locations_exposure(exposure_df)
 \donttest{
-fresno <- purexposure::frenso_clean
+fresno <- purexposure::fresno_clean
 df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
                               "55190 Point Rd., Big Creek, CA 93605"),
                  start_date = "2000-01-01", end_date = "2000-12-31")
