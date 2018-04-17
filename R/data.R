@@ -60,7 +60,7 @@
 #' \url{https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html}
 "california_shp"
 
-#' A toy raw PUR dataset
+#' An example raw PUR dataset
 #'
 #' A PUR dataset pulled using `pull_raw_pur` for Fresno county for the year
 #' 2000 and filtered to the month of January.
@@ -68,7 +68,7 @@
 #' @format A data frame with 18,062 rows and 33 columns.
 "fresno_raw"
 
-#' A toy clean PUR dataset
+#' An example clean PUR dataset
 #'
 #' A PUR dataset pulled using `pull_clean_pur` for Fresno county for the year
 #' 2000 and filtered to the month of January.
@@ -76,7 +76,7 @@
 #' @format A data frame with 16,907 rows and 13 columns.
 "fresno_clean"
 
-#' A toy exposure list
+#' An example exposure list
 #'
 #' A list created using the `calculate_exposure` function for the `fresno_ex`
 #' dataset, the location (longitude, latitude) "-119.726751, 36.660967", and
@@ -86,7 +86,7 @@
 #' `buffer_plot_df`, and `clean_pur_df`.
 "exposure_ex"
 
-#' Another toy exposure list
+#' Another example exposure list
 #'
 #' Another list created using the `calculate_exposure` function for the
 #' `fresno_ex` dataset, the location (longitude, latitude)
@@ -102,3 +102,11 @@
 #' A SpatialPolygonsDataFrame object pulled using the `pull_spdf` function for
 #' Fresno county sections.
 "fresno_spdf"
+
+#' An example PUR product table
+#'
+#' A PUR Product Table pulled using `pull_product_table` for the year 2000.
+#'
+#' @format A data frame with 41,076 rows and 5 columns.
+"products_2000"
+

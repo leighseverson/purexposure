@@ -3,7 +3,7 @@
 \docType{data}
 \name{exposure_ex}
 \alias{exposure_ex}
-\title{A toy exposure list}
+\title{An example exposure list}
 \format{A list with four data frame elements: `exposure`, `meta_data`,
 `buffer_plot_df`, and `clean_pur_df`.}
 \usage{

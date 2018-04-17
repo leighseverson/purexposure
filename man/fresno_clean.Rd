@@ -3,7 +3,7 @@
 \docType{data}
 \name{fresno_clean}
 \alias{fresno_clean}
-\title{A toy clean PUR dataset}
+\title{An example clean PUR dataset}
 \format{A data frame with 16,907 rows and 13 columns.}
 \usage{
 fresno_clean

@@ -3,7 +3,7 @@
 \docType{data}
 \name{fresno_raw}
 \alias{fresno_raw}
-\title{A toy raw PUR dataset}
+\title{An example raw PUR dataset}
 \format{A data frame with 18,062 rows and 33 columns.}
 \usage{
 fresno_raw
