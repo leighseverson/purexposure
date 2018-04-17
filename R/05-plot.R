@@ -20,13 +20,18 @@
 #' @param alpha A number in [0,1] specifying the transparency of the fill
 #'   color. Numbers closer to 0 will result in more transparency. The default is
 #'   0.5.
+#' @param ... Used internally.
 #'
 #' @return A ggplot or a list of ggplots of Califnornia with shaded-in counties.
 #' List element names correspond to county names.
 #'
 #' @examples
-#' plot_county_locations("fresno")
+#' \dontshow{
+#' fresno_spdf <- purexposure::fresno_spdf
+#' plot_county_locations("fresno", spdf = fresno_spdf)}
 #' \donttest{
+#' plot_county_locations("fresno")
+#'
 #' pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 #' plot_county_locations(pur_df)
 #'
@@ -40,7 +45,7 @@
 #' @importFrom rlang !!
 #' @export
 plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
-                                 fill_color = "red", alpha = 0.5) {
+                                 fill_color = "red", alpha = 0.5, ...) {
 
   ca_shp <- purexposure::california_shp
   ca_df <- spdf_to_df(ca_shp)
@@ -80,8 +85,15 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
   }
 
   # pull county shapefiles
-  county_shps <- purrr::map(counties, pull_spdf)
-  county_dfs <- suppressWarnings(purrr::map(county_shps, spdf_to_df))
+
+  args <- list(...)
+
+  if (is.null(args$spdf)) {
+    county_shps <- purrr::map(counties, pull_spdf)
+    county_dfs <- suppressWarnings(purrr::map(county_shps, spdf_to_df))
+  } else {
+    county_dfs <- list(args$spdf %>% spdf_to_df)
+  }
 
   ca <- df_plot(ca_df)
   plot <- ca + ggplot2::geom_polygon(data = county_dfs[[1]],

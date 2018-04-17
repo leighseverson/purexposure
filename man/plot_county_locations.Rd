@@ -5,7 +5,7 @@
 \title{Plot a county's location in California.}
 \usage{
 plot_county_locations(counties_or_df, separate_plots = FALSE,
-  fill_color = "red", alpha = 0.5)
+  fill_color = "red", alpha = 0.5, ...)
 }
 \arguments{
 \item{counties_or_df}{A character vector of county names, pur codes, or fips
@@ -25,6 +25,8 @@ hex color code ("#0000FF", for example). The default is "red".}
 \item{alpha}{A number in [0,1] specifying the transparency of the fill
 color. Numbers closer to 0 will result in more transparency. The default is
 0.5.}
+
+\item{...}{Used internally.}
 }
 \value{
 A ggplot or a list of ggplots of Califnornia with shaded-in counties.
@@ -38,8 +40,12 @@ or a PUR data frame with a \code{county_cd}, \code{county_name},
 \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 }
 \examples{
-plot_county_locations("fresno")
+\dontshow{
+fresno_spdf <- purexposure::fresno_spdf
+plot_county_locations("fresno", spdf = fresno_spdf)}
 \donttest{
+plot_county_locations("fresno")
+
 pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
 plot_county_locations(pur_df)
 
