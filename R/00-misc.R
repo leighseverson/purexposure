@@ -62,7 +62,7 @@ df_plot <- function(df) {
 #'
 #' @examples
 #' library(magrittr)
-#' df <- pull_spdf("fresno") %>% spdf_to_df()
+#' df <- purexposure::fresno_spdf %>% spdf_to_df()
 #' \donttest{
 #' df2 <- pull_spdf("sonoma") %>% spdf_to_df()
 #'
