@@ -19,6 +19,7 @@ Meant to be analogous to the ease of using plot() to quickly view a
 SpatialPolygonDataFrame object.
 }
 \examples{
+library(magrittr)
 pull_spdf("fresno") \%>\%
    spdf_to_df() \%>\%
    df_plot()

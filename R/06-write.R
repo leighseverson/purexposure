@@ -78,6 +78,7 @@
 #' }
 #'
 #' @examples
+#' library(magrittr)
 #' \donttest{
 #' chemical_class_df <- rbind(find_chemical_codes(2000:2001, "sulfur"),
 #'                            find_chemical_codes(2000:2001, "methyl bromide")) %>%

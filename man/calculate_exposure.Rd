@@ -130,6 +130,7 @@ estimate of exposure in kg of active ingredient per m^2.
 }
 
 \examples{
+library(magrittr)
 \dontshow{
 clean_pur <- purexposure::fresno_clean
 fresno_spdf <- purexposure::fresno_spdf

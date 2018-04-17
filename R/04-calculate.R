@@ -108,6 +108,7 @@
 #' }
 #'
 #' @examples
+#' library(magrittr)
 #' \dontshow{
 #' clean_pur <- purexposure::fresno_clean
 #' fresno_spdf <- purexposure::fresno_spdf

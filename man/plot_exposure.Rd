@@ -68,6 +68,7 @@ ingredients, and application method relevant for the exposure values returned
 from \code{calculate_exposure}.
 }
 \examples{
+library(magrittr)
 fresno_list <- purexposure::exposure_ex \%>\% plot_exposure()
 names(fresno_list)
 fresno_list$maps

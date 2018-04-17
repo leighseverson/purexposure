@@ -28,6 +28,7 @@ whether to facet the time series by active ingredient (\code{chemname}) or by
 \code{chemical_class}.
 }
 \examples{
+library(magrittr)
 purexposure::frenso_clean \%>\% plot_application_timeseries()
 \donttest{
 pull_clean_pur(1990:1992, "fresno") \%>\%

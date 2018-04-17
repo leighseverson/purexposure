@@ -83,6 +83,7 @@ is summed by section or township. PLS units can be shaded by amount or by
 percentile.
 }
 \examples{
+library(magrittr)
 fresno_spdf <- purexposure::fresno_spdf
 # application in Fresno for the month of January, 2000
 fresno_list <- purexposure::frenso_clean \%>\%

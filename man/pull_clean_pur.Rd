@@ -165,6 +165,7 @@ end of the current R session.
 }
 
 \examples{
+library(magrittr)
 \dontshow{
 fresno_raw <- purexposure::fresno_raw
 df <- pull_clean_pur(2000, "fresno", raw_pur = fresno_raw)}

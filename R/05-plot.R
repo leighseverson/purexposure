@@ -188,6 +188,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' }
 #'
 #' @examples
+#' library(magrittr)
 #' fresno_spdf <- purexposure::fresno_spdf
 #' # application in Fresno for the month of January, 2000
 #' fresno_list <- purexposure::frenso_clean %>%
@@ -484,6 +485,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #' }
 #'
 #' @examples
+#' library(magrittr)
 #' fresno_list <- purexposure::exposure_ex %>% plot_exposure()
 #' names(fresno_list)
 #' fresno_list$maps
@@ -671,6 +673,7 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #' @return A \code{ggplot2} object.
 #'
 #' @examples
+#' library(magrittr)
 #' purexposure::frenso_clean %>% plot_application_timeseries()
 #' \donttest{
 #' pull_clean_pur(1990:1992, "fresno") %>%
