@@ -28,9 +28,8 @@ utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
 #'
 #' @examples
 #' library(magrittr)
-#' pull_spdf("fresno") %>%
-#'    spdf_to_df() %>%
-#'    df_plot()
+#' fresno <- purexposure::fresno_spdf
+#' fresno %>% spdf_to_df %>% df_plot()
 #' \donttest{
 #' pull_spdf("san diego", "township") %>%
 #'    spdf_to_df() %>%
