@@ -5,7 +5,8 @@
 \title{Find pesticide product names and registration numbers from PUR Product Lookup
 Tables.}
 \usage{
-find_product_name(years, products = "all", quiet = FALSE, by_year = FALSE)
+find_product_name(years, products = "all", quiet = FALSE, by_year = FALSE,
+  ...)
 }
 \arguments{
 \item{years}{A vector of four digit years in the range of 1990 to 2015.}
@@ -23,6 +24,8 @@ The default value is FALSE.}
 Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
 default, a data frame is returned with unique results from all years given
 in the `years` argument.}
+
+\item{...}{Used internally.}
 }
 \value{
 A data frame with seven columns:
@@ -66,8 +69,11 @@ tables are saved in a temporary environment, which is deleted at the end of
 the current R session.
 }
 \examples{
-prod_df <- find_product_name(2000, "mosquito")
+\dontshow{
+product_df <- purexposure::products_2000
+prod_df <- find_product_name(2000, "mosquito", product_df = product_df)}
 \donttest{
+prod_df <- find_product_name(2000, "mosquito")
 prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 }
 }

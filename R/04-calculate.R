@@ -108,11 +108,13 @@
 #' }
 #'
 #' @examples
-#' clean_pur <- purexposure::fresno_ex
+#' \dontshow{
+#' clean_pur <- purexposure::fresno_clean
+#' fresno_spdf <- purexposure::fresno_spdf
 #' exposure_list <- calculate_exposure(clean_pur,
 #'                                     location = "-120.098794, 36.532866",
-#'                                     radius = 3000)
-#' names(exposure_list)
+#'                                     radius = 3000,
+#'                                     spdf = frenso_spdf)}
 #' \donttest{
 #' # specify time intervals
 #' exp_list2 <- calculate_exposure(clean_pur,
@@ -160,7 +162,7 @@
 calculate_exposure <- function(clean_pur_df, location, radius,
                                time_period = NULL, start_date = NULL,
                                end_date = NULL, chemicals = "all",
-                               aerial_ground = FALSE, verbose = TRUE, ...) { # original_location
+                               aerial_ground = FALSE, verbose = TRUE, ...) { # original_location or spdf
 
   # get numeric coordinate vector from location
   if (length(grep("-", location)) == 1) {
@@ -189,10 +191,11 @@ calculate_exposure <- function(clean_pur_df, location, radius,
 
   clean_pur_df <- clean_pur_df %>% dplyr::filter(county_name == toupper(county))
 
+  args <- list(...)
+
   if (verbose) {
 
     # relevant for write_exposure()
-    args <- list(...)
     if (!is.null(args$original_location)) {
       loc_message <- args$original_location
     } else {
@@ -231,13 +234,23 @@ calculate_exposure <- function(clean_pur_df, location, radius,
                                           max_long = max(long),
                                           max_lat = max(lat))
 
-  if ("section" %in% colnames(clean_pur_df)) {
-    shp <- pull_spdf(as.character(county), "section")
-    df <- spdf_to_df(shp)
+  if (is.null(args$spdf)) {
+
+    if ("section" %in% colnames(clean_pur_df)) {
+      shp <- pull_spdf(as.character(county), "section")
+      df <- spdf_to_df(shp)
+    } else {
+      shp <- pull_spdf(as.character(county), "township")
+      df <- spdf_to_df(shp)
+    }
+
   } else {
-    shp <- pull_spdf(as.character(county), "township")
+
+    shp <- args$spdf
     df <- spdf_to_df(shp)
+
   }
+
 
   context_plot <- ggplot2::ggplot(data = df) +
     ggplot2::geom_polygon(ggplot2::aes(x = long, y = lat, group = group),

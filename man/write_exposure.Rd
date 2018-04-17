@@ -111,6 +111,7 @@ out files (exposure values, meta data, and plots) to a specified directory.
 }
 
 \examples{
+\donttest{
 chemical_class_df <- rbind(find_chemical_codes(2000:2001, "sulfur"),
                            find_chemical_codes(2000:2001, "methyl bromide")) \%>\%
    dplyr::rename(chemical_class = chemical)
@@ -133,16 +134,15 @@ write_exposure(pur, df, c(1500, 3000), "chemical_class",
                directory = temp_dir)
 exposure_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 meta_data <- readRDS(paste0(temp_dir, "/meta_data.rds"))
-list.files(paste0(temp, "/exposure_plots"))
+list.files(paste0(temp_dir, "/exposure_plots"))
+}
 \dontshow{
-pur <- purexposure::fresno_ex
+pur <- purexposure::fresno_clean
+spdf <- purexposure::fresno_spdf
 df <- data.frame(location = "-119.726751, 36.660967",
                  start_date = "2000-01-01",
                  end_date = "2000-12-31")
 temp <- tempdir()
-write_exposure(pur, df, 3000, temp)
-exposure <- readRDS(paste0(temp, "/exposure_df.rds"))
-meta <- readRDS(paste0(temp, "/meta_data.rds"))
-list.files(paste0(temp, "/exposure_plots"))
+write_exposure(pur, df, 3000, temp, spdf = spdf)
 }
 }

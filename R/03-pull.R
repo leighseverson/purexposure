@@ -181,6 +181,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' @param aerial_ground TRUE / FALSE indicating if you would like to
 #'   retain aerial/ground application data ("A" = aerial, "G" = ground, and
 #'   "O" = other.) The default is TRUE.
+#' @param ... Used internally.
 #'
 #' @return A data frame:
 #'   \describe{
@@ -256,7 +257,9 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #' }
 #'
 #' @examples
-#' df <- pull_clean_pur(2000, "fresno")
+#' \dontshow{
+#' fresno_raw <- purexposure::fresno_raw
+#' df <- pull_clean_pur(2000, "fresno", raw_pur = fresno_raw)}
 #' \donttest{
 #' df <- pull_clean_pur(years = 2000:2001,
 #'                      counties = c("06001", "29", "riverside"),
@@ -296,10 +299,15 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
                            sum_application = FALSE, unit = "section",
                            sum = "all", chemical_class = NULL,
                            aerial_ground = TRUE, verbose = TRUE,
-                           quiet = FALSE) {
+                           quiet = FALSE, ...) {
 
+  args <- list(...)
+  if (is.null(args$raw_pur)) {
     raw_df <- pull_raw_pur(years = years, counties = counties, verbose = verbose,
                            quiet = quiet)
+  } else {
+    raw_df <- raw_pur
+  }
 
   df <- raw_df %>%
     dplyr::mutate(township_pad = stringr::str_pad(raw_df$township, 2, "left", pad = "0"),
@@ -616,11 +624,11 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 #' a temporary directory.
 #'
 #' @examples
-#' fresno_shp <- pull_spdf("fresno")
 #' \donttest{
-#' graphics::plot(fresno_shp)
+#' fresno_shp <- pull_spdf("fresno")
+#' fresno_shp %>% spdf_to_df() %>% df_plot()
 #' del_norte_shp <- pull_spdf("08", "township")
-#' graphics::plot(del_norte_shp)
+#' del_norte_shp %>% spdf_to_df() %>% df_plot()
 #' }
 #' @export
 pull_spdf <- function(county, section_township = "section",
@@ -764,7 +772,8 @@ pull_spdf <- function(county, section_township = "section",
 #' }
 #'
 #' @examples
-#' prod_95 <- pull_product_table(1995)
+#' \donttest{
+#' prod_95 <- pull_product_table(1995)}
 #' @importFrom magrittr %>%
 #' @export
 pull_product_table <- function(years, quiet = FALSE) {

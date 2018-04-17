@@ -93,6 +93,7 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #'   Tables separated by year (in a `year` column). If `by_year` is `FALSE`, the
 #'   default, a data frame is returned with unique results from all years given
 #'   in the `years` argument.
+#' @param ... Used internally.
 #'
 #' @return A data frame with seven columns:
 #' \describe{
@@ -125,15 +126,23 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #' }
 #'
 #' @examples
-#' prod_df <- find_product_name(2000, "mosquito")
+#' \dontshow{
+#' product_df <- purexposure::products_2000
+#' prod_df <- find_product_name(2000, "mosquito", product_df = product_df)}
 #' \donttest{
+#' prod_df <- find_product_name(2000, "mosquito")
 #' prod_df2 <- find_product_name(2010, c("insecticide", "rodenticide"))
 #' }
 #' @export
 find_product_name <- function(years, products = "all", quiet = FALSE,
-                              by_year = FALSE) {
+                              by_year = FALSE, ...) {
 
-  prod_df <- pull_product_table(years, quiet = quiet)
+  args <- list(...)
+  if (is.null(args$product_df)) {
+    prod_df <- pull_product_table(years, quiet = quiet)
+  } else {
+    prod_df <- product_df
+  }
 
   for (i in 1:length(products)) {
     df <- help_find_product(products[i], prod_df)
@@ -173,10 +182,8 @@ find_product_name <- function(years, products = "all", quiet = FALSE,
 #'
 #' @examples
 #' find_counties(c("01", "06005", "el dorado"))
-#' \donttest{
 #' find_counties(c("01", "06005", "el dorado"), return = "fips_codes")
 #' find_counties(c("01", "06005", "el dorado"), return = "names")
-#' }
 #' @importFrom magrittr %>%
 #' @export
 find_counties <- function(counties, return = "pur_codes") {

@@ -60,13 +60,21 @@
 #' \url{https://www.census.gov/geo/maps-data/data/cbf/cbf_state.html}
 "california_shp"
 
-#' A toy PUR dataset
+#' A toy raw PUR dataset
+#'
+#' A PUR dataset pulled using `pull_raw_pur` for Fresno county for the year
+#' 2000 and filtered to the month of January.
+#'
+#' @format A data frame with 18,062 rows and 33 columns.
+"fresno_raw"
+
+#' A toy clean PUR dataset
 #'
 #' A PUR dataset pulled using `pull_clean_pur` for Fresno county for the year
 #' 2000 and filtered to the month of January.
 #'
 #' @format A data frame with 16,907 rows and 13 columns.
-"fresno_ex"
+"fresno_clean"
 
 #' A toy exposure list
 #'
@@ -89,5 +97,8 @@
 #' `buffer_plot_df`, and `clean_pur_df`.
 "exposure_ex2"
 
-
-
+#' SpatialPolygonsDataFrame describing Fresno county sections
+#'
+#' A SpatialPolygonsDataFrame object pulled using the `pull_spdf` function for
+#' Fresno county sections.
+"fresno_spdf"

@@ -48,10 +48,10 @@ a temporary directory.
 }
 
 \examples{
-fresno_shp <- pull_spdf("fresno")
 \donttest{
-graphics::plot(fresno_shp)
+fresno_shp <- pull_spdf("fresno")
+fresno_shp \%>\% spdf_to_df() \%>\% df_plot()
 del_norte_shp <- pull_spdf("08", "township")
-graphics::plot(del_norte_shp)
+del_norte_shp \%>\% spdf_to_df() \%>\% df_plot()
 }
 }

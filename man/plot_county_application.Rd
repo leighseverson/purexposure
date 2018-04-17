@@ -7,7 +7,7 @@
 plot_county_application(clean_pur_df, county = NULL, pls = NULL,
   color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
   end_date = NULL, chemicals = "all", fill = "viridis", crop = FALSE,
-  alpha = 1)
+  alpha = 1, ...)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur}.}
@@ -60,6 +60,8 @@ sections or townships with recorded application data.}
 
 \item{alpha}{A number in [0,1] specifying the transparency of fill colors.
 Numbers closer to 0 will result in more transparency. The default is 1.}
+
+\item{...}{Used internally.}
 }
 \value{
 A list with three elements:
@@ -81,7 +83,10 @@ is summed by section or township. PLS units can be shaded by amount or by
 percentile.
 }
 \examples{
-fresno_list <- purexposure::fresno_ex \%>\% plot_county_application()
+fresno_spdf <- purexposure::fresno_spdf
+# application in Fresno for the month of January, 2000
+fresno_list <- purexposure::frenso_clean \%>\%
+    plot_county_application(spdf = fresno_spdf)
 names(fresno_list)
 \donttest{
 # plot all active ingredients

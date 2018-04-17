@@ -54,5 +54,6 @@ tables are saved in a temporary environment, which is deleted at the end of
 the current R session.
 }
 \examples{
-prod_95 <- pull_product_table(1995)
+\donttest{
+prod_95 <- pull_product_table(1995)}
 }

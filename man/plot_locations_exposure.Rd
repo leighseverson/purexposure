@@ -11,7 +11,8 @@ plot_locations_exposure(exposure_df, section_township = "section",
 \item{exposure_df}{A data frame returned from \code{write_exposure} with 10
 columns, including \code{exposure}, \code{location}, \code{radius},
 \code{longitude}, and \code{latitude}. This data frame should be filtered
-so that there is one exposure value per location.}
+so that there is one exposure value per location. (This could also be the
+`exposure` element returned from `calculate_exposure`.)}
 
 \item{section_township}{Either "section" (the default) or "township". Specifies
 which PLS unit to plot the county by.}
@@ -37,7 +38,7 @@ exposure_df <- rbind(purexposure::exposure_ex$exposure,
                      purexposure::exposure_ex2$exposure)
 plot_locations_exposure(exposure_df)
 \donttest{
-fresno <- purexposure::fresno_ex
+fresno <- purexposure::frenso_clean
 df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
                               "55190 Point Rd., Big Creek, CA 93605"),
                  start_date = "2000-01-01", end_date = "2000-12-31")
@@ -45,6 +46,5 @@ temp_dir <- tempdir()
 write_exposure(fresno, df, 3000, temp_dir)
 exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 plot_locations_exposure(exp_df)
-plot_locations_exposure(purexposure::exposure_ex$exposure)
 }
 }

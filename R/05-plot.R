@@ -174,6 +174,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   sections or townships with recorded application data.
 #' @param alpha A number in [0,1] specifying the transparency of fill colors.
 #'   Numbers closer to 0 will result in more transparency. The default is 1.
+#' @param ... Used internally.
 #'
 #' @return A list with three elements:
 #' \describe{
@@ -187,7 +188,10 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' }
 #'
 #' @examples
-#' fresno_list <- purexposure::fresno_ex %>% plot_county_application()
+#' fresno_spdf <- purexposure::fresno_spdf
+#' # application in Fresno for the month of January, 2000
+#' fresno_list <- purexposure::frenso_clean %>%
+#'     plot_county_application(spdf = fresno_spdf)
 #' names(fresno_list)
 #' \donttest{
 #' # plot all active ingredients
@@ -230,7 +234,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                    percentile = c(0.25, 0.5, 0.75),
                                    start_date = NULL, end_date = NULL,
                                    chemicals = "all", fill = "viridis",
-                                   crop = FALSE, alpha = 1) {
+                                   crop = FALSE, alpha = 1, ...) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
@@ -270,7 +274,14 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                 "like to plot data for with the county argument."))
   }
 
-  county_shp <- pull_spdf(code, section_township = section_township)
+  args <- list(...)
+
+  if (is.null(args$spdf)) {
+    county_shp <- pull_spdf(code, section_township = section_township)
+  } else {
+    county_shp <- args$spdf
+  }
+
   county_bbox <- as.data.frame(county_shp@bbox)
   county_df <- spdf_to_df(county_shp)
 
@@ -660,7 +671,7 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #' @return A \code{ggplot2} object.
 #'
 #' @examples
-#' purexposure::fresno_ex %>% plot_application_timeseries()
+#' purexposure::frenso_clean %>% plot_application_timeseries()
 #' \donttest{
 #' pull_clean_pur(1990:1992, "fresno") %>%
 #'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
@@ -714,7 +725,8 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' @param exposure_df A data frame returned from \code{write_exposure} with 10
 #'   columns, including \code{exposure}, \code{location}, \code{radius},
 #'   \code{longitude}, and \code{latitude}. This data frame should be filtered
-#'   so that there is one exposure value per location.
+#'   so that there is one exposure value per location. (This could also be the
+#'   `exposure` element returned from `calculate_exposure`.)
 #' @param section_township Either "section" (the default) or "township". Specifies
 #'   which PLS unit to plot the county by.
 #' @inheritParams plot_county_application
@@ -727,7 +739,7 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #'                      purexposure::exposure_ex2$exposure)
 #' plot_locations_exposure(exposure_df)
 #' \donttest{
-#' fresno <- purexposure::fresno_ex
+#' fresno <- purexposure::frenso_clean
 #' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
 #'                               "55190 Point Rd., Big Creek, CA 93605"),
 #'                  start_date = "2000-01-01", end_date = "2000-12-31")
@@ -735,7 +747,6 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' write_exposure(fresno, df, 3000, temp_dir)
 #' exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 #' plot_locations_exposure(exp_df)
-#' plot_locations_exposure(purexposure::exposure_ex$exposure)
 #' }
 #' @importFrom magrittr %>%
 #' @export
