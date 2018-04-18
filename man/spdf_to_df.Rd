@@ -22,7 +22,8 @@ the \code{pull_spdf} function to a data frame.
 \examples{
 library(magrittr)
 \dontshow{
-df <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure")) \%>\% spdf_to_df()}
+df <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure")) \%>\%
+   spdf_to_df()}
 \donttest{
 df <- pull_spdf("frenso") \%>\% spdf_to_df()
 df2 <- pull_spdf("sonoma") \%>\% spdf_to_df()

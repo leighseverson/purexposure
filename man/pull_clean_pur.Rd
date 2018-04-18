@@ -167,7 +167,8 @@ end of the current R session.
 \examples{
 library(magrittr)
 \dontshow{
-fresno_raw <- readRDS(system.file("extdata", "fresno_raw.rds", package = "purexposure"))
+fresno_raw <- readRDS(system.file("extdata", "fresno_raw.rds",
+                                  package = "purexposure"))
 df <- pull_clean_pur(2000, "fresno", raw_pur = fresno_raw)}
 \donttest{
 df <- pull_clean_pur(years = 2000:2001,

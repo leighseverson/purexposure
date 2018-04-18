@@ -110,12 +110,12 @@
 #' @examples
 #' library(magrittr)
 #' \dontshow{
-#' clean_pur <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure"))
-#' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
-#' exposure_list <- calculate_exposure(clean_pur,
-#'                                     location = "-120.098794, 36.532866",
-#'                                     radius = 3000,
-#'                                     spdf = fresno_spdf)}
+#' clean_pur <- readRDS(system.file("extdata", "fresno_clean.rds",
+#'                                  package = "purexposure"))
+#' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
+#'                                    package = "purexposure"))
+#' exposure_list <- calculate_exposure(clean_pur, location = "-120.098794, 36.532866",
+#'                                     radius = 3000, spdf = fresno_spdf)}
 #' \donttest{
 #' # specify time intervals
 #' exp_list2 <- calculate_exposure(clean_pur,

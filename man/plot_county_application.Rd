@@ -84,10 +84,12 @@ percentile.
 }
 \examples{
 library(magrittr)
-fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure))
-fresno_clean <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure))
-fresno_list <- fresno_clean \%>\%
-    plot_county_application(spdf = fresno_spdf)
+\dontshow{
+fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
+                                   package = "purexposure"))
+fresno_clean <- readRDS(system.file("extdata", "fresno_clean.rds",
+                                    package = "purexposure"))
+fresno_list <- fresno_clean \%>\% plot_county_application(spdf = fresno_spdf)}
 \donttest{
 # plot all active ingredients
 fresno_df <- pull_clean_pur(2000:2001, "fresno")
