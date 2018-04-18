@@ -751,12 +751,6 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' corresponding exposure value.
 #'
 #' @examples
-#' \dontshow{
-#' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
-#' exp1 <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure"))
-#' exp2 <- readRDS(system.file("extdata", "exposure_ex2.rds", package = "purexposure"))
-#' exposure_df <- rbind(exp1, exp2)
-#' plot_locations_exposure(exposure_df, spdf = spdf)}
 #' \donttest{
 #' fresno <- purexposure::fresno_clean
 #' df <- data.frame(location = c("295 West Saginaw Ave., Caruthers, CA 93609",
@@ -765,8 +759,13 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' temp_dir <- tempdir()
 #' write_exposure(fresno, df, 3000, temp_dir)
 #' exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
-#' plot_locations_exposure(exp_df)
-#' }
+#' plot_locations_exposure(exp_df)}
+#' \dontshow{
+#' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+#' exp1 <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure"))$exposure
+#' exp2 <- readRDS(system.file("extdata", "exposure_ex2.rds", package = "purexposure"))$exposure
+#' exposure_df <- rbind(exp1, exp2)
+#' plot_locations_exposure(exposure_df, spdf = spdf)}
 #' @importFrom magrittr %>%
 #' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",

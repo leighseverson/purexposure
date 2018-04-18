@@ -12,8 +12,7 @@ utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
                          "section", "signlwrd_ind", "start_date", "township",
                          "township_pad", "tship_dir", "unit_treated", "use_no",
                          "x", "y", "year", "pur_code", "fips_code", "product",
-                         "geocode_quiet", "latlon_loc", "n", "n_row",
-                         "product_df", "raw_pur", "spdf"))
+                         "geocode_quiet", "latlon_loc", "n", "n_row"))
 
 #' Plot data frame spatial objects.
 #'

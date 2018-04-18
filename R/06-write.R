@@ -105,8 +105,8 @@
 #' list.files(paste0(temp_dir, "/exposure_plots"))
 #' }
 #' \dontshow{
-#' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure))
-#' pur <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure))
+#' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+#' pur <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure"))
 #' df <- data.frame(location = "-119.726751, 36.660967",
 #'                  start_date = "2000-01-01",
 #'                  end_date = "2000-12-31")
