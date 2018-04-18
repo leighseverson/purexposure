@@ -28,9 +28,11 @@ utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
 #'
 #' @examples
 #' library(magrittr)
-#' fresno <- purexposure::fresno_spdf
-#' fresno %>% spdf_to_df %>% df_plot()
+#' \dontshow{
+#' fresno <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+#' fresno %>% spdf_to_df %>% df_plot()}
 #' \donttest{
+#' pull_spdf("fresno") %>% spdf_to_df() %>% df_plot()
 #' pull_spdf("san diego", "township") %>%
 #'    spdf_to_df() %>%
 #'    df_plot()
@@ -62,10 +64,11 @@ df_plot <- function(df) {
 #'
 #' @examples
 #' library(magrittr)
-#' df <- purexposure::fresno_spdf %>% spdf_to_df()
+#' \dontshow{
+#' df <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure")) %>% spdf_to_df()}
 #' \donttest{
+#' df <- pull_spdf("frenso") %>% spdf_to_df()
 #' df2 <- pull_spdf("sonoma") %>% spdf_to_df()
-#'
 #' # use df_plot() function to easily plot the output data frames:
 #' df_plot(df)
 #' df_plot(df2)

@@ -20,9 +20,11 @@ SpatialPolygonDataFrame object.
 }
 \examples{
 library(magrittr)
-fresno <- purexposure::fresno_spdf
-fresno \%>\% spdf_to_df \%>\% df_plot()
+\dontshow{
+fresno <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+fresno \%>\% spdf_to_df \%>\% df_plot()}
 \donttest{
+pull_spdf("fresno") \%>\% spdf_to_df() \%>\% df_plot()
 pull_spdf("san diego", "township") \%>\%
    spdf_to_df() \%>\%
    df_plot()

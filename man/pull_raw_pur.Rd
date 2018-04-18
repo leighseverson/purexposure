@@ -58,8 +58,8 @@ end of the current R session.
 }
 
 \examples{
-df <- pull_raw_pur(years = 2000, counties = "fresno")
 \donttest{
+df <- pull_raw_pur(years = 2000, counties = "fresno")
 df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
 df3 <- pull_raw_pur(years = 2015, counties = c("colusa"))
 }

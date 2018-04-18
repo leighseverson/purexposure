@@ -127,7 +127,7 @@ find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 #'
 #' @examples
 #' \dontshow{
-#' product_df <- purexposure::products_2000
+#' product_df <- readRDS(system.file("extdata", "products_2000.rds", package = "purexposure"))
 #' prod_df <- find_product_name(2000, "mosquito", product_df = product_df)}
 #' \donttest{
 #' prod_df <- find_product_name(2000, "mosquito")

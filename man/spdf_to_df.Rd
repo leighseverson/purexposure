@@ -21,10 +21,11 @@ the \code{pull_spdf} function to a data frame.
 }
 \examples{
 library(magrittr)
-df <- purexposure::fresno_spdf \%>\% spdf_to_df()
+\dontshow{
+df <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure")) \%>\% spdf_to_df()}
 \donttest{
+df <- pull_spdf("frenso") \%>\% spdf_to_df()
 df2 <- pull_spdf("sonoma") \%>\% spdf_to_df()
-
 # use df_plot() function to easily plot the output data frames:
 df_plot(df)
 df_plot(df2)

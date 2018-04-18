@@ -39,20 +39,3 @@ or a PUR data frame with a \code{county_cd}, \code{county_name},
 \code{pur_code}, or \code{fips_code} column (A data frame returned from either
 \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 }
-\examples{
-\dontshow{
-fresno_spdf <- purexposure::fresno_spdf
-plot_county_locations("fresno", spdf = fresno_spdf)}
-\donttest{
-plot_county_locations("fresno")
-
-pur_df <- pull_clean_pur(1990, counties = c("01", "05", "12"))
-plot_county_locations(pur_df)
-
-plot_list <- plot_county_locations(c("san bernardino", "ventura"),
-                                   separate_plots = TRUE)
-names(plot_list)
-plot_list[[1]]
-plot_list[[2]]
-}
-}

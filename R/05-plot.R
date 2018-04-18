@@ -27,7 +27,7 @@
 #'
 #' @examples
 #' \dontshow{
-#' fresno_spdf <- purexposure::fresno_spdf
+#' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure))
 #' plot_county_locations("fresno", spdf = fresno_spdf)}
 #' \donttest{
 #' plot_county_locations("fresno")
@@ -201,11 +201,10 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'
 #' @examples
 #' library(magrittr)
-#' fresno_spdf <- purexposure::fresno_spdf
-#' # application in Fresno for the month of January, 2000
-#' fresno_list <- purexposure::fresno_clean %>%
+#' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure))
+#' fresno_clean <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure))
+#' fresno_list <- fresno_clean %>%
 #'     plot_county_application(spdf = fresno_spdf)
-#' names(fresno_list)
 #' \donttest{
 #' # plot all active ingredients
 #' fresno_df <- pull_clean_pur(2000:2001, "fresno")
@@ -498,11 +497,8 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' @examples
 #' library(magrittr)
-#' fresno_list <- purexposure::exposure_ex %>% plot_exposure()
-#' names(fresno_list)
-#' fresno_list$maps
-#' fresno_list$pls_data
-#' fresno_list$exposure
+#' \dontshow{
+#' fresno_list <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure")) %>% plot_exposure()}
 #' \donttest{
 #' tulare_list <- pull_clean_pur(2010, "tulare") %>%
 #'    calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) %>%
@@ -686,7 +682,7 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #'
 #' @examples
 #' library(magrittr)
-#' purexposure::fresno_clean %>% plot_application_timeseries()
+#' readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure")) %>% plot_application_timeseries()
 #' \donttest{
 #' pull_clean_pur(1990:1992, "fresno") %>%
 #'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
@@ -752,9 +748,10 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #'
 #' @examples
 #' \dontshow{
-#' spdf <- purexposure::fresno_spdf
-#' exposure_df <- rbind(purexposure::exposure_ex$exposure,
-#'                      purexposure::exposure_ex2$exposure)
+#' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+#' exp1 <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure"))
+#' exp2 <- readRDS(system.file("extdata", "exposure_ex2.rds", package = "purexposure"))
+#' exposure_df <- rbind(exp1, exp2)
 #' plot_locations_exposure(exposure_df, spdf = spdf)}
 #' \donttest{
 #' fresno <- purexposure::fresno_clean

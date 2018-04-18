@@ -37,9 +37,10 @@ for multiple locations in a given county.
 }
 \examples{
 \dontshow{
-spdf <- purexposure::fresno_spdf
-exposure_df <- rbind(purexposure::exposure_ex$exposure,
-                     purexposure::exposure_ex2$exposure)
+spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
+exp1 <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure"))
+exp2 <- readRDS(system.file("extdata", "exposure_ex2.rds", package = "purexposure"))
+exposure_df <- rbind(exp1, exp2)
 plot_locations_exposure(exposure_df, spdf = spdf)}
 \donttest{
 fresno <- purexposure::fresno_clean

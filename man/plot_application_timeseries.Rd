@@ -29,7 +29,7 @@ whether to facet the time series by active ingredient (\code{chemname}) or by
 }
 \examples{
 library(magrittr)
-purexposure::fresno_clean \%>\% plot_application_timeseries()
+readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure")) \%>\% plot_application_timeseries()
 \donttest{
 pull_clean_pur(1990:1992, "fresno") \%>\%
     dplyr::filter(chemname \%in\% toupper(c("methyl bromide", "sulfur"))) \%>\%

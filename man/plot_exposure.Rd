@@ -69,11 +69,8 @@ from \code{calculate_exposure}.
 }
 \examples{
 library(magrittr)
-fresno_list <- purexposure::exposure_ex \%>\% plot_exposure()
-names(fresno_list)
-fresno_list$maps
-fresno_list$pls_data
-fresno_list$exposure
+\dontshow{
+fresno_list <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure")) \%>\% plot_exposure()}
 \donttest{
 tulare_list <- pull_clean_pur(2010, "tulare") \%>\%
    calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) \%>\%
