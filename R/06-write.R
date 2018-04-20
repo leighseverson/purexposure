@@ -175,7 +175,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
     exposure_list <- purrr::pmap(exposure_args, safe_calculate_exposure,
                                  clean_pur_df = clean_pur_df, chemicals = chemicals,
                                  aerial_ground = aerial_ground, verbose = verbose,
-                                 spdf = spdf)
+                                 spdf = args$spdf)
   }
 
 
