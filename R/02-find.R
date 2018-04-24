@@ -142,7 +142,7 @@ find_product_name <- function(years, products = "all", quiet = FALSE,
   if (is.null(args$product_df)) {
     prod_df <- pull_product_table(years, quiet = quiet)
   } else {
-    prod_df <- product_df
+    prod_df <- args$product_df
   }
 
   for (i in 1:length(products)) {
