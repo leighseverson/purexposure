@@ -40,7 +40,7 @@ or a PUR data frame with a \code{county_cd}, \code{county_name},
 \code{pull_pur_file}, \code{pull_raw_pur}, or \code{pull_clean_pur}).
 }
 \examples{
-\dontshow{
+\donttest{
 fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
                                    package = "purexposure"))
 plot_county_locations("fresno", spdf = fresno_spdf)}

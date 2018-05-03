@@ -26,7 +26,7 @@
 #' List element names correspond to county names.
 #'
 #' @examples
-#' \dontshow{
+#' \donttest{
 #' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
 #'                                    package = "purexposure"))
 #' plot_county_locations("fresno", spdf = fresno_spdf)}
@@ -202,7 +202,7 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'
 #' @examples
 #' library(magrittr)
-#' \dontshow{
+#' \donttest{
 #' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
 #'                                    package = "purexposure"))
 #' fresno_clean <- readRDS(system.file("extdata", "fresno_clean.rds",
@@ -500,7 +500,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 #'
 #' @examples
 #' library(magrittr)
-#' \dontshow{
+#' \donttest{
 #' fresno_list <- readRDS(system.file("extdata", "exposure_ex.rds",
 #'                                    package = "purexposure")) %>% plot_exposure()}
 #' \donttest{

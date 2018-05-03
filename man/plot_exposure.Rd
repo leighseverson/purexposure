@@ -69,7 +69,7 @@ from \code{calculate_exposure}.
 }
 \examples{
 library(magrittr)
-\dontshow{
+\donttest{
 fresno_list <- readRDS(system.file("extdata", "exposure_ex.rds",
                                    package = "purexposure")) \%>\% plot_exposure()}
 \donttest{

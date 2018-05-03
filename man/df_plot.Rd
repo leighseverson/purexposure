@@ -20,7 +20,7 @@ SpatialPolygonDataFrame object.
 }
 \examples{
 library(magrittr)
-\dontshow{
+\donttest{
 fresno <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
 fresno \%>\% spdf_to_df \%>\% df_plot()}
 \donttest{

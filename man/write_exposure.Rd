@@ -137,7 +137,7 @@ exposure_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 meta_data <- readRDS(paste0(temp_dir, "/meta_data.rds"))
 list.files(paste0(temp_dir, "/exposure_plots"))
 }
-\dontshow{
+\donttest{
 spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
 pur <- readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure"))
 df <- data.frame(location = "-119.726751, 36.660967",

@@ -27,7 +27,8 @@ Given a California address or longitude/latitude coordinates,
 PUR code.
 }
 \examples{
+\donttest{
 address <- "13883 Lassen Ave, Helm, CA 93627"
 long_lat <- c("-120.09789, 36.53379")
-find_location_county(c(address, long_lat))
+find_location_county(c(address, long_lat))}
 }

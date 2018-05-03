@@ -109,7 +109,7 @@
 #'
 #' @examples
 #' library(magrittr)
-#' \dontshow{
+#' \donttest{
 #' clean_pur <- readRDS(system.file("extdata", "fresno_clean.rds",
 #'                                  package = "purexposure"))
 #' fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",

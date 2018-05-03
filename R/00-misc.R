@@ -27,7 +27,7 @@ utils::globalVariables(c("DDLAT", "DDLONG", "MTR", "MTRS", "acre_treated",
 #'
 #' @examples
 #' library(magrittr)
-#' \dontshow{
+#' \donttest{
 #' fresno <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
 #' fresno %>% spdf_to_df %>% df_plot()}
 #' \donttest{
@@ -63,7 +63,7 @@ df_plot <- function(df) {
 #'
 #' @examples
 #' library(magrittr)
-#' \dontshow{
+#' \donttest{
 #' df <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure")) %>%
 #'    spdf_to_df()}
 #' \donttest{

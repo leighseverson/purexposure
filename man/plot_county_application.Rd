@@ -84,7 +84,7 @@ percentile.
 }
 \examples{
 library(magrittr)
-\dontshow{
+\donttest{
 fresno_spdf <- readRDS(system.file("extdata", "fresno_spdf.rds",
                                    package = "purexposure"))
 fresno_clean <- readRDS(system.file("extdata", "fresno_clean.rds",

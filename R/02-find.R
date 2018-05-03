@@ -233,9 +233,10 @@ find_counties <- function(counties, return = "pur_codes") {
 #' coordinate pair given in \code{location} is located.
 #'
 #' @examples
+#' \donttest{
 #' address <- "13883 Lassen Ave, Helm, CA 93627"
 #' long_lat <- c("-120.09789, 36.53379")
-#' find_location_county(c(address, long_lat))
+#' find_location_county(c(address, long_lat))}
 #' @export
 find_location_county <- function(locations, return = "name", ...) { #latlon_out
 
