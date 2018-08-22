@@ -119,7 +119,7 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
                            chemicals = "all", aerial_ground = FALSE,
                            write_plots = TRUE, verbose = TRUE, ...) {
 
-  locations <- as.character(unique(locations_dates_df$location))
+  locations <- as.character(unique(locations_dates_df$location)) # problem here...
 
   for (i in 1:length(locations)) {
     if (length(grep("-", locations[i])) == 1) {
@@ -146,6 +146,8 @@ write_exposure <- function(clean_pur_df, locations_dates_df, radii, directory,
 
   loc_df <- data.frame(location = unique(locations_dates_df$location),
                        latlon_loc = latlon)
+
+  ##
 
   locations_dates_df <- locations_dates_df %>%
     dplyr::full_join(loc_df, by = "location") %>%

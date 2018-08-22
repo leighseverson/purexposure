@@ -187,6 +187,8 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   sections or townships with recorded application data.
 #' @param alpha A number in [0,1] specifying the transparency of fill colors.
 #'   Numbers closer to 0 will result in more transparency. The default is 1.
+#' @param ggmap_background TRUE / FALSE for whether you would like a ggmap
+#'   background.
 #' @param ... Used internally.
 #'
 #' @return A list with three elements:
@@ -245,11 +247,12 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #' @importFrom rlang :=
 #' @export
 plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
-                                   color_by = "amount",
-                                   percentile = c(0.25, 0.5, 0.75),
-                                   start_date = NULL, end_date = NULL,
-                                   chemicals = "all", fill = "viridis",
-                                   crop = FALSE, alpha = 1, ...) {
+                                    color_by = "amount",
+                                    percentile = c(0.25, 0.5, 0.75),
+                                    start_date = NULL, end_date = NULL,
+                                    chemicals = "all", fill = "viridis",
+                                    crop = FALSE, alpha = 1,
+                                    ggmap_background = TRUE, ...) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
@@ -381,10 +384,12 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   long_range <- grDevices::extendrange(county_df$long)
   lat_range <- grDevices::extendrange(county_df$lat)
 
-  suppressMessages(suppressWarnings(
-    location <- ggmap::get_map(c(floor(county_bbox$min[1]), floor(county_bbox$min[2]),
-                                 ceiling(county_bbox$max[1]), ceiling(county_bbox$max[2])),
-                               color = "bw")))
+  if (ggmap_background) {
+    suppressMessages(suppressWarnings(
+      location <- ggmap::get_map(c(floor(county_bbox$min[1]), floor(county_bbox$min[2]),
+                                   ceiling(county_bbox$max[1]), ceiling(county_bbox$max[2])),
+                                 color = "bw")))
+  }
 
   legend_label <- paste0("Applied Pesticides\n(kg/", section_township, ")")
 
@@ -399,7 +404,13 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   gradient <- colormap::colormap(fill, nshades = 1000, alpha = alpha)
   # gradient <- c("#FFFFFF", gradient)
 
-  plot <- ggmap::ggmap(location) +
+  if (ggmap_background) {
+    plot <- ggmap::ggmap(location)
+  } else {
+    plot <- ggplot()
+  }
+
+  plot <- plot  +
     ggplot2::geom_polygon(data = county_df, ggplot2::aes(x = long, y = lat, group = group),
                           color = "black", fill = NA) +
     ggplot2::geom_polygon(data = pur_spatial, ggplot2::aes_string(x = "long", y = "lat", ## aes_string
@@ -762,11 +773,12 @@ plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
 #' exp_df <- readRDS(paste0(temp_dir, "/exposure_df.rds"))
 #' plot_locations_exposure(exp_df)}
 #' \dontshow{
+#' \donttest{
 #' spdf <- readRDS(system.file("extdata", "fresno_spdf.rds", package = "purexposure"))
 #' exp1 <- readRDS(system.file("extdata", "exposure_ex.rds", package = "purexposure"))$exposure
 #' exp2 <- readRDS(system.file("extdata", "exposure_ex2.rds", package = "purexposure"))$exposure
 #' exposure_df <- rbind(exp1, exp2)
-#' plot_locations_exposure(exposure_df, spdf = spdf)}
+#' plot_locations_exposure(exposure_df, spdf = spdf)}}
 #' @importFrom magrittr %>%
 #' @export
 plot_locations_exposure <- function(exposure_df, section_township = "section",
