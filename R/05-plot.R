@@ -407,7 +407,7 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
   if (ggmap_background) {
     plot <- ggmap::ggmap(location)
   } else {
-    plot <- ggplot()
+    plot <- ggplot2::ggplot()
   }
 
   plot <- plot  +
