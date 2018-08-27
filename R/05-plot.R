@@ -257,8 +257,8 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                     chemicals = "all", fill = "viridis",
                                     crop = FALSE, alpha = 1,
                                     ggmap_background = TRUE,
-                                    polygon_color = "black",
-                                    polygon_size = 0.5, ...) {
+                                    polygon_color = "grey",
+                                    polygon_size = 0.25, ...) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
