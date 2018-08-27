@@ -7,7 +7,8 @@
 plot_county_application(clean_pur_df, county = NULL, pls = NULL,
   color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
   end_date = NULL, chemicals = "all", fill = "viridis", crop = FALSE,
-  alpha = 1, ggmap_background = TRUE, ...)
+  alpha = 1, ggmap_background = TRUE, polygon_color = "grey",
+  polygon_size = 0.25, ...)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur}.}
@@ -63,6 +64,12 @@ Numbers closer to 0 will result in more transparency. The default is 1.}
 
 \item{ggmap_background}{TRUE / FALSE for whether you would like a ggmap
 background.}
+
+\item{polygon_color}{passed to the \code{color} argument of
+\code{ggplot2::geom_polygon}.}
+
+\item{polygon_size}{passed to the \code{size} argument of
+\code{ggplot2::geom_polygon}.}
 
 \item{...}{Used internally.}
 }
