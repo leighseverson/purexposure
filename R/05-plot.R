@@ -189,6 +189,10 @@ plot_county_locations <- function(counties_or_df, separate_plots = FALSE,
 #'   Numbers closer to 0 will result in more transparency. The default is 1.
 #' @param ggmap_background TRUE / FALSE for whether you would like a ggmap
 #'   background.
+#' @param polygon_color passed to the \code{color} argument of
+#'   \code{ggplot2::geom_polygon}.
+#' @param polygon_size passed to the \code{size} argument of
+#'   \code{ggplot2::geom_polygon}.
 #' @param ... Used internally.
 #'
 #' @return A list with three elements:
@@ -252,7 +256,9 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
                                     start_date = NULL, end_date = NULL,
                                     chemicals = "all", fill = "viridis",
                                     crop = FALSE, alpha = 1,
-                                    ggmap_background = TRUE, ...) {
+                                    ggmap_background = TRUE,
+                                    polygon_color = "black",
+                                    polygon_size = 0.5, ...) {
 
   if (is.null(pls)) {
     if ("section" %in% colnames(clean_pur_df)) {
@@ -412,10 +418,11 @@ plot_county_application <- function(clean_pur_df, county = NULL, pls = NULL,
 
   plot <- plot  +
     ggplot2::geom_polygon(data = county_df, ggplot2::aes(x = long, y = lat, group = group),
-                          color = "black", fill = NA) +
+                          color = polygon_color, fill = NA, size = polygon_size) +
     ggplot2::geom_polygon(data = pur_spatial, ggplot2::aes_string(x = "long", y = "lat", ## aes_string
                                                                   group = "group",
-                                                                  fill = fill_var))
+                                                                  fill = fill_var),
+                          color = polygon_color, size = polygon_size)
 
   if (color_by == "amount") {
 
