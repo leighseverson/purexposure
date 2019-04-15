@@ -17,8 +17,15 @@ pull_chemical_list <- function(year) {
   unzip(file, exdir = dir)
   setwd(dir)
 
-  chemical_file <- readr::read_csv("chemical.txt") %>%
-    dplyr::select(-chemalpha_cd)
+  if (year > 2015) {
+    setwd(paste0("pur", year))
+    chemical_file <- readr::read_csv("chemical.txt") %>%
+      dplyr::select(-chemalpha_cd)
+    setwd("..")
+  } else {
+    chemical_file <- readr::read_csv("chemical.txt") %>%
+      dplyr::select(-chemalpha_cd)
+  }
 
   setwd(current_dir)
 
@@ -26,7 +33,7 @@ pull_chemical_list <- function(year) {
 
 }
 
-chemical_list <- purrr::map(1990:2015, pull_chemical_list)
-names(chemical_list) <- 1990:2015
+chemical_list <- purrr::map(1990:2016, pull_chemical_list)
+names(chemical_list) <- 1990:2016
 
 usethis::use_data(chemical_list, overwrite = TRUE)

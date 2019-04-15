@@ -20,11 +20,11 @@ number of rows ranging from 3,579 to 3,934 and two columns:
 chemical_list
 }
 \description{
-A list of data frames (one for each year from 1990 through 2015) containing
+A list of data frames (one for each year from 1990 through 2016) containing
 California Department of Pesticide Regulation chemical codes and names used
 to identify active ingredients in Pesticide Use Report data. "chemical.txt"
 files for each year were pulled from the .zip files "pur1990.zip" through
-"pur2015.zip" found here:
+"pur2016.zip" found here:
 \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 }
 \keyword{datasets}

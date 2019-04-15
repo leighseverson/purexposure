@@ -5,9 +5,10 @@
 \title{Plot pesticide application by county.}
 \usage{
 plot_county_application(clean_pur_df, county = NULL, pls = NULL,
-  color_by = "amount", percentile = c(0.25, 0.5, 0.75), start_date = NULL,
-  end_date = NULL, chemicals = "all", fill = "viridis", crop = FALSE,
-  alpha = 1, ggmap_background = TRUE, polygon_color = "grey",
+  color_by = "amount", percentile = c(0.25, 0.5, 0.75),
+  start_date = NULL, end_date = NULL, chemicals = "all",
+  fill = "viridis", crop = FALSE, alpha = 1,
+  ggmap_background = TRUE, polygon_color = "grey",
   polygon_size = 0.25, ...)
 }
 \arguments{

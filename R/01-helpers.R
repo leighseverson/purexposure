@@ -9,8 +9,16 @@ help_pull_pur <- function(year, counties = "all", quiet = FALSE) {
   if (!"all" %in% counties) {
     codes <- find_counties(counties)
   } else {
+
     sm_year <- substr(year, 3, 4)
-    files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+
+    if (year > 2015) {
+      files <- grep(paste0("udc", sm_year, "_"), list.files(paste0("pur", year)),
+                    value = TRUE)
+    } else {
+      files <- grep(paste0("udc", sm_year, "_"), list.files(), value = TRUE)
+    }
+
     codes <- substr(files, 7, 8)
   }
 
@@ -105,15 +113,41 @@ help_read_in_counties <- function(code_or_file, type, year) {
 
   if (type == "codes") {
 
-    raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"),
-                      progress = FALSE)))
+    if (year > 2015) {
+
+      setwd(paste0("pur", year))
+
+      raw_data <- suppressWarnings(suppressMessages(
+        readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"),
+                        progress = FALSE)))
+
+      setwd("..")
+
+    } else {
+      raw_data <- suppressWarnings(suppressMessages(
+        readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"),
+                        progress = FALSE)))
+    }
+
+
     raw_data <- dplyr::mutate_all(raw_data, as.character)
 
   } else if (type == "files") {
 
-    raw_data <- suppressWarnings(suppressMessages(
-      readr::read_csv(code_or_file, progress = FALSE)))
+    if (year > 2015) {
+      setwd(paste0("pur", year))
+
+      raw_data <- suppressWarnings(suppressMessages(
+        readr::read_csv(code_or_file, progress = FALSE)))
+
+      setwd("..")
+
+    } else {
+      raw_data <- suppressWarnings(suppressMessages(
+        readr::read_csv(code_or_file, progress = FALSE)))
+    }
+
+
     raw_data <- dplyr::mutate_all(raw_data, as.character)
 
   }

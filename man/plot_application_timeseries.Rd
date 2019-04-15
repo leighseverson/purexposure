@@ -4,7 +4,8 @@
 \alias{plot_application_timeseries}
 \title{Plot time series of active ingredients in applied pesticides.}
 \usage{
-plot_application_timeseries(clean_pur_df, facet = FALSE, axes = "fixed")
+plot_application_timeseries(clean_pur_df, facet = FALSE,
+  axes = "fixed")
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned from \code{pull_clean_pur}.}

@@ -9,7 +9,7 @@
 #' \url{https://www.cdpr.ca.gov/docs/pur/pur16rep/chmrpt16.pdf}
 #'
 #' @param years A vector of four-digit numeric years in the range of 1990 to
-#'   2015. Indicates the years in which you would like to match chemical codes.
+#'   2016. Indicates the years in which you would like to match chemical codes.
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied
 #'   in the given year. The default value is "all", which returns codes for all

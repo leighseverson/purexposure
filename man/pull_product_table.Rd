@@ -7,7 +7,7 @@
 pull_product_table(years, quiet = FALSE)
 }
 \arguments{
-\item{years}{A vector of four digit years in the range of 1990 to 2015.}
+\item{years}{A vector of four digit years in the range of 1990 to 2016.}
 
 \item{quiet}{TRUE / FALSE indicating whether you would like a
 message and progress bar printed for the product table that is downloaded.
