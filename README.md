@@ -71,7 +71,7 @@ and was not added to PUR data sets until 1999. Application time is
 therefore often missing in raw PUR data sets, and is not retained in
 data sets cleaned using this package.
 
-PUR data sets can be pulled by years in the range \[1990, 2015\].
+PUR data sets can be pulled by years in the range \[1990, 2016\].
 
 ### Geography
 
@@ -155,8 +155,8 @@ find_chemical_codes(c(2000, 2001), chemicals = "methyl bromide", by_year = TRUE)
 #> # A tibble: 2 x 4
 #>   chem_code chemname       chemical        year
 #>       <int> <chr>          <chr>          <dbl>
-#> 1       385 METHYL BROMIDE methyl bromide 2000.
-#> 2       385 METHYL BROMIDE methyl bromide 2001.
+#> 1       385 METHYL BROMIDE methyl bromide  2000
+#> 2       385 METHYL BROMIDE methyl bromide  2001
 ```
 
 This often results in identical search results for multiple years.
@@ -170,7 +170,7 @@ find_chemical_codes(c(2006, 2007), chemicals = "imazosulfuron", by_year = TRUE)
 #> # A tibble: 1 x 4
 #>   chem_code chemname      chemical       year
 #>       <int> <chr>         <chr>         <dbl>
-#> 1      5987 IMAZOSULFURON imazosulfuron 2007.
+#> 1      5987 IMAZOSULFURON imazosulfuron  2007
 ```
 
 If the `by_year` argument is left to its default value of `FALSE`,
@@ -215,7 +215,7 @@ product table and search for applied pesticide products for a given year
 or years:
 
 ``` r
-product_table <- find_product_name(2015, "insecticide")
+product_table <- find_product_name(2016, "insecticide")
 ```
 
 ``` r
@@ -223,9 +223,9 @@ head(product_table, 3)
 #> # A tibble: 3 x 6
 #>   prodno prodstat_ind product_name             signlwrd_ind  year product 
 #>    <int> <chr>        <chr>                           <int> <int> <chr>   
-#> 1     32 C            WEST INSECTICIDE                    4  2015 insecti…
-#> 2     59 C            WESTBAN-2E INSECTICIDE              3  2015 insecti…
-#> 3     71 C            AERO WEST BRAND INSECTI…            4  2015 insecti…
+#> 1     32 C            WEST INSECTICIDE                    4  2015 insecti~
+#> 2     59 C            WESTBAN-2E INSECTICIDE              3  2015 insecti~
+#> 3     71 C            AERO WEST BRAND INSECTI~            4  2015 insecti~
 ```
 
 The `prodno` column in the product table can be matched with the same
@@ -295,10 +295,10 @@ fresno_raw <- pull_raw_pur(years = 2004, counties = "fresno")
 ``` r
 head(fresno_raw, 2)
 #> # A tibble: 2 x 33
-#>   use_no  prodno chem_code prodchem_pct lbs_chm_used lbs_prd_used
-#>   <chr>   <chr>  <chr>     <chr>        <chr>        <chr>       
-#> 1 1254636 25111  253       50           0.03125      0.0625      
-#> 2 1254637 24089  2170      61.6         0.0866096    0.1406      
+#>   use_no prodno chem_code prodchem_pct lbs_chm_used lbs_prd_used
+#>   <chr>  <chr>  <chr>     <chr>        <chr>        <chr>       
+#> 1 12546~ 25111  253       50           0.03125      0.0625      
+#> 2 12546~ 24089  2170      61.6         0.0866096    0.1406      
 #> # ... with 27 more variables: amt_prd_used <chr>, unit_of_meas <chr>,
 #> #   acre_planted <chr>, unit_planted <chr>, acre_treated <chr>,
 #> #   unit_treated <chr>, applic_cnt <chr>, applic_dt <chr>,
@@ -325,7 +325,7 @@ downloaded manually from CDPR’s FTP server in a few ways:
 For documentation of raw PUR data, you can reference the Pesticide Use
 Report Data User Guide & Documentation document published by the CA
 Department of Pesticide Regulation. The file is saved as “cd\_doc.pdf”
-in any “pur\[year\].zip” file between 1990 and 2015 found here:
+in any “pur\[year\].zip” file between 1990 and 2016 found here:
 <ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>.
 
 #### Cleaned data
@@ -342,10 +342,10 @@ fresno_clean <- pull_clean_pur(2004, "fresno")
 ``` r
 head(fresno_clean, 2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname     kg_chm_used section township county_name pur_code
-#>       <int> <chr>              <dbl> <chr>   <chr>    <chr>       <chr>   
-#> 1      1855 GLYPHOSATE,…       0.634 M14S22… M14S22E  FRESNO      10      
-#> 2       806 2,4-D, DIME…       1.04  M14S22… M14S22E  FRESNO      10      
+#>   chem_code chemname kg_chm_used section township county_name pur_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
+#> 1      1855 GLYPHOS~       0.634 M14S22~ M14S22E  FRESNO      10      
+#> 2       806 2,4-D, ~       1.04  M14S22~ M14S22E  FRESNO      10      
 #> # ... with 6 more variables: fips_code <chr>, date <date>,
 #> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
 ```
@@ -408,10 +408,10 @@ nevada_sulfur <- pull_clean_pur(years = 2000, counties = "nevada", chemicals = "
 ``` r
 head(nevada_sulfur, 2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname    kg_chm_used section  township county_name pur_code
-#>       <int> <chr>             <dbl> <chr>    <chr>    <chr>       <chr>   
-#> 1       358 LIME-SULFUR        7.47 M15N09E… M15N09E  NEVADA      29      
-#> 2       560 SULFUR             2.18 M17N08E… M17N08E  NEVADA      29      
+#>   chem_code chemname kg_chm_used section township county_name pur_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
+#> 1       358 LIME-SU~        7.47 M15N09~ M15N09E  NEVADA      29      
+#> 2       560 SULFUR          2.18 M17N08~ M17N08E  NEVADA      29      
 #> # ... with 6 more variables: fips_code <chr>, date <date>,
 #> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
 unique(nevada_sulfur$chemname)
@@ -461,11 +461,11 @@ tulare <- pull_clean_pur(2010, "tulare",
 ``` r
 tulare %>% arrange(township) %>% slice(1:3)
 #> # A tibble: 3 x 7
-#>   chemname  kg_chm_used township county_name pur_code fips_code date      
-#>   <chr>           <dbl> <chr>    <chr>       <chr>    <chr>     <date>    
-#> 1 DIURON           97.3 M15S25E  TULARE      54       06107     2010-01-02
-#> 2 GLYPHOSA…        47.3 M15S25E  TULARE      54       06107     2010-01-02
-#> 3 SIMAZINE        120.  M15S25E  TULARE      54       06107     2010-01-02
+#>   chemname   kg_chm_used township county_name pur_code fips_code date      
+#>   <chr>            <dbl> <chr>    <chr>       <chr>    <chr>     <date>    
+#> 1 DIURON            97.3 M15S25E  TULARE      54       06107     2010-01-02
+#> 2 GLYPHOSATE        47.3 M15S25E  TULARE      54       06107     2010-01-02
+#> 3 SIMAZINE         120.  M15S25E  TULARE      54       06107     2010-01-02
 ```
 
 There is one record per active ingredient per township per day.
@@ -492,7 +492,7 @@ tail(chemical_class_df, 2)
 #> # A tibble: 2 x 3
 #>   chem_code chemname                                        chemical_class
 #>       <int> <chr>                                           <chr>         
-#> 1      3758 POLYOXYETHYLENE P-TERT-BUTYL PHENOL-FORMALDEHY… aldehyde      
+#> 1      3758 POLYOXYETHYLENE P-TERT-BUTYL PHENOL-FORMALDEHY~ aldehyde      
 #> 2      3405 SODIUM FORMALDEHYDE SULFOXYLATE                 aldehyde
 ```
 
@@ -517,11 +517,11 @@ fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE,
 ``` r
 head(fresno_classes, 3)
 #> # A tibble: 3 x 8
-#>   chemical_class kg_chm_used section   township county_name pur_code
-#>   <chr>                <dbl> <chr>     <chr>    <chr>       <chr>   
-#> 1 other                216.  M12S13E27 M12S13E  FRESNO      10      
-#> 2 other                197.  M12S13E28 M12S13E  FRESNO      10      
-#> 3 other                 15.0 M15S23E14 M15S23E  FRESNO      10      
+#>   chemical_class kg_chm_used section township county_name pur_code
+#>   <chr>                <dbl> <chr>   <chr>    <chr>       <chr>   
+#> 1 other                216.  M12S13~ M12S13E  FRESNO      10      
+#> 2 other                197.  M12S13~ M12S13E  FRESNO      10      
+#> 3 other                 15.0 M15S23~ M15S23E  FRESNO      10      
 #> # ... with 2 more variables: fips_code <chr>, date <date>
 ```
 
@@ -564,7 +564,7 @@ and temporarily saved in the current session.
 
 The temporary environment is called `purexposure_package_env`, and data
 are saved as objects in a list called `pur_lst`. Raw PUR data sets are
-saved in the format “\[year\]\_\[pur county code\]" (e.g., “2000\_10”),
+saved in the format "\[year\]\_\[pur county code\]" (e.g., “2000\_10”),
 product tabes are saved by year (e.g., “2000”), and
 SpatialPolygonsDataFrame objects are saved by county name (e.g.,
 “Fresno”).
@@ -626,9 +626,9 @@ exposure value (\(\frac{kg}{m^2}\)):
 ``` r
 monroe$exposure
 #> # A tibble: 1 x 9
-#>   exposure chemicals start_date end_date   aerial_ground location   radius
-#>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>       <dbl>
-#> 1  0.00458 all       2015-01-01 2015-12-31 NA            11842 Sou…  1500.
+#>   exposure chemicals start_date end_date   aerial_ground location radius
+#>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>     <dbl>
+#> 1  0.00458 all       2015-01-01 2015-12-31 NA            11842 S~   1500
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -657,14 +657,18 @@ unit, active ingredients, and time period. Other columns are `location`,
 
 ``` r
 monroe$meta_data %>% slice(1:3)
-#> # A tibble: 3 x 12
-#>   pls       chemicals percent     kg kg_intersection start_date end_date  
-#>   <chr>     <chr>       <dbl>  <dbl>           <dbl> <date>     <date>    
-#> 1 M15S21E31 all        0.0373  4936.           184.  2015-01-01 2015-12-31
-#> 2 M15S20E36 all        0.0389  2332.            90.6 2015-01-01 2015-12-31
-#> 3 M16S21E06 all        0.800  22721.         18170.  2015-01-01 2015-12-31
-#> # ... with 5 more variables: aerial_ground <lgl>, none_recorded <lgl>,
-#> #   location <chr>, radius <dbl>, area <dbl>
+#>         pls chemicals    percent        kg kg_intersection start_date
+#> 1 M15S21E31       all 0.03730446  4936.458       184.15190 2015-01-01
+#> 2 M15S20E36       all 0.03885254  2332.108        90.60831 2015-01-01
+#> 3 M16S21E06       all 0.79971267 22720.602     18169.95306 2015-01-01
+#>     end_date aerial_ground none_recorded
+#> 1 2015-12-31            NA         FALSE
+#> 2 2015-12-31            NA         FALSE
+#> 3 2015-12-31            NA         FALSE
+#>                                location radius    area
+#> 1 11842 South Chestnut Ave., Fresno, CA   1500 7068583
+#> 2 11842 South Chestnut Ave., Fresno, CA   1500 7068583
+#> 3 11842 South Chestnut Ave., Fresno, CA   1500 7068583
 ```
 
 To make the process of calculating exposure more clear, we can
@@ -716,10 +720,10 @@ And the `clean_pur_df` element is the cleaned PUR data set returned from
 ``` r
 monroe$clean_pur_df %>% head(2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname    kg_chm_used section  township county_name pur_code
-#>       <int> <chr>             <dbl> <chr>    <chr>    <chr>       <chr>   
-#> 1      5014 IRON PHOSP…      0.580  M15S20E… M15S20E  FRESNO      10      
-#> 2      3983 SPINOSAD         0.0581 M13S22E… M13S22E  FRESNO      10      
+#>   chem_code chemname kg_chm_used section township county_name pur_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
+#> 1      5014 IRON PH~      0.580  M15S20~ M15S20E  FRESNO      10      
+#> 2      3983 SPINOSAD      0.0581 M13S22~ M13S22E  FRESNO      10      
 #> # ... with 6 more variables: fips_code <chr>, date <date>,
 #> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
 ```
@@ -737,11 +741,11 @@ monroe2 <- pull_clean_pur(2015, "fresno") %>%
 ``` r
 monroe2$exposure
 #> # A tibble: 3 x 9
-#>    exposure chemicals start_date end_date   aerial_ground location  radius
-#>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…  1500.
-#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…  1500.
-#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…  1500.
+#>   exposure chemicals start_date end_date   aerial_ground location radius
+#>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>     <dbl>
+#> 1  2.15e-3 all       2015-01-01 2015-04-30 NA            11842 S~   1500
+#> 2  2.42e-3 all       2015-05-01 2015-08-31 NA            11842 S~   1500
+#> 3  1.30e-5 all       2015-09-01 2015-12-31 NA            11842 S~   1500
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -830,7 +834,7 @@ plot_m_percentile$cutoff_values
 
 In this case, sections with \(\leq\) 1,352.539 kilograms of pesticides
 applied in the portion that intersects with the specified buffer will
-fall under the lowest percentile category (“`<= 25th percentile"`).
+fall under the lowest percentile category ("`<= 25th percentile"`).
 
 By default, fill colors of pesticide application are scaled according to
 the range of application across the entire county for the appropriate
@@ -871,11 +875,11 @@ rows:
 ``` r
 monroe2$exposure
 #> # A tibble: 3 x 9
-#>    exposure chemicals start_date end_date   aerial_ground location  radius
-#>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-#> 1 0.00215   all       2015-01-01 2015-04-30 NA            11842 So…  1500.
-#> 2 0.00242   all       2015-05-01 2015-08-31 NA            11842 So…  1500.
-#> 3 0.0000130 all       2015-09-01 2015-12-31 NA            11842 So…  1500.
+#>   exposure chemicals start_date end_date   aerial_ground location radius
+#>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>     <dbl>
+#> 1  2.15e-3 all       2015-01-01 2015-04-30 NA            11842 S~   1500
+#> 2  2.42e-3 all       2015-05-01 2015-08-31 NA            11842 S~   1500
+#> 3  1.30e-5 all       2015-09-01 2015-12-31 NA            11842 S~   1500
 #> # ... with 2 more variables: longitude <dbl>, latitude <dbl>
 ```
 
@@ -922,11 +926,11 @@ exposure_df[1:3,]
 
     #> [1] 12
     #> # A tibble: 3 x 10
-    #>    exposure chemicals start_date end_date   aerial_ground location  radius
-    #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…  1500.
-    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…  1500.
-    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…  1500.
+    #>   exposure chemicals start_date end_date   aerial_ground location radius
+    #>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>     <dbl>
+    #> 1  8.15e-4 all       2000-01-01 2000-04-01 NA            3333 Am~   1500
+    #> 2  3.14e-3 all       2000-01-01 2000-07-01 NA            3333 Am~   1500
+    #> 3  5.56e-5 all       2005-03-01 2005-06-01 NA            1616 So~   1500
     #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
     #> #   error_message <lgl>
 
@@ -1188,14 +1192,14 @@ head(exposure_df)
 
     #> [1] 12
     #> # A tibble: 6 x 10
-    #>    exposure chemicals start_date end_date   aerial_ground location  radius
-    #>       <dbl> <chr>     <date>     <date>     <lgl>         <chr>      <dbl>
-    #> 1 0.000815  all       2000-01-01 2000-04-01 NA            3333 Ame…  1500.
-    #> 2 0.00314   all       2000-01-01 2000-07-01 NA            3333 Ame…  1500.
-    #> 3 0.0000556 all       2005-03-01 2005-06-01 NA            1616 Sou…  1500.
-    #> 4 0.0000885 all       2005-03-01 2005-09-01 NA            1616 Sou…  1500.
-    #> 5 0.00376   all       2005-05-01 2005-08-01 NA            295 West…  1500.
-    #> 6 0.00383   all       2005-05-01 2005-11-01 NA            295 West…  1500.
+    #>   exposure chemicals start_date end_date   aerial_ground location radius
+    #>      <dbl> <chr>     <date>     <date>     <lgl>         <chr>     <dbl>
+    #> 1  8.15e-4 all       2000-01-01 2000-04-01 NA            3333 Am~   1500
+    #> 2  3.14e-3 all       2000-01-01 2000-07-01 NA            3333 Am~   1500
+    #> 3  5.56e-5 all       2005-03-01 2005-06-01 NA            1616 So~   1500
+    #> 4  8.85e-5 all       2005-03-01 2005-09-01 NA            1616 So~   1500
+    #> 5  3.76e-3 all       2005-05-01 2005-08-01 NA            295 Wes~   1500
+    #> 6  3.83e-3 all       2005-05-01 2005-11-01 NA            295 Wes~   1500
     #> # ... with 3 more variables: longitude <dbl>, latitude <dbl>,
     #> #   error_message <lgl>
 
@@ -1239,7 +1243,7 @@ head(meta_data[[1]])
 Additionally, if `write_plots` is left as its default (`TRUE`), plots
 returned from `plot_exposure` will be saved in a subdirectory called
 `exposure_plots`. Each plot is saved as
-    “\#\_exposure\_plot.png“.
+    "\#\_exposure\_plot.png".
 
 ``` r
 list.files("~/Documents/fresno_example/exposure_plots")
@@ -1260,7 +1264,7 @@ corresponds to `exposure_df[1,]` and
 If `color_by` is set to `"percentile"`, there is an additional
 subdirectory (“exposure\_plots/cutoff\_values”) where data frames with
 cutoff values for each percentile are saved. These files are similarly
-named (“\#\_cutoff\_values.rds“) with file numbers corresponding to
+named ("\#\_cutoff\_values.rds") with file numbers corresponding to
 \#\_exposure\_plot.png file numbers.
 
 ### Source code and bugs
