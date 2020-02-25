@@ -4,8 +4,13 @@
 \alias{plot_locations_exposure}
 \title{Plot exposure for multiple locations in a county.}
 \usage{
-plot_locations_exposure(exposure_df, section_township = "section",
-  fill = "viridis", alpha = 1, ...)
+plot_locations_exposure(
+  exposure_df,
+  section_township = "section",
+  fill = "viridis",
+  alpha = 1,
+  ...
+)
 }
 \arguments{
 \item{exposure_df}{A data frame returned from \code{write_exposure} with 10

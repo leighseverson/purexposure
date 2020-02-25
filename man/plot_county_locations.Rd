@@ -4,8 +4,13 @@
 \alias{plot_county_locations}
 \title{Plot a county's location in California.}
 \usage{
-plot_county_locations(counties_or_df, separate_plots = FALSE,
-  fill_color = "red", alpha = 0.5, ...)
+plot_county_locations(
+  counties_or_df,
+  separate_plots = FALSE,
+  fill_color = "red",
+  alpha = 0.5,
+  ...
+)
 }
 \arguments{
 \item{counties_or_df}{A character vector of county names, pur codes, or fips

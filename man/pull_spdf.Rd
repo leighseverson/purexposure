@@ -50,8 +50,8 @@ a temporary directory.
 \examples{
 \donttest{
 fresno_shp <- pull_spdf("fresno")
-fresno_shp \%>\% spdf_to_df() \%>\% df_plot()
+fresno_shp %>% spdf_to_df() %>% df_plot()
 del_norte_shp <- pull_spdf("08", "township")
-del_norte_shp \%>\% spdf_to_df() \%>\% df_plot()
+del_norte_shp %>% spdf_to_df() %>% df_plot()
 }
 }

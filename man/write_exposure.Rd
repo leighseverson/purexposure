@@ -4,9 +4,17 @@
 \alias{write_exposure}
 \title{Write exposure values for specified locations and dates in a certain county.}
 \usage{
-write_exposure(clean_pur_df, locations_dates_df, radii, directory,
-  chemicals = "all", aerial_ground = FALSE, write_plots = TRUE,
-  verbose = TRUE, ...)
+write_exposure(
+  clean_pur_df,
+  locations_dates_df,
+  radii,
+  directory,
+  chemicals = "all",
+  aerial_ground = FALSE,
+  write_plots = TRUE,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
@@ -114,7 +122,7 @@ out files (exposure values, meta data, and plots) to a specified directory.
 library(magrittr)
 \donttest{
 chemical_class_df <- rbind(find_chemical_codes(2000:2001, "sulfur"),
-                           find_chemical_codes(2000:2001, "methyl bromide")) \%>\%
+                           find_chemical_codes(2000:2001, "methyl bromide")) %>%
    dplyr::rename(chemical_class = chemical)
 pur <- pull_clean_pur(2000:2001, counties = "fresno",
                       chemicals = chemical_class_df$chemname,

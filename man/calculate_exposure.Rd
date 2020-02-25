@@ -4,9 +4,18 @@
 \alias{calculate_exposure}
 \title{Calculate exposure to active ingredients present in applied pesticides.}
 \usage{
-calculate_exposure(clean_pur_df, location, radius, time_period = NULL,
-  start_date = NULL, end_date = NULL, chemicals = "all",
-  aerial_ground = FALSE, verbose = TRUE, ...)
+calculate_exposure(
+  clean_pur_df,
+  location,
+  radius,
+  time_period = NULL,
+  start_date = NULL,
+  end_date = NULL,
+  chemicals = "all",
+  aerial_ground = FALSE,
+  verbose = TRUE,
+  ...
+)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur} that
@@ -158,20 +167,20 @@ exp_list3$county_plot
 # calculate exposure by specified chemical classes
 # this is an example of `none_recorded = TRUE`
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
-                           find_chemical_codes(2000, "aldehyde")) \%>\%
+                           find_chemical_codes(2000, "aldehyde")) %>%
    dplyr::rename(chemical_class = chemical)
 exp_list4 <- pull_clean_pur(1995, "fresno",
                             chemicals = chemical_class_df$chemname,
                             sum_application = TRUE,
                             sum = "chemical_class",
-                            chemical_class = chemical_class_df) \%>\%
+                            chemical_class = chemical_class_df) %>%
    calculate_exposure(location = "13883 Lassen Ave, Helm, CA 93627",
                       radius = 1500,
                       chemicals = "chemical_class")
 exp_list4$meta_data
 
 # incorporate aerial/ground application information
-exp_list5 <- pull_clean_pur(2000, "yolo") \%>\%
+exp_list5 <- pull_clean_pur(2000, "yolo") %>%
    calculate_exposure(location = "-121.9018, 38.7646",
    radius = 2500,
    aerial_ground = TRUE)

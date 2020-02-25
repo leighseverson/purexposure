@@ -3,7 +3,6 @@
 \docType{package}
 \name{purexposure}
 \alias{purexposure}
-\alias{purexposure-package}
 \title{purexposure: A package for working with CA Pesticide Use Registry data.}
 \description{
 The \code{purexposure} package provides functions to pull data from California's

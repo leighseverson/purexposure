@@ -4,15 +4,24 @@
 \alias{pull_clean_pur}
 \title{Pull cleaned PUR data by counties, years, and active ingredients.}
 \usage{
-pull_clean_pur(years = "all", counties = "all", chemicals = "all",
-  sum_application = FALSE, unit = "section", sum = "all",
-  chemical_class = NULL, aerial_ground = TRUE, verbose = TRUE,
-  quiet = FALSE, ...)
+pull_clean_pur(
+  years = "all",
+  counties = "all",
+  chemicals = "all",
+  sum_application = FALSE,
+  unit = "section",
+  sum = "all",
+  chemical_class = NULL,
+  aerial_ground = TRUE,
+  verbose = TRUE,
+  quiet = FALSE,
+  ...
+)
 }
 \arguments{
 \item{years}{A four-digit numeric year or vector of years in the range of
-1990 to 2016. Indicates the years for which you would like to pull PUR
-data sets. \code{years == "all"} will pull data from 1990 through 2016.}
+1990 to 2017. Indicates the years for which you would like to pull PUR
+data sets. \code{years == "all"} will pull data from 1990 through 2017.}
 
 \item{counties}{A vector of character strings giving either a county name,
 two digit PUR county codes, or six-digit FIPS county codes for each county.
@@ -156,7 +165,7 @@ end of the current R session.
     For documentation of raw PUR data, see the Pesticide Use Report Data User
     Guide & Documentation document published by the California Department of
     Pesticide Regulation. This file is saved as "cd_doc.pdf" in
-    any "pur[year].zip" file between 1990 and 2016 found here:
+    any "pur[year].zip" file between 1990 and 2017 found here:
     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
     \item{If this function returns an error (because the FTP site is down,
     for example), check your working directory. You may need to change it
@@ -177,12 +186,12 @@ df <- pull_clean_pur(years = 2000:2001,
                      aerial_ground = TRUE)
 
 # filter to active ingredients present in particular products
-prod_nos <- find_product_name(2003, "insecticide") \%>\%
-    dplyr::select(prodno) \%>\%
+prod_nos <- find_product_name(2003, "insecticide") %>%
+    dplyr::select(prodno) %>%
     tibble_to_vector()
 
-df2 <- pull_clean_pur(2003, "10") \%>\%
-    dplyr::filter(prodno \%in\% prod_nos)
+df2 <- pull_clean_pur(2003, "10") %>%
+    dplyr::filter(prodno %in% prod_nos)
 
 # Sum application by active ingredients
 df3 <- pull_clean_pur(years = 2009:2010,
@@ -192,7 +201,7 @@ df3 <- pull_clean_pur(years = 2009:2010,
 
 # Or by chemical classes
 chemical_class_df <- rbind(find_chemical_codes(2000, "methylene"),
-                           find_chemical_codes(2000, "aldehyde")) \%>\%
+                           find_chemical_codes(2000, "aldehyde")) %>%
    dplyr::rename(chemical_class = chemical)
 
 df4 <- pull_clean_pur(years = 1995,

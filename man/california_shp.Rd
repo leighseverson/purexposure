@@ -13,7 +13,7 @@ california_shp
 }
 \description{
 A SpatialPolygonsDataFrame object for the outline of the state of California.
-Downloaded and subset from the 2016 U.S. Census Cartographic Boundary
+Downloaded and subset from the 2018 U.S. Census Cartographic Boundary
 Shapefile for states.
 }
 \keyword{datasets}

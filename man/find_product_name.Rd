@@ -5,11 +5,10 @@
 \title{Find pesticide product names and registration numbers from PUR Product Lookup
 Tables.}
 \usage{
-find_product_name(years, products = "all", quiet = FALSE,
-  by_year = FALSE, ...)
+find_product_name(years, products = "all", quiet = FALSE, by_year = FALSE, ...)
 }
 \arguments{
-\item{years}{A vector of four digit years in the range of 1990 to 2016.}
+\item{years}{A vector of four digit years in the range of 1990 to 2017.}
 
 \item{products}{A character string or a vector of character strings with
 pesticide product names that you would like to search for. Not case

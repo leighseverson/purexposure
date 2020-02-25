@@ -7,8 +7,8 @@ library(broom)
 # 1:20,000,000 resolution level
 
 current_dir <- getwd()
-setwd("~/Downloads/cb_2016_us_state_20m")
-shp_file <- "cb_2016_us_state_20m.shp"
+setwd("~/../Downloads/cb_2018/")
+shp_file <- "cb_2018_us_state_20m.shp"
 
 shp <- rgdal::readOGR(shp_file,
                       layer = basename(strsplit(shp_file, "\\.")[[1]])[1],

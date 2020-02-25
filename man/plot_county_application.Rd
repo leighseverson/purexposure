@@ -4,12 +4,23 @@
 \alias{plot_county_application}
 \title{Plot pesticide application by county.}
 \usage{
-plot_county_application(clean_pur_df, county = NULL, pls = NULL,
-  color_by = "amount", percentile = c(0.25, 0.5, 0.75),
-  start_date = NULL, end_date = NULL, chemicals = "all",
-  fill = "viridis", crop = FALSE, alpha = 1,
-  ggmap_background = TRUE, polygon_color = "grey",
-  polygon_size = 0.25, ...)
+plot_county_application(
+  clean_pur_df,
+  county = NULL,
+  pls = NULL,
+  color_by = "amount",
+  percentile = c(0.25, 0.5, 0.75),
+  start_date = NULL,
+  end_date = NULL,
+  chemicals = "all",
+  fill = "viridis",
+  crop = FALSE,
+  alpha = 1,
+  ggmap_background = TRUE,
+  polygon_color = "grey",
+  polygon_size = 0.25,
+  ...
+)
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned by \code{pull_clean_pur}.}
@@ -121,14 +132,14 @@ fresno_list2$map
 chemical_class_df <- purrr::map2_dfr(2010, c("methidathion", "parathion",
                                              "naled", "malathion",
                                              "trichlorfon"),
-                                     find_chemical_codes) \%>\%
-     dplyr::mutate(chemical_class = "organophosphates") \%>\%
+                                     find_chemical_codes) %>%
+     dplyr::mutate(chemical_class = "organophosphates") %>%
      dplyr::select(-chemical)
 op_yuba <- pull_clean_pur(2010, "yuba",
                           chemicals = chemical_class_df$chemname,
                           verbose = F, sum_application = T,
                           sum = "chemical_class",
-                          chemical_class = chemical_class_df) \%>\%
+                          chemical_class = chemical_class_df) %>%
    plot_county_application()
 op_yuba$map
 }

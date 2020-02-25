@@ -4,10 +4,16 @@
 \alias{plot_exposure}
 \title{Plot exposure to applied pesticides at a location.}
 \usage{
-plot_exposure(exposure_list, color_by = "amount",
-  buffer_or_county = "county", percentile = c(0.25, 0.5, 0.75),
-  fill = "viridis", alpha = 0.7, pls_labels = FALSE,
-  pls_labels_size = 4)
+plot_exposure(
+  exposure_list,
+  color_by = "amount",
+  buffer_or_county = "county",
+  percentile = c(0.25, 0.5, 0.75),
+  fill = "viridis",
+  alpha = 0.7,
+  pls_labels = FALSE,
+  pls_labels_size = 4
+)
 }
 \arguments{
 \item{exposure_list}{A list returned from \code{calculate_exposure}.}
@@ -73,8 +79,8 @@ library(magrittr)
 fresno_list <- readRDS(system.file("extdata", "exposure_ex.rds",
                                    package = "purexposure")) \%>\% plot_exposure()}
 \donttest{
-tulare_list <- pull_clean_pur(2010, "tulare") \%>\%
-   calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) \%>\%
+tulare_list <- pull_clean_pur(2010, "tulare") %>%
+   calculate_exposure(location = "-119.3473, 36.2077", radius = 3500) %>%
    plot_exposure()
 names(tulare_list)
 tulare_list$maps
@@ -84,11 +90,11 @@ tulare_list$exposure
 # return one plot, pls_data data frame, exposure row, and cutoff_values
 # data frame for each exposure combination
 
-dalton_list <- pull_clean_pur(2000, "modoc") \%>\%
+dalton_list <- pull_clean_pur(2000, "modoc") %>%
     calculate_exposure(location = "-121.4182, 41.9370",
                        radius = 4000,
                        time_period = "6 months",
-                       aerial_ground = TRUE) \%>\%
+                       aerial_ground = TRUE) %>%
     plot_exposure(fill = "plasma")
 do.call("rbind", dalton_list$exposure)
 # one map for each exposure value (unique combination of chemicals,
@@ -102,18 +108,18 @@ dalton_list$maps[[6]]
 
 # exposure to a particular active ingredient
 # plot percentile categories instead of amounts
-chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) \%>\%
+chemical_df <- rbind(find_chemical_codes(2009, c("metam-sodium"))) %>%
      dplyr::rename(chemical_class = chemical)
 
 santa_maria <- pull_clean_pur(2008:2010, "santa barbara",
                               chemicals = chemical_df$chemname,
                               sum_application = TRUE,
                               sum = "chemical_class",
-                              chemical_class = chemical_df) \%>\%
+                              chemical_class = chemical_df) %>%
      calculate_exposure(location = "-119.6122, 34.90635",
                         radius = 3000,
                         time_period = "1 year",
-                        chemicals = "chemical_class") \%>\%
+                        chemicals = "chemical_class") %>%
      plot_exposure(color_by = "percentile")
 do.call("rbind", santa_maria$exposure)
 santa_maria$maps[[1]]
@@ -121,8 +127,8 @@ santa_maria$maps[[2]]
 santa_maria$maps[[3]]
 
 # scale colors based on buffer or county
-clotho <- pull_clean_pur(1996, "fresno") \%>\%
-  dplyr::filter(chemname == "SULFUR") \%>\%
+clotho <- pull_clean_pur(1996, "fresno") %>%
+  dplyr::filter(chemname == "SULFUR") %>%
   calculate_exposure(location = "-119.6082, 36.7212",
                     radius = 1500)
 

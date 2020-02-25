@@ -27,11 +27,11 @@
 
 #' California Pesticide Use Report chemical codes.
 #'
-#' A list of data frames (one for each year from 1990 through 2016) containing
+#' A list of data frames (one for each year from 1990 through 2017) containing
 #' California Department of Pesticide Regulation chemical codes and names used
 #' to identify active ingredients in Pesticide Use Report data. "chemical.txt"
 #' files for each year were pulled from the .zip files "pur1990.zip" through
-#' "pur2016.zip" found here:
+#' "pur2017.zip" found here:
 #' \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives}
 #'
 #' @format A list of 26 elements. Each element is a data frame with a variable
@@ -51,7 +51,7 @@
 #' California state SpatialPolygonsDataFrame object.
 #'
 #' A SpatialPolygonsDataFrame object for the outline of the state of California.
-#' Downloaded and subset from the 2016 U.S. Census Cartographic Boundary
+#' Downloaded and subset from the 2018 U.S. Census Cartographic Boundary
 #' Shapefile for states.
 #'
 #' @format A SpatialPolygonsDataFrame object at the 1:20,000,000 resolution level.

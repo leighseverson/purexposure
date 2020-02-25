@@ -4,8 +4,7 @@
 \alias{plot_application_timeseries}
 \title{Plot time series of active ingredients in applied pesticides.}
 \usage{
-plot_application_timeseries(clean_pur_df, facet = FALSE,
-  axes = "fixed")
+plot_application_timeseries(clean_pur_df, facet = FALSE, axes = "fixed")
 }
 \arguments{
 \item{clean_pur_df}{A data frame returned from \code{pull_clean_pur}.}
@@ -33,8 +32,8 @@ library(magrittr)
 readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure")) \%>\%
     plot_application_timeseries()
 \donttest{
-pull_clean_pur(1990:1992, "fresno") \%>\%
-    dplyr::filter(chemname \%in\% toupper(c("methyl bromide", "sulfur"))) \%>\%
+pull_clean_pur(1990:1992, "fresno") %>%
+    dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
     plot_application_timeseries(facet = TRUE)
 }
 }
