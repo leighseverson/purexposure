@@ -706,11 +706,6 @@ plot_exposure <- function(exposure_list, color_by = "amount",
 #' library(magrittr)
 #' readRDS(system.file("extdata", "fresno_clean.rds", package = "purexposure")) %>%
 #'     plot_application_timeseries()
-#' \donttest{
-#' pull_clean_pur(1990:1992, "fresno") %>%
-#'     dplyr::filter(chemname %in% toupper(c("methyl bromide", "sulfur"))) %>%
-#'     plot_application_timeseries(facet = TRUE)
-#' }
 #' @export
 plot_application_timeseries <- function(clean_pur_df, facet = FALSE,
                                         axes = "fixed") {
