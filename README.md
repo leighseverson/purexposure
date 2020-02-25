@@ -71,7 +71,7 @@ and was not added to PUR data sets until 1999. Application time is
 therefore often missing in raw PUR data sets, and is not retained in
 data sets cleaned using this package.
 
-PUR data sets can be pulled by years in the range \[1990, 2016\].
+PUR data sets can be pulled by years in the range \[1990, 2017\].
 
 ### Geography
 
@@ -215,17 +215,17 @@ product table and search for applied pesticide products for a given year
 or years:
 
 ``` r
-product_table <- find_product_name(2016, "insecticide")
+product_table <- find_product_name(2017, "insecticide")
 ```
 
 ``` r
 head(product_table, 3)
 #> # A tibble: 3 x 6
-#>   prodno prodstat_ind product_name             signlwrd_ind  year product 
-#>    <int> <chr>        <chr>                           <int> <int> <chr>   
-#> 1     32 C            WEST INSECTICIDE                    4  2015 insecti~
-#> 2     59 C            WESTBAN-2E INSECTICIDE              3  2015 insecti~
-#> 3     71 C            AERO WEST BRAND INSECTI~            4  2015 insecti~
+#>   prodno prodstat_ind product_name                  signlwrd_ind  year product  
+#>    <int> <chr>        <chr>                                <int> <int> <chr>    
+#> 1     32 C            WEST INSECTICIDE                         4  2015 insectic~
+#> 2     59 C            WESTBAN-2E INSECTICIDE                   3  2015 insectic~
+#> 3     71 C            AERO WEST BRAND INSECTICIDE ~            4  2015 insectic~
 ```
 
 The `prodno` column in the product table can be matched with the same
@@ -295,17 +295,16 @@ fresno_raw <- pull_raw_pur(years = 2004, counties = "fresno")
 ``` r
 head(fresno_raw, 2)
 #> # A tibble: 2 x 33
-#>   use_no prodno chem_code prodchem_pct lbs_chm_used lbs_prd_used
-#>   <chr>  <chr>  <chr>     <chr>        <chr>        <chr>       
-#> 1 12546~ 25111  253       50           0.03125      0.0625      
-#> 2 12546~ 24089  2170      61.6         0.0866096    0.1406      
-#> # ... with 27 more variables: amt_prd_used <chr>, unit_of_meas <chr>,
-#> #   acre_planted <chr>, unit_planted <chr>, acre_treated <chr>,
-#> #   unit_treated <chr>, applic_cnt <chr>, applic_dt <chr>,
-#> #   applic_time <chr>, county_cd <chr>, base_ln_mer <chr>, township <chr>,
-#> #   tship_dir <chr>, range <chr>, range_dir <chr>, section <chr>,
-#> #   site_loc_id <chr>, grower_id <chr>, license_no <chr>,
-#> #   planting_seq <chr>, aer_gnd_ind <chr>, site_code <chr>,
+#>   use_no prodno chem_code prodchem_pct lbs_chm_used lbs_prd_used amt_prd_used
+#>   <chr>  <chr>  <chr>     <chr>        <chr>        <chr>        <chr>       
+#> 1 12546~ 25111  253       50           0.03125      0.0625       1           
+#> 2 12546~ 24089  2170      61.6         0.0866096    0.1406       2           
+#> # ... with 26 more variables: unit_of_meas <chr>, acre_planted <chr>,
+#> #   unit_planted <chr>, acre_treated <chr>, unit_treated <chr>,
+#> #   applic_cnt <chr>, applic_dt <chr>, applic_time <chr>, county_cd <chr>,
+#> #   base_ln_mer <chr>, township <chr>, tship_dir <chr>, range <chr>,
+#> #   range_dir <chr>, section <chr>, site_loc_id <chr>, grower_id <chr>,
+#> #   license_no <chr>, planting_seq <chr>, aer_gnd_ind <chr>, site_code <chr>,
 #> #   qualify_cd <chr>, batch_no <chr>, document_no <chr>, summary_cd <chr>,
 #> #   record_id <chr>
 ```
@@ -325,7 +324,7 @@ downloaded manually from CDPR’s FTP server in a few ways:
 For documentation of raw PUR data, you can reference the Pesticide Use
 Report Data User Guide & Documentation document published by the CA
 Department of Pesticide Regulation. The file is saved as “cd\_doc.pdf”
-in any “pur\[year\].zip” file between 1990 and 2016 found here:
+in any “pur\[year\].zip” file between 1990 and 2017 found here:
 <ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>.
 
 #### Cleaned data
@@ -342,12 +341,12 @@ fresno_clean <- pull_clean_pur(2004, "fresno")
 ``` r
 head(fresno_clean, 2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname kg_chm_used section township county_name pur_code
-#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
-#> 1      1855 GLYPHOS~       0.634 M14S22~ M14S22E  FRESNO      10      
-#> 2       806 2,4-D, ~       1.04  M14S22~ M14S22E  FRESNO      10      
-#> # ... with 6 more variables: fips_code <chr>, date <date>,
-#> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
+#>   chem_code chemname kg_chm_used section township county_name pur_code fips_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>    <chr>    
+#> 1      1855 GLYPHOS~       0.634 M14S22~ M14S22E  FRESNO      10       06019    
+#> 2       806 2,4-D, ~       1.04  M14S22~ M14S22E  FRESNO      10       06019    
+#> # ... with 5 more variables: date <date>, aerial_ground <chr>, use_no <chr>,
+#> #   outlier <dbl>, prodno <int>
 ```
 
 Pesticide application is recorded by active ingredient (`chem_code` and
@@ -408,12 +407,12 @@ nevada_sulfur <- pull_clean_pur(years = 2000, counties = "nevada", chemicals = "
 ``` r
 head(nevada_sulfur, 2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname kg_chm_used section township county_name pur_code
-#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
-#> 1       358 LIME-SU~        7.47 M15N09~ M15N09E  NEVADA      29      
-#> 2       560 SULFUR          2.18 M17N08~ M17N08E  NEVADA      29      
-#> # ... with 6 more variables: fips_code <chr>, date <date>,
-#> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
+#>   chem_code chemname kg_chm_used section township county_name pur_code fips_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>    <chr>    
+#> 1       358 LIME-SU~        7.47 M15N09~ M15N09E  NEVADA      29       06057    
+#> 2       560 SULFUR          2.18 M17N08~ M17N08E  NEVADA      29       06057    
+#> # ... with 5 more variables: date <date>, aerial_ground <chr>, use_no <chr>,
+#> #   outlier <dbl>, prodno <int>
 unique(nevada_sulfur$chemname)
 #> [1] "LIME-SULFUR" "SULFUR"
 ```
@@ -490,10 +489,10 @@ head(chemical_class_df, 2)
 #> 2      2530 3,3-DIMETHYL-2-METHYLENE NORCAMPHENE methylene
 tail(chemical_class_df, 2)
 #> # A tibble: 2 x 3
-#>   chem_code chemname                                        chemical_class
-#>       <int> <chr>                                           <chr>         
-#> 1      3758 POLYOXYETHYLENE P-TERT-BUTYL PHENOL-FORMALDEHY~ aldehyde      
-#> 2      3405 SODIUM FORMALDEHYDE SULFOXYLATE                 aldehyde
+#>   chem_code chemname                                              chemical_class
+#>       <int> <chr>                                                 <chr>         
+#> 1      3758 POLYOXYETHYLENE P-TERT-BUTYL PHENOL-FORMALDEHYDE RES~ aldehyde      
+#> 2      3405 SODIUM FORMALDEHYDE SULFOXYLATE                       aldehyde
 ```
 
 You may need to do some additional filtering if the results returned by
@@ -517,12 +516,12 @@ fresno_classes <- pull_clean_pur(2008, "fresno", sum_application = TRUE,
 ``` r
 head(fresno_classes, 3)
 #> # A tibble: 3 x 8
-#>   chemical_class kg_chm_used section township county_name pur_code
-#>   <chr>                <dbl> <chr>   <chr>    <chr>       <chr>   
-#> 1 other                216.  M12S13~ M12S13E  FRESNO      10      
-#> 2 other                197.  M12S13~ M12S13E  FRESNO      10      
-#> 3 other                 15.0 M15S23~ M15S23E  FRESNO      10      
-#> # ... with 2 more variables: fips_code <chr>, date <date>
+#>   chemical_class kg_chm_used section township county_name pur_code fips_code
+#>   <chr>                <dbl> <chr>   <chr>    <chr>       <chr>    <chr>    
+#> 1 other                216.  M12S13~ M12S13E  FRESNO      10       06019    
+#> 2 other                197.  M12S13~ M12S13E  FRESNO      10       06019    
+#> 3 other                 15.0 M15S23~ M15S23E  FRESNO      10       06019    
+#> # ... with 1 more variable: date <date>
 ```
 
 ``` r
@@ -661,14 +660,14 @@ monroe$meta_data %>% slice(1:3)
 #> 1 M15S21E31       all 0.03730446  4936.458       184.15190 2015-01-01
 #> 2 M15S20E36       all 0.03885254  2332.108        90.60831 2015-01-01
 #> 3 M16S21E06       all 0.79971267 22720.602     18169.95306 2015-01-01
-#>     end_date aerial_ground none_recorded
-#> 1 2015-12-31            NA         FALSE
-#> 2 2015-12-31            NA         FALSE
-#> 3 2015-12-31            NA         FALSE
-#>                                location radius    area
-#> 1 11842 South Chestnut Ave., Fresno, CA   1500 7068583
-#> 2 11842 South Chestnut Ave., Fresno, CA   1500 7068583
-#> 3 11842 South Chestnut Ave., Fresno, CA   1500 7068583
+#>     end_date aerial_ground none_recorded                              location
+#> 1 2015-12-31            NA         FALSE 11842 South Chestnut Ave., Fresno, CA
+#> 2 2015-12-31            NA         FALSE 11842 South Chestnut Ave., Fresno, CA
+#> 3 2015-12-31            NA         FALSE 11842 South Chestnut Ave., Fresno, CA
+#>   radius    area
+#> 1   1500 7068583
+#> 2   1500 7068583
+#> 3   1500 7068583
 ```
 
 To make the process of calculating exposure more clear, we can
@@ -720,12 +719,12 @@ And the `clean_pur_df` element is the cleaned PUR data set returned from
 ``` r
 monroe$clean_pur_df %>% head(2)
 #> # A tibble: 2 x 13
-#>   chem_code chemname kg_chm_used section township county_name pur_code
-#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>   
-#> 1      5014 IRON PH~      0.580  M15S20~ M15S20E  FRESNO      10      
-#> 2      3983 SPINOSAD      0.0581 M13S22~ M13S22E  FRESNO      10      
-#> # ... with 6 more variables: fips_code <chr>, date <date>,
-#> #   aerial_ground <chr>, use_no <chr>, outlier <dbl>, prodno <int>
+#>   chem_code chemname kg_chm_used section township county_name pur_code fips_code
+#>       <int> <chr>          <dbl> <chr>   <chr>    <chr>       <chr>    <chr>    
+#> 1      5014 IRON PH~      0.580  M15S20~ M15S20E  FRESNO      10       06019    
+#> 2      3983 SPINOSAD      0.0581 M13S22~ M13S22E  FRESNO      10       06019    
+#> # ... with 5 more variables: date <date>, aerial_ground <chr>, use_no <chr>,
+#> #   outlier <dbl>, prodno <int>
 ```
 
 If we wanted to calculate exposure for the same location in four month
@@ -1218,27 +1217,27 @@ head(meta_data[[1]])
 ```
 
     #> [1] 12
-    #>         pls chemicals   percent        kg kg_intersection start_date
-    #> 1 M14S21E32       all 0.1742803 1409.3826        245.6276 2000-01-01
-    #> 2 M14S21E31       all 0.7114561 5139.5855       3656.5897 2000-01-01
-    #> 3 M14S20E36       all 0.1307941 2543.8801        332.7245 2000-01-01
-    #> 4 M15S21E05       all 0.3483183 1740.7311        606.3285 2000-01-01
-    #> 5 M15S21E06       all 0.9969748  492.2735        490.7843 2000-01-01
-    #> 6 M15S20E01       all 0.2648533 1336.7372        354.0393 2000-01-01
-    #>     end_date aerial_ground none_recorded
-    #> 1 2000-04-01            NA         FALSE
-    #> 2 2000-04-01            NA         FALSE
-    #> 3 2000-04-01            NA         FALSE
-    #> 4 2000-04-01            NA         FALSE
-    #> 5 2000-04-01            NA         FALSE
-    #> 6 2000-04-01            NA         FALSE
-    #>                               location radius    area error_message
-    #> 1 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
-    #> 2 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
-    #> 3 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
-    #> 4 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
-    #> 5 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
-    #> 6 3333 American Ave., Fresno, CA 93725   1500 7068583            NA
+    #>         pls chemicals   percent        kg kg_intersection start_date   end_date
+    #> 1 M14S21E32       all 0.1742803 1409.3826        245.6276 2000-01-01 2000-04-01
+    #> 2 M14S21E31       all 0.7114561 5139.5855       3656.5897 2000-01-01 2000-04-01
+    #> 3 M14S20E36       all 0.1307941 2543.8801        332.7245 2000-01-01 2000-04-01
+    #> 4 M15S21E05       all 0.3483183 1740.7311        606.3285 2000-01-01 2000-04-01
+    #> 5 M15S21E06       all 0.9969748  492.2735        490.7843 2000-01-01 2000-04-01
+    #> 6 M15S20E01       all 0.2648533 1336.7372        354.0393 2000-01-01 2000-04-01
+    #>   aerial_ground none_recorded                             location radius
+    #> 1            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #> 2            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #> 3            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #> 4            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #> 5            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #> 6            NA         FALSE 3333 American Ave., Fresno, CA 93725   1500
+    #>      area error_message
+    #> 1 7068583            NA
+    #> 2 7068583            NA
+    #> 3 7068583            NA
+    #> 4 7068583            NA
+    #> 5 7068583            NA
+    #> 6 7068583            NA
 
 Additionally, if `write_plots` is left as its default (`TRUE`), plots
 returned from `plot_exposure` will be saved in a subdirectory called

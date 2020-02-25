@@ -53,7 +53,7 @@ Pesticide applications are reported on a product basis, but are recorded by the 
 
 Records for the amount of active ingredient applied are reliably recorded by day. Raw PUR data sets have a variable called `applic_time`, the time that the pesticide product application was completed; however, application time is only required for production agricultural reports and was not added to PUR data sets until 1999. Application time is therefore often missing in raw PUR data sets, and is not retained in data sets cleaned using this package. 
 
-PUR data sets can be pulled by years in the range [1990, 2016]. 
+PUR data sets can be pulled by years in the range [1990, 2017]. 
 
 ### Geography  
 
@@ -121,7 +121,7 @@ You can use active ingredients listed under the relevant class to include in the
 The `find_product_name` works similarly: you can use it to download a product table and search for applied pesticide products for a given year or years: 
 
 ```{r eval = FALSE, echo = 1}
-product_table <- find_product_name(2016, "insecticide")
+product_table <- find_product_name(2017, "insecticide")
 save(product_table, file = "data/product_table.RData")
 ```
 ```{r echo = FALSE}
@@ -181,7 +181,7 @@ Raw data pulled using `pull_raw_pur` may differ from data sets downloaded manual
 1. Number of columns: The data pulled using `pull_raw_pur` always has 33 columns. The data sets for some years and counties included columns called `error_flag` and `comtrs`. Since these variables are inconsistently present and are not documented in the User Guide & Documentation manual, they were removed. 
 2. Order of rows: Data sets pulled using this package are arranged by `applic_dt` (application date) and `county_cd` (county code). This may not be the case for data sets downloaded manually. 
 
-For documentation of raw PUR data, you can reference the Pesticide Use Report Data User Guide & Documentation document published by the CA Department of Pesticide Regulation. The file is saved as "cd_doc.pdf" in any  "pur[year].zip" file between 1990 and 2016 found here: ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/. 
+For documentation of raw PUR data, you can reference the Pesticide Use Report Data User Guide & Documentation document published by the CA Department of Pesticide Regulation. The file is saved as "cd_doc.pdf" in any  "pur[year].zip" file between 1990 and 2017 found here: ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/. 
 
 #### Cleaned data 
 
