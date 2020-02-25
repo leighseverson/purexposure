@@ -5,11 +5,11 @@
 #' Table for a given year. This function uses pattern matching to return results.
 #' As a starting place, or for more thorough classifications, see the CA
 #' Department of Pesticide Regulation's Summary of Pesticide Use Report Data,
-#' Indexed by Chemical (2017):
+#' Indexed by Chemical (2016):
 #' \url{https://www.cdpr.ca.gov/docs/pur/pur16rep/chmrpt16.pdf}
 #'
-#' @param years A vector of four-digit numeric years in the range of 1990 to
-#'   2017. Indicates the years in which you would like to match chemical codes.
+#' @param years A vector of four-digit numeric years, starting with 1990.
+#' Indicates the years in which you would like to match chemical codes.
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied
 #'   in the given year. The default value is "all", which returns codes for all
@@ -46,6 +46,20 @@
 find_chemical_codes <- function(years, chemicals = "all", by_year = FALSE) {
 
   df <- purexposure::chemical_list
+
+  length_ask <- length(years)
+  length_match <- length((names(df) %in% years)[names(df) %in% years == T])
+
+  if (length_match < length_ask) {
+    match <- names(df)[names(df) %in% years]
+    if (length(match) > 0) {
+      missing_years <- years[!years %in% match]
+    } else {
+      missing_years <- years
+    }
+    missing_years <- paste0(missing_years, collapse = ", ")
+    stop(paste0("Data isn't available for ", missing_years))
+  }
 
   df <- df[names(df) %in% years]
 

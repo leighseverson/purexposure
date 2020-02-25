@@ -7,8 +7,8 @@
 find_chemical_codes(years, chemicals = "all", by_year = FALSE)
 }
 \arguments{
-\item{years}{A vector of four-digit numeric years in the range of 1990 to
-2017. Indicates the years in which you would like to match chemical codes.}
+\item{years}{A vector of four-digit numeric years, starting with 1990.
+Indicates the years in which you would like to match chemical codes.}
 
 \item{chemicals}{A string or vector of strings giving search terms of
 chemicals to match with active ingredients present in pesticides applied
@@ -40,7 +40,7 @@ a data frame with corresponding chemical codes from the PUR Chemical Lookup
 Table for a given year. This function uses pattern matching to return results.
 As a starting place, or for more thorough classifications, see the CA
 Department of Pesticide Regulation's Summary of Pesticide Use Report Data,
-Indexed by Chemical (2017):
+Indexed by Chemical (2016):
 \url{https://www.cdpr.ca.gov/docs/pur/pur16rep/chmrpt16.pdf}
 }
 \section{Note}{

@@ -71,7 +71,11 @@ and was not added to PUR data sets until 1999. Application time is
 therefore often missing in raw PUR data sets, and is not retained in
 data sets cleaned using this package.
 
-PUR data sets can be pulled by years in the range \[1990, 2017\].
+PUR data is typically about two years behind. For example, 2017 data was
+made available in June of 2019. You can check CDPR’s FTP site
+[here](ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/) to see the
+most recent year of data available to pull. You can use the package to
+pull data from 1990 up to that most recent year.
 
 ### Geography
 
@@ -324,7 +328,7 @@ downloaded manually from CDPR’s FTP server in a few ways:
 For documentation of raw PUR data, you can reference the Pesticide Use
 Report Data User Guide & Documentation document published by the CA
 Department of Pesticide Regulation. The file is saved as “cd\_doc.pdf”
-in any “pur\[year\].zip” file between 1990 and 2017 found here:
+in any “pur\[year\].zip” file found here:
 <ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>.
 
 #### Cleaned data

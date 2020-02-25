@@ -7,9 +7,10 @@
 #' PUR data sets are saved in a temporary environment, which is deleted at the
 #' end of the current R session.
 #'
-#' @param years A four-digit numeric year or vector of years in the range of
-#'   1990 to 2017. Indicates the years for which you would like to pull PUR
-#'   data sets. \code{years == "all"} will pull data from 1990 through 2017.
+#' @param years A four-digit numeric year or vector of years, starting with
+#'   1990. Indicates the years for which you would like to pull PUR
+#'   data sets. \code{years == "all"} will pull data from 1990 through the
+#'   most recent year of available data.
 #' @param counties A vector of character strings giving either a county name,
 #'   two digit PUR county codes, or six-digit FIPS county codes for each county.
 #'   Not case sensitive. California names, county codes as they appear in PUR
@@ -34,7 +35,7 @@
 #'    \item{For documentation of raw PUR data, see the Pesticide Use
 #'   Report Data User Guide & Documentation document published by the California
 #'   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
-#'   "pur[year].zip" file between 1990 and 2017 found here:
+#'   "pur[year].zip" file found here:
 #'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
 #'   \item{If this function returns an error (because the FTP site is down, for
 #'   example), check your working directory. You may need to change it back from
@@ -52,14 +53,23 @@
 pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
                          quiet = FALSE) {
 
+  suppressMessages(
+    st <- RCurl::getURL("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/",
+                        verbose = T,
+                        ftp.use.epsv = T,
+                        dirlistonly = T)
+  )
+
+  most_recent_year <- as.integer(stringr::str_sub(st, nchar(st)-9, nchar(st)-6))
+
   if ("all" %in% tolower(years)) {
-    years <- 1990:2017
+    years <- 1990:most_recent_year
   }
   if (!all(is.numeric(years))) {
     stop("Years should be four-digit numeric values.")
   }
-  if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > 2017)) {
-    stop("Years should be between 1990 and 2017.")
+  if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > most_recent_year)) {
+    stop(paste0("Years should be between 1990 and ", most_recent_year, "."))
   }
 
   code_df <- purexposure::county_codes
@@ -780,6 +790,20 @@ pull_spdf <- function(county, section_township = "section",
 #' @export
 pull_product_table <- function(years, quiet = FALSE) {
 
+  suppressMessages(
+    st <- RCurl::getURL("ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/",
+                        verbose = T,
+                        ftp.use.epsv = T,
+                        dirlistonly = T)
+  )
+
+  most_recent_year <- as.integer(stringr::str_sub(st, nchar(st)-9, nchar(st)-6))
+
+  if (max(as.integer(years)) > most_recent_year) {
+    stop(paste0("Your range of years exceeds the most recent year of data available ",
+                "(", most_recent_year, ")"))
+  }
+
   current_dir <- getwd()
 
   if (!exists("purexposure_package_env")) {
@@ -799,9 +823,9 @@ pull_product_table <- function(years, quiet = FALSE) {
       utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
       utils::unzip(file, exdir = dir)
 
-      if (year > 2015) {
+      if (years[i] > 2015) {
 
-        setwd(paste0("pur", year))
+        if (dir.exists(paste0("pur", years[i]))) setwd(paste0("pur", years[i]))
         suppressWarnings(suppressMessages(
           purexposure_package_env$pur_lst[[as.character(years[i])]] <-
             readr::read_csv("product.txt") %>%
@@ -812,7 +836,7 @@ pull_product_table <- function(years, quiet = FALSE) {
                           signlwrd_ind = as.integer(signlwrd_ind),
                           year = as.integer(years[i]))
         ))
-          setwd("..")
+        if (dir.exists(paste0("pur", years[i]))) setwd("..")
 
       } else {
 
@@ -855,9 +879,9 @@ pull_product_table <- function(years, quiet = FALSE) {
         utils::download.file(url, destfile = file, mode = "wb", quiet = quiet)
         utils::unzip(file, exdir = dir)
 
-        if (year > 2015) {
+        if (years[i] > 2015) {
 
-          setwd(paste0("pur", year))
+          if (dir.exists(paste0("pur", years[i]))) setwd(paste0("pur", years[i]))
           suppressWarnings(suppressMessages(
             purexposure_package_env$pur_lst[[as.character(to_be_downloaded[i])]] <-
               readr::read_csv("product.txt") %>%
@@ -868,7 +892,7 @@ pull_product_table <- function(years, quiet = FALSE) {
                             signlwrd_ind = as.integer(signlwrd_ind),
                             year = as.integer(to_be_downloaded[i]))
           ))
-          setwd("..")
+          if (dir.exists(paste0("pur", years[i]))) setwd("..")
 
         } else {
 

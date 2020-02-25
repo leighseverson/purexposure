@@ -7,9 +7,10 @@
 pull_raw_pur(years = "all", counties = "all", verbose = TRUE, quiet = FALSE)
 }
 \arguments{
-\item{years}{A four-digit numeric year or vector of years in the range of
-1990 to 2017. Indicates the years for which you would like to pull PUR
-data sets. \code{years == "all"} will pull data from 1990 through 2017.}
+\item{years}{A four-digit numeric year or vector of years, starting with
+1990. Indicates the years for which you would like to pull PUR
+data sets. \code{years == "all"} will pull data from 1990 through the
+most recent year of available data.}
 
 \item{counties}{A vector of character strings giving either a county name,
 two digit PUR county codes, or six-digit FIPS county codes for each county.
@@ -48,7 +49,7 @@ end of the current R session.
    \item{For documentation of raw PUR data, see the Pesticide Use
   Report Data User Guide & Documentation document published by the California
   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
-  "pur[year].zip" file between 1990 and 2017 found here:
+  "pur[year].zip" file found here:
   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
   \item{If this function returns an error (because the FTP site is down, for
   example), check your working directory. You may need to change it back from
