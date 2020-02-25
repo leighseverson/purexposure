@@ -115,13 +115,13 @@ help_read_in_counties <- function(code_or_file, type, year) {
 
     if (year > 2015) {
 
-      setwd(paste0("pur", year))
+      if (dir.exists(paste0("pur", year))) change_dir <- T; setwd(paste0("pur", year))
 
       raw_data <- suppressWarnings(suppressMessages(
         readr::read_csv(paste0("udc", sm_year, "_", code_or_file, ".txt"),
                         progress = FALSE)))
 
-      setwd("..")
+      if (exists("change_dir")) setwd("..")
 
     } else {
       raw_data <- suppressWarnings(suppressMessages(
@@ -135,12 +135,12 @@ help_read_in_counties <- function(code_or_file, type, year) {
   } else if (type == "files") {
 
     if (year > 2015) {
-      setwd(paste0("pur", year))
+      if (dir.exists(paste0("pur", year))) change_dir <- T; setwd(paste0("pur", year))
 
       raw_data <- suppressWarnings(suppressMessages(
         readr::read_csv(code_or_file, progress = FALSE)))
 
-      setwd("..")
+      if (exists("change_dir")) setwd("..")
 
     } else {
       raw_data <- suppressWarnings(suppressMessages(
