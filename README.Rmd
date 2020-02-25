@@ -53,7 +53,7 @@ Pesticide applications are reported on a product basis, but are recorded by the 
 
 Records for the amount of active ingredient applied are reliably recorded by day. Raw PUR data sets have a variable called `applic_time`, the time that the pesticide product application was completed; however, application time is only required for production agricultural reports and was not added to PUR data sets until 1999. Application time is therefore often missing in raw PUR data sets, and is not retained in data sets cleaned using this package. 
 
-PUR data is typically about two years behind. For example, 2017 data was made available in June of 2019. You can check CDPR's FTP site [here](ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/) to see the most recent year of data available to pull. You can use the package to pull data from 1990 up to that most recent year. 
+PUR data is typically about two years behind. For example, 2017 data was made available in June of 2019. You can check CDPR's FTP site (ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/) to see the most recent year of data available to pull. You can use the package to pull data from 1990 up to that most recent year. 
 
 ### Geography  
 

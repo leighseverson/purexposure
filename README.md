@@ -73,7 +73,7 @@ data sets cleaned using this package.
 
 PUR data is typically about two years behind. For example, 2017 data was
 made available in June of 2019. You can check CDPR’s FTP site
-[here](ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/) to see the
+(<ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/>) to see the
 most recent year of data available to pull. You can use the package to
 pull data from 1990 up to that most recent year.
 
