@@ -5,11 +5,11 @@
 #' Table for a given year. This function uses pattern matching to return results.
 #' As a starting place, or for more thorough classifications, see the CA
 #' Department of Pesticide Regulation's Summary of Pesticide Use Report Data,
-#' Indexed by Chemical (2016):
+#' Indexed by Chemical (2017):
 #' \url{https://www.cdpr.ca.gov/docs/pur/pur16rep/chmrpt16.pdf}
 #'
 #' @param years A vector of four-digit numeric years in the range of 1990 to
-#'   2016. Indicates the years in which you would like to match chemical codes.
+#'   2017. Indicates the years in which you would like to match chemical codes.
 #' @param chemicals A string or vector of strings giving search terms of
 #'   chemicals to match with active ingredients present in pesticides applied
 #'   in the given year. The default value is "all", which returns codes for all

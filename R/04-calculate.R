@@ -262,11 +262,6 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     ggplot2::coord_map()
 
   # find sections (and townships) w/in buffer
-  which_pls <- df %>% dplyr::filter(long >= range$min_long &
-                                       long <= range$max_long &
-                                       lat >= range$min_lat &
-                                       lat <= range$max_lat)
-
   if (nrow(which_pls) == 0) {
 
     if ("section" %in% colnames(clean_pur_df)) {
@@ -275,18 +270,28 @@ calculate_exposure <- function(clean_pur_df, location, radius,
         dplyr::summarise(min_long = min(long), min_lat = min(lat),
                          max_long = max(long), max_lat = max(lat))
 
-      corner <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_calc_distance,
-                                origin_long = range$max_long,
-                                origin_lat = range$max_lat) %>%
+      corner_upper <- purrr::map2_dfr(borders$max_long, borders$max_lat, help_calc_distance,
+                                      origin_long = range$max_long,
+                                      origin_lat = range$max_lat) %>%
         dplyr::filter(long > range$max_long & lat > range$max_lat) %>%
         dplyr::filter(dist == min(dist))
 
-      closest_pls <- borders %>% dplyr::filter(max_long == corner$long,
-                                               max_lat == corner$lat) %>%
+      corner_lower <- purrr::map2_dfr(borders$min_long, borders$min_lat, help_calc_distance,
+                                      origin_long = range$min_long,
+                                      origin_lat = range$min_lat) %>%
+        dplyr::filter(long < range$max_long & lat < range$min_lat) %>%
+        dplyr::filter(dist == min(dist))
+
+      closest_pls_upper <- borders %>% dplyr::filter(max_long == corner_upper$long,
+                                                     max_lat == corner_upper$lat) %>%
+        dplyr::select(MTRS) %>%
+        tibble_to_vector()
+      closest_pls_lower <- borders %>% dplyr::filter(min_long == corner_lower$long,
+                                                     min_lat == corner_lower$lat) %>%
         dplyr::select(MTRS) %>%
         tibble_to_vector()
 
-      which_pls <- df %>% dplyr::filter(MTRS == closest_pls)
+      which_pls <- df %>% dplyr::filter(MTRS == c(closest_pls_lower,closest_pls_upper))
 
     } else {
 

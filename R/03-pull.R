@@ -8,8 +8,8 @@
 #' end of the current R session.
 #'
 #' @param years A four-digit numeric year or vector of years in the range of
-#'   1990 to 2016. Indicates the years for which you would like to pull PUR
-#'   data sets. \code{years == "all"} will pull data from 1990 through 2016.
+#'   1990 to 2017. Indicates the years for which you would like to pull PUR
+#'   data sets. \code{years == "all"} will pull data from 1990 through 2017.
 #' @param counties A vector of character strings giving either a county name,
 #'   two digit PUR county codes, or six-digit FIPS county codes for each county.
 #'   Not case sensitive. California names, county codes as they appear in PUR
@@ -34,7 +34,7 @@
 #'    \item{For documentation of raw PUR data, see the Pesticide Use
 #'   Report Data User Guide & Documentation document published by the California
 #'   Department of Pesticide Regulation. This file is saved as "cd_doc.pdf" in any
-#'   "pur[year].zip" file between 1990 and 2016 found here:
+#'   "pur[year].zip" file between 1990 and 2017 found here:
 #'   \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.}
 #'   \item{If this function returns an error (because the FTP site is down, for
 #'   example), check your working directory. You may need to change it back from
@@ -45,7 +45,7 @@
 #' \donttest{
 #' df <- pull_raw_pur(years = 2000, counties = "fresno")
 #' df2 <- pull_raw_pur(years = c(2000, 2010), counties = c("butte", "15", "06001"))
-#' df3 <- pull_raw_pur(years = 2016, counties = c("colusa"))
+#' df3 <- pull_raw_pur(years = 2017, counties = c("colusa"))
 #' }
 #' @importFrom magrittr %>%
 #' @export
@@ -53,13 +53,13 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
                          quiet = FALSE) {
 
   if ("all" %in% tolower(years)) {
-    years <- 1990:2016
+    years <- 1990:2017
   }
   if (!all(is.numeric(years))) {
     stop("Years should be four-digit numeric values.")
   }
-  if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > 2016)) {
-    stop("Years should be between 1990 and 2016.")
+  if (all(is.numeric(years)) & (min(years) < 1990 | max(years) > 2017)) {
+    stop("Years should be between 1990 and 2017.")
   }
 
   code_df <- purexposure::county_codes
@@ -249,7 +249,7 @@ pull_raw_pur <- function(years = "all", counties = "all", verbose = TRUE,
 #'     For documentation of raw PUR data, see the Pesticide Use Report Data User
 #'     Guide & Documentation document published by the California Department of
 #'     Pesticide Regulation. This file is saved as "cd_doc.pdf" in
-#'     any "pur[year].zip" file between 1990 and 2016 found here:
+#'     any "pur[year].zip" file between 1990 and 2017 found here:
 #'     \url{ftp://transfer.cdpr.ca.gov/pub/outgoing/pur_archives/}.
 #'     \item{If this function returns an error (because the FTP site is down,
 #'     for example), check your working directory. You may need to change it
@@ -415,7 +415,7 @@ pull_clean_pur <- function(years = "all", counties = "all", chemicals = "all",
 
     if (is.character(years)) {
       if (years == "all") {
-        years <- 1990:2016
+        years <- 1990:2017
       }
     }
 
@@ -738,7 +738,7 @@ pull_spdf <- function(county, section_township = "section",
 #' tables are saved in a temporary environment, which is deleted at the end of
 #' the current R session.
 #'
-#' @param years A vector of four digit years in the range of 1990 to 2016.
+#' @param years A vector of four digit years in the range of 1990 to 2017.
 #' @param quiet TRUE / FALSE indicating whether you would like a
 #'   message and progress bar printed for the product table that is downloaded.
 #'   The default value is FALSE.

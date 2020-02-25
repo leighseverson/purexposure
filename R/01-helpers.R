@@ -401,10 +401,13 @@ help_filter_pls <- function(pls, pls_quote, which_pls, shp, buffer, df,
 
     if (pls_quote == "MTRS") {
       percent_df <- data.frame(MTRS = comb_shp_filt@data$MTRS[i],
-                               percent = intersected_area/section_area)
+                               percent = intersected_area/section_area,
+                               intersection_m2=(intersected_area/section_area)*2589988.1)
     } else {
       percent_df <- data.frame(MTR = comb_shp_filt@data$MTR[i],
-                               percent = intersected_area/section_area)
+                               percent = intersected_area/section_area,
+                               intersection_m2=(intersected_area/section_area)*2589988.1)
+
     }
 
     if (i == 1) {
@@ -646,7 +649,7 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
     }
   }
 
-  buffer_area <- pi * (radius^2)
+  buffer_area <- sum(intersection_m2)
 
   if ("section" %in% colnames(pur_filt)) {
     exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
