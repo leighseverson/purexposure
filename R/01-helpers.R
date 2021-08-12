@@ -655,7 +655,7 @@ help_calculate_exposure <- function(start_date, end_date, aerial_ground,
     }
   }
 
-  buffer_area <- sum(intersection_m2)
+  buffer_area <- pi * (radius^2)# sum(intersection_m2)
 
   if ("section" %in% colnames(pur_filt)) {
     exp <- help_write_md(clean_pur_df, pls_percents, pur_out, location, start_date,
