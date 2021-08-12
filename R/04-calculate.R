@@ -262,6 +262,11 @@ calculate_exposure <- function(clean_pur_df, location, radius,
     ggplot2::coord_map()
 
   # find sections (and townships) w/in buffer
+  which_pls <- df %>% dplyr::filter(long >= range$min_long &
+                                      long <= range$max_long &
+                                      lat >= range$min_lat &
+                                      lat <= range$max_lat)
+
   if (nrow(which_pls) == 0) {
 
     if ("section" %in% colnames(clean_pur_df)) {
